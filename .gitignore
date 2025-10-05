@@ -51,3 +51,5 @@ firebase.json
 !.env.example
 .trae/.ignore
 .kiro/settings/mcp.json
+apartgo.json
+WARP.md
