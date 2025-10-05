@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fault Reporting Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        line-height: 1.6;
+      }
+      .test-section {
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      .pass {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+      }
+      .fail {
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+      }
+      .info {
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+      }
+      .step {
+        margin: 10px 0;
+      }
+      .expected {
+        font-style: italic;
+        color: #666;
+      }
+      .actual {
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🧪 Fault Reporting Auto-Submission Test</h1>
+
+    <div class="test-section info">
+      <h2>📋 Test Checklist</h2>
+      <p>This test verifies the following requirements:</p>
+      <ul>
+        <li>✅ Report Fault button is disabled when location/description are empty</li>
+        <li>✅ Report Fault button is enabled when location and description are filled</li>
+        <li>✅ Auto-submission happens when file is uploaded (if form is ready)</li>
+        <li>✅ Fault data is saved to Firestore</li>
+        <li>✅ Form resets after successful submission</li>
+      </ul>
+    </div>
+
+    <div class="test-section">
+      <h2>🔍 Manual Testing Instructions</h2>
+      <div class="step">
+        <h3>Step 1: Navigate to Fault Reporting Page</h3>
+        <p class="expected">Expected: Page loads with form fields and upload area</p>
+        <p>
+          <a href="http://localhost:3002/fault-reporting" target="_blank"
+            >Open Fault Reporting Page</a
+          >
+        </p>
+      </div>
+
+      <div class="step">
+        <h3>Step 2: Check Initial Button State</h3>
+        <p class="expected">Expected: "Report Fault" button should be disabled (grayed out)</p>
+        <p>✅ Button should be disabled when location and description are empty</p>
+      </div>
+
+      <div class="step">
+        <h3>Step 3: Fill Location Field Only</h3>
+        <p class="expected">Expected: Button should still be disabled</p>
+        <p>Enter: "Unit 101 - Kitchen"</p>
+      </div>
+
+      <div class="step">
+        <h3>Step 4: Fill Description Field</h3>
+        <p class="expected">Expected: Button should become enabled (but still need file upload)</p>
+        <p>Enter: "Leaky faucet dripping constantly"</p>
+      </div>
+
+      <div class="step">
+        <h3>Step 5: Upload an Image</h3>
+        <p class="expected">Expected: File uploads and fault auto-submits immediately</p>
+        <p>Use any image file (JPG, PNG, etc.)</p>
+        <p>Look for success toast: "Your fault report has been submitted automatically."</p>
+      </div>
+
+      <div class="step">
+        <h3>Step 6: Verify Form Reset</h3>
+        <p class="expected">Expected: Location and description fields should be cleared</p>
+        <p>File upload area should be reset</p>
+      </div>
+
+      <div class="step">
+        <h3>Step 7: Check Database</h3>
+        <p class="expected">Expected: Fault should appear in Current Faults</p>
+        <p>
+          <a href="http://localhost:3002/current-faults" target="_blank">View Current Faults</a>
+        </p>
+        <p><a href="http://localhost:3002/api/debug/faults" target="_blank">Check Debug API</a></p>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2>🚨 Edge Case Testing</h2>
+      <div class="step">
+        <h3>Test A: Upload File Without Form Fields</h3>
+        <p class="expected">Expected: File uploads but no auto-submission occurs</p>
+        <p>Button should remain disabled until fields are filled</p>
+      </div>
+
+      <div class="step">
+        <h3>Test B: Fill Fields But Don't Upload File</h3>
+        <p class="expected">Expected: Button should be disabled until file is uploaded</p>
+        <p>Manual submission should show error: "Please upload at least one image"</p>
+      </div>
+
+      <div class="step">
+        <h3>Test C: Multiple File Uploads</h3>
+        <p class="expected">Expected: Only first file upload triggers auto-submission</p>
+        <p>Additional files should not trigger duplicate submissions</p>
+      </div>
+    </div>
+
+    <div class="test-section">
+      <h2>🔬 Browser Console Logs</h2>
+      <p>Open browser DevTools (F12) and check console for debugging output:</p>
+      <ul>
+        <li>📋 Form readiness check logs</li>
+        <li>🚀 Auto-submission logs</li>
+        <li>💾 Firestore operation logs</li>
+        <li>🖼️ File upload progress</li>
+      </ul>
+    </div>
+
+    <script>
+      // Add timestamp to help with testing
+      console.log('🧪 Test page loaded at:', new Date().toLocaleTimeString());
+      console.log('📍 Test URL: http://localhost:3002/fault-reporting');
+      console.log('🎯 Expected behavior: Auto-submission on file upload when form is ready');
+    </script>
+  </body>
+</html>

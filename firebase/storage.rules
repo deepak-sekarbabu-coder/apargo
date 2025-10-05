@@ -1,0 +1,22 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Enhanced storage system - supports organized uploads structure
+    match /uploads/{allPaths=**} {
+      allow read;
+      allow write: if request.auth != null;
+    }
+
+    // Legacy paths - kept for backwards compatibility
+    match /faults/{allPaths=**} {
+      allow read;
+      allow write: if request.auth != null;
+    }
+
+    // Allow authenticated users to upload and read payment receipts
+    match /receipts/{allPaths=**} {
+      allow read;
+      allow write: if request.auth != null;
+    }
+  }
+}

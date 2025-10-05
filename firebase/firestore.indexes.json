@@ -1,0 +1,152 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "fileMetadata",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "category", "order": "ASC" },
+        { "fieldPath": "uploadedAt", "order": "DESC" }
+      ]
+    },
+    {
+      "collectionGroup": "fileMetadata",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "uploadedBy", "order": "ASC" },
+        { "fieldPath": "uploadedAt", "order": "DESC" }
+      ]
+    },
+    {
+      "collectionGroup": "balanceSheets",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "apartmentId", "order": "ASC" },
+        { "fieldPath": "monthYear", "order": "ASC" }
+      ]
+    },
+    {
+      "collectionGroup": "payments",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "payerId", "order": "ASC" },
+        { "fieldPath": "monthYear", "order": "ASC" }
+      ]
+    },
+    {
+      "collectionGroup": "expenses",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "paidByApartment", "order": "ASC" },
+        { "fieldPath": "date", "order": "DESC" }
+      ]
+    },
+    {
+      "collectionGroup": "expenses",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "owedByApartments", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "date", "order": "DESC" }
+      ]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [{ "fieldPath": "apartment", "order": "ASC" }]
+    },
+    {
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [{ "fieldPath": "email", "order": "ASC" }]
+    },
+    {
+      "collectionGroup": "payments",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "apartmentId", "order": "ASC" },
+        { "fieldPath": "monthYear", "order": "ASC" }
+      ]
+    },
+    {
+      "collectionGroup": "payments",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "monthYear", "order": "ASC" },
+        { "fieldPath": "category", "order": "ASC" }
+      ]
+    },
+    {
+      "collectionGroup": "payments",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "monthYear", "order": "ASC" },
+        { "fieldPath": "category", "order": "ASC" },
+        { "fieldPath": "apartmentId", "order": "ASC" }
+      ]
+    },
+    {
+      "collectionGroup": "polls",
+      "queryScope": "COLLECTION",
+      "fields": [{ "fieldPath": "isActive", "order": "ASC" }]
+    },
+    {
+      "collectionGroup": "notifications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "isActive", "order": "ASC" },
+        { "fieldPath": "type", "order": "ASC" },
+        { "fieldPath": "createdAt", "order": "DESC" }
+      ]
+    },
+    {
+      "collectionGroup": "notifications",
+      "queryScope": "COLLECTION",
+      "fields": [{ "fieldPath": "toApartmentId", "arrayConfig": "CONTAINS" }]
+    },
+    {
+      "collectionGroup": "notifications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "toApartmentId", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "createdAt", "order": "DESC" }
+      ]
+    },
+    {
+      "collectionGroup": "notifications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "toApartmentId", "order": "ASC" },
+        { "fieldPath": "createdAt", "order": "DESC" }
+      ]
+    },
+    {
+      "collectionGroup": "maintenanceTasks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASC" },
+        { "fieldPath": "scheduledDate", "order": "DESC" }
+      ]
+    },
+    {
+      "collectionGroup": "maintenanceTasks",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "status", "order": "ASC" },
+        { "fieldPath": "scheduledDate", "order": "ASC" }
+      ]
+    },
+    {
+      "collectionGroup": "maintenanceTasks",
+      "queryScope": "COLLECTION",
+      "fields": [{ "fieldPath": "completedDate", "order": "DESC" }]
+    },
+    {
+      "collectionGroup": "vendors",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "isActive", "order": "ASC" },
+        { "fieldPath": "name", "order": "ASC" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

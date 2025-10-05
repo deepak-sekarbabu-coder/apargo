@@ -1,0 +1,11 @@
+# API routes - route to Netlify's Next.js handler (leave this in place)
+# NOTE: Removed the SPA catch-all (/* -> /index.html) because it intercepts
+# Next.js App Router API routes and causes HTML (index.html) to be returned
+# for API requests, producing 404/Invalid-JSON errors in the client.
+# NOTE: Do NOT add manual API route mappings here for App Router projects.
+# The @netlify/plugin-nextjs manages Next.js App Router API routes and server
+# functions automatically. Manually redirecting `/api/*` to
+# `/.netlify/functions/___netlify-handler` or adding a SPA catch-all can
+# intercept API requests and return the site HTML (index.html) instead of
+# the expected JSON responses. Keep this file empty unless you have static
+# redirects that explicitly do NOT target `/api/*` or `/_next/*`.

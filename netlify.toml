@@ -1,0 +1,82 @@
+[build]
+  command = "npm run netlify-build"
+  publish = ".next"
+
+# Build environment configuration
+[build.environment]
+  # Node.js configuration
+  NODE_VERSION = "20"
+  NPM_FLAGS = "--legacy-peer-deps"
+  
+  # Build optimization
+  NEXT_PHASE = "phase-production-build"
+  
+  # Reduce build size
+  GENERATE_SOURCEMAP = "false"
+  NEXT_TELEMETRY_DISABLED = "1"
+  
+  # Firebase environment variables (set these in Netlify UI)
+  # These are placeholders - actual values must be set in Netlify dashboard
+  # NEXT_PUBLIC_FIREBASE_API_KEY = "your-api-key-here"
+  # NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN = "your-project.firebaseapp.com"
+  # NEXT_PUBLIC_FIREBASE_PROJECT_ID = "your-project-id"
+  # NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET = "your-project.appspot.com"
+  # NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID = "your-sender-id"
+  # NEXT_PUBLIC_FIREBASE_APP_ID = "your-app-id"
+  # NEXT_PUBLIC_FIREBASE_VAPID_KEY = "your-vapid-key-here"
+  
+  # Security and scanning configuration
+  SECRETS_SCAN_OMIT_PATHS = ".env.example,.env.local,node_modules/**,docs/**,.firebaserc,firebase.json"
+  SECRETS_SCAN_OMIT_KEYS = "FIREBASE_PRIVATE_KEY,FIREBASE_SERVICE_ACCOUNT_JSON"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[functions]
+  directory = ".netlify/functions"
+  node_bundler = "esbuild"
+  # Optimize function size
+  included_files = ["!node_modules/**", "!.git/**", "!tests/**", "!docs/**"]
+  
+[functions.env]
+  # Prevent memory leaks in serverless functions
+  NODE_OPTIONS = "--max-old-space-size=1024"
+
+# API routes - Let @netlify/plugin-nextjs handle these automatically
+# Do not manually redirect API routes
+
+# NOTE: Removed previous catch-all redirect (/* -> /index.html) because it intercepted
+# Next.js API routes (e.g. /api/payment-events) on Netlify, returning the HTML
+# payload instead of JSON which surfaced as 404 errors in the payment status widget.
+# The @netlify/plugin-nextjs handles all page and dynamic route rewrites automatically.
+# If a SPA-style fallback is ever needed for a pure static export, reintroduce a
+# catch-all redirect but ensure it does NOT apply to /api/*, /_next/*, or /static/*.
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.gstatic.com https://accounts.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://*.firebaseapp.com https://*.googleapis.com https://*.google.com https://firestore.googleapis.com wss://*.firebaseio.com;"
+
+# API headers
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    Access-Control-Allow-Origin = "*"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization"
+
+# Cache static assets
+[[headers]]
+  for = "/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

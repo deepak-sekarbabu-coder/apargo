@@ -1,0 +1,513 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 96%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 202 70% 40%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 222.2 84% 20%; /* Updated for higher contrast */
+    --accent: 33 100% 64%;
+    --accent-foreground: 22.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 202 70% 55%;
+    --radius: 0.5rem;
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 222.2 84% 4.9%;
+    --sidebar-primary: 202 70% 40%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 210 40% 96.1%;
+    --sidebar-accent-foreground: 222.2 47.4% 11.2%;
+    --sidebar-border: 214.3 31.8% 91.4%;
+    --sidebar-ring: 202 70% 55%;
+  }
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 202 70% 60%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 210 40% 85%; /* Updated for higher contrast in dark mode */
+    --accent: 33 100% 64%;
+    --accent-foreground: 22.2 47.4% 11.2%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 202 70% 55%;
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+    --sidebar-background: 222.2 84% 4.9%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 202 70% 60%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 217.2 32.6% 17.5%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217.2 32.6% 17.5%;
+    --sidebar-ring: 202 70% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    /* Enable proper touch scrolling on mobile devices */
+    touch-action: pan-x pan-y;
+    -webkit-text-size-adjust: 100%;
+    -webkit-overflow-scrolling: touch;
+    /* Prevent horizontal scrolling issues */
+    overflow-x: hidden;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    /* Critical: Enable touch scrolling on mobile */
+    touch-action: pan-x pan-y;
+    /* iOS Safari optimizations */
+    -webkit-overflow-scrolling: touch;
+    /* Prevent bounce scrolling */
+    overscroll-behavior: contain;
+    /* Ensure body can scroll */
+    overflow-y: auto;
+    overflow-x: hidden;
+    /* Fix iOS viewport issues */
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* Mobile Receipt Modal Improvements */
+@layer utilities {
+  .receipt-modal-content {
+    /* Ensure content doesn't exceed viewport on mobile */
+    max-height: calc(100vh - 2rem);
+    max-height: calc(100dvh - 2rem);
+  }
+
+  .receipt-image-container {
+    /* Enable smooth touch interactions for images */
+    touch-action: pan-x pan-y pinch-zoom;
+    -webkit-overflow-scrolling: touch;
+    /* Center the content */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .receipt-image {
+    /* Improve image rendering on mobile */
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+    /* Allow user to zoom into receipt on mobile */
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  /* Mobile-specific dialog improvements */
+  @media (max-width: 640px) {
+    .mobile-dialog-content {
+      margin: 0.5rem;
+      max-height: calc(100vh - 1rem);
+      max-height: calc(100dvh - 1rem);
+      border-radius: 0.75rem;
+    }
+
+    .receipt-image-container {
+      /* On mobile, allow the image to take more space */
+      padding: 0.25rem;
+    }
+
+    .receipt-modal-header {
+      /* Compact header on mobile */
+      padding-bottom: 0.5rem;
+    }
+  }
+
+  /* Prevent text selection on touch devices during image interaction */
+  .receipt-image-container * {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    user-select: none;
+  }
+
+  /* Admin File Manager Mobile Optimizations */
+  .admin-mobile-file-card {
+    @apply shadow-sm border-muted/20 hover:shadow-md transition-shadow duration-200;
+  }
+
+  .admin-mobile-checkbox {
+    @apply w-5 h-5 min-w-[1.25rem] min-h-[1.25rem];
+    /* Larger touch target for mobile */
+    margin: 0.25rem;
+  }
+
+  .admin-mobile-input {
+    @apply min-h-[2.75rem] text-base; /* Prevent zoom on iOS */
+  }
+
+  .admin-mobile-select {
+    @apply min-h-[2.75rem] text-base; /* Prevent zoom on iOS */
+  }
+
+  .admin-mobile-action-button {
+    @apply min-h-[2.5rem] px-4 text-sm font-medium;
+    /* Comfortable touch targets for mobile */
+    min-width: 2.5rem;
+  }
+
+  .admin-stats-card {
+    @apply transition-shadow duration-200 hover:shadow-md;
+  }
+
+  .admin-filter-badge {
+    @apply text-xs px-2 py-1 cursor-pointer hover:bg-muted/80 transition-colors;
+  }
+
+  /* Mobile-specific admin layout improvements */
+  @media (max-width: 768px) {
+    .admin-mobile-file-card {
+      @apply rounded-lg;
+      /* More rounded corners on mobile for modern look */
+    }
+
+    .admin-mobile-action-button {
+      @apply text-xs px-3 py-2;
+      /* Slightly smaller on very small screens but still touch-friendly */
+    }
+
+    .admin-stats-card .text-2xl {
+      @apply text-xl;
+      /* Prevent overflow on very small screens */
+    }
+  }
+
+  /* Touch optimizations for admin interface */
+  @media (hover: none) and (pointer: coarse) {
+    .admin-mobile-checkbox:focus {
+      @apply ring-2 ring-primary ring-offset-2;
+    }
+
+    .admin-mobile-action-button:focus {
+      @apply ring-2 ring-primary ring-offset-2;
+    }
+
+    .admin-filter-badge:active {
+      @apply bg-muted;
+    }
+  }
+
+  /* Admin Tab Mobile Optimizations */
+  .admin-mobile-tab {
+    @apply flex flex-col md:flex-row items-center justify-center;
+    @apply px-2 py-2 md:px-4 md:py-2;
+    @apply text-xs md:text-sm;
+    @apply min-h-[3rem] md:min-h-[2.5rem];
+    /* Better spacing and touch targets on mobile */
+  }
+
+  /* Mobile tab spacing improvements */
+  @media (max-width: 768px) {
+    .admin-mobile-tab {
+      @apply gap-1;
+      /* Small gap between icon and text on mobile */
+    }
+
+    .admin-mobile-tab svg {
+      @apply w-5 h-5;
+      /* Slightly larger icons on mobile for better visibility */
+    }
+  }
+
+  /* Admin User Card Mobile Optimizations */
+  .admin-mobile-user-card {
+    @apply rounded-lg shadow-sm border-muted/20 hover:shadow-md transition-shadow duration-200;
+    @apply bg-card;
+  }
+
+  /* Improved mobile spacing for admin components */
+  @media (max-width: 768px) {
+    .admin-mobile-user-card {
+      @apply mx-1;
+      /* Slight margin for better visual separation */
+    }
+  }
+
+  /* Browser Extension Attribute Cleanup
+     These rules help prevent hydration mismatches caused by browser extensions
+     that inject attributes like bis_skin_checked into DOM elements */
+  [bis_skin_checked],
+  [data-new-gr-c-s-check-loaded],
+  [data-gr-ext-installed],
+  [data-new-gr-c-s-loaded],
+  [grammarly-extension],
+  [data-lt-installed] {
+    /* Reset any potential styling issues caused by extension attributes */
+    position: relative;
+  }
+
+  /* Ensure proper z-indexing even if extensions modify it */
+  [bis_skin_checked]:not([style*='z-index']) {
+    z-index: auto !important;
+  }
+
+  /* Additional hydration safety rules */
+  [bis_skin_checked='1'] {
+    /* Ensure consistent rendering regardless of extension attribute value */
+    display: revert !important;
+    visibility: visible !important;
+  }
+
+  /* Suppress extension attribute rendering until cleanup is complete */
+  html[data-hydration-root='true'] [bis_skin_checked] {
+    /* Apply subtle transition to avoid flash during cleanup */
+    transition: none !important;
+  }
+
+  /* Enhanced Mobile and Touch Optimizations */
+  /* Global mobile viewport and safe area support */
+  :root {
+    --safe-area-inset-top: env(safe-area-inset-top, 0px);
+    --safe-area-inset-right: env(safe-area-inset-right, 0px);
+    --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-area-inset-left: env(safe-area-inset-left, 0px);
+    --touch-target-size: 44px;
+    --touch-target-size-enhanced: 48px;
+  }
+
+  /* iOS Safari specific fixes */
+  @supports (-webkit-touch-callout: none) {
+    .ios-scroll-fix {
+      -webkit-overflow-scrolling: touch;
+      overflow: auto;
+    }
+
+    .ios-input-fix {
+      font-size: 16px !important;
+      transform: translateZ(0);
+    }
+  }
+
+  /* Enhanced touch interactions */
+  .touch-optimized {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .touch-target {
+    min-height: var(--touch-target-size);
+    min-width: var(--touch-target-size);
+    touch-action: manipulation;
+  }
+
+  .touch-target-enhanced {
+    min-height: var(--touch-target-size-enhanced);
+    min-width: var(--touch-target-size-enhanced);
+    touch-action: manipulation;
+  }
+
+  /* Focus management for accessibility */
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+  }
+
+  .focus-ring-inset {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset;
+  }
+
+  /* Skip links for keyboard navigation */
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50;
+    @apply bg-primary text-primary-foreground px-4 py-2 rounded-md font-medium;
+    @apply focus:ring-2 focus:ring-ring focus:ring-offset-2;
+  }
+
+  /* Enhanced scrollable areas */
+  .smooth-scroll {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    /* Enable touch scrolling */
+    touch-action: pan-y;
+  }
+
+  .scroll-touch {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    /* Enable vertical touch scrolling */
+    touch-action: pan-y;
+  }
+
+  /* Fix for scrollable containers */
+  .scrollable-container {
+    touch-action: pan-y;
+    -webkit-overflow-scrolling: touch;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  /* Mobile-optimized text selection */
+  .select-text {
+    user-select: text;
+    -webkit-user-select: text;
+  }
+
+  .select-none {
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  /* Mobile layout helpers */
+  .mobile-full-width {
+    width: calc(100vw - 2rem);
+    max-width: 100%;
+  }
+
+  .mobile-safe-area {
+    padding-top: var(--safe-area-inset-top);
+    padding-right: var(--safe-area-inset-right);
+    padding-bottom: var(--safe-area-inset-bottom);
+    padding-left: var(--safe-area-inset-left);
+  }
+
+  .mobile-safe-top {
+    padding-top: var(--safe-area-inset-top);
+  }
+
+  .mobile-safe-bottom {
+    padding-bottom: var(--safe-area-inset-bottom);
+  }
+
+  /* Performance optimizations */
+  .gpu-accelerated {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  .optimize-animation {
+    will-change: transform, opacity;
+    backface-visibility: hidden;
+  }
+
+  /* Touch device specific optimizations */
+  @media (hover: none) and (pointer: coarse) {
+    /* Enhanced button interactions */
+    .btn-touch {
+      @apply min-h-[44px] px-4 py-2 text-base touch-target;
+    }
+
+    .btn-touch:active {
+      transform: scale(0.98);
+      transition: transform 0.1s ease;
+    }
+
+    /* Enhanced form controls */
+    .form-control-touch {
+      @apply min-h-[44px] text-base px-3 py-2;
+      font-size: 16px; /* Prevent iOS zoom */
+    }
+
+    /* Enhanced interactive elements */
+    .interactive-touch {
+      @apply touch-target;
+    }
+
+    .interactive-touch:active {
+      @apply bg-muted/50;
+      transition: background-color 0.1s ease;
+    }
+  }
+
+  /* Landscape mobile optimizations */
+  @media (orientation: landscape) and (max-height: 500px) {
+    .landscape-compact {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+
+    .landscape-hide {
+      display: none;
+    }
+
+    .landscape-minimal {
+      min-height: 32px;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.875rem;
+    }
+  }
+
+  /* High contrast mode support */
+  @media (prefers-contrast: high) {
+    .high-contrast-border {
+      border-width: 2px;
+      border-color: currentColor;
+    }
+
+    .high-contrast-focus {
+      outline: 3px solid;
+      outline-offset: 2px;
+    }
+  }
+
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    .respect-motion-preference {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+
+    .smooth-scroll {
+      scroll-behavior: auto;
+    }
+  }
+
+  /* One-time subtle pulse animation for highlighting newly added items */
+  @keyframes pulse-once-highlight {
+    0% {
+      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
+      opacity: 0.5;
+    }
+    50% {
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+      opacity: 1;
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+      opacity: 1;
+    }
+  }
+  .animate-pulse-once {
+    animation: pulse-once-highlight 1.4s ease-out 1;
+  }
+}
