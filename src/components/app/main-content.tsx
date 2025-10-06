@@ -77,6 +77,7 @@ interface MainContentProps {
   onAddUser: (userData: Omit<User, 'id'>) => Promise<void>;
   onUpdateUserFromAdmin: (user: User) => Promise<void>;
   onDeleteUser: (userId: string) => Promise<void>;
+  onRejectUser: (userId: string) => Promise<void>;
   onAddCategory: (categoryData: Omit<Category, 'id'>) => Promise<void>;
   onUpdateCategory: (category: Category) => Promise<void>;
   onDeleteCategory: (categoryId: string) => Promise<void>;
@@ -118,6 +119,7 @@ export function MainContent({
   onAddUser,
   onUpdateUserFromAdmin,
   onDeleteUser,
+  onRejectUser,
   onAddCategory,
   onUpdateCategory,
   onDeleteCategory,
@@ -224,6 +226,7 @@ export function MainContent({
           onAddUser={onAddUser}
           onUpdateUser={onUpdateUserFromAdmin}
           onDeleteUser={onDeleteUser}
+          onRejectUser={onRejectUser}
           onAddCategory={onAddCategory}
           onUpdateCategory={onUpdateCategory}
           onDeleteCategory={onDeleteCategory}

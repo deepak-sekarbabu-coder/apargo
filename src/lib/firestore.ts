@@ -198,6 +198,17 @@ export const getUsers = async (apartment?: string): Promise<User[]> => {
   return userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as User);
 };
 
+export const getAllUsers = async (apartment?: string): Promise<User[]> => {
+  let usersQuery = query(collection(db, 'users'));
+  if (apartment) {
+    usersQuery = query(usersQuery, where('apartment', '==', apartment)); // Composite index: apartment
+  }
+  // Only fetch needed fields for user list
+  usersQuery = query(usersQuery); // Add .select() if using Firestore Lite
+  const userSnapshot = await getDocs(usersQuery);
+  return userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as User);
+};
+
 export const getUser = async (id: string): Promise<User | null> => {
   const userDoc = doc(db, 'users', id);
   const userSnapshot = await getDoc(userDoc);
@@ -249,6 +260,17 @@ export const deleteUser = async (id: string): Promise<void> => {
 
 export const subscribeToUsers = (callback: (users: User[]) => void, apartment?: string) => {
   let usersQuery = query(collection(db, 'users'), where('isApproved', '==', true));
+  if (apartment) {
+    usersQuery = query(usersQuery, where('apartment', '==', apartment));
+  }
+  return onSnapshot(usersQuery, (snapshot: QuerySnapshot<DocumentData>) => {
+    const users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as User);
+    callback(users);
+  });
+};
+
+export const subscribeToAllUsers = (callback: (users: User[]) => void, apartment?: string) => {
+  let usersQuery = query(collection(db, 'users'));
   if (apartment) {
     usersQuery = query(usersQuery, where('apartment', '==', apartment));
   }

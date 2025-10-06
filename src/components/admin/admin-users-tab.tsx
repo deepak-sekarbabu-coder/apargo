@@ -41,6 +41,7 @@ interface AdminUsersTabProps {
   onAddUser: (userData: Omit<User, 'id'>) => void;
   onUpdateUser: (user: User) => void;
   onDeleteUser: (userId: string) => void;
+  onRejectUser: (userId: string) => void;
 }
 
 export function AdminUsersTab({
@@ -48,6 +49,7 @@ export function AdminUsersTab({
   onAddUser,
   onUpdateUser,
   onDeleteUser,
+  onRejectUser,
 }: AdminUsersTabProps) {
   // Local search state - simplified like vendor filtering
   const [localUserSearch, setLocalUserSearch] = useState('');
@@ -182,14 +184,45 @@ export function AdminUsersTab({
                         Approved
                       </Badge>
                     ) : (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="admin-mobile-action-button text-blue-600 hover:text-blue-700 hover:bg-blue-50 text-xs px-3 py-2"
-                        onClick={() => onUpdateUser({ ...u, isApproved: true })}
-                      >
-                        Approve
-                      </Button>
+                      <>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="admin-mobile-action-button text-green-600 hover:text-green-700 hover:bg-green-50 text-xs px-3 py-2"
+                          onClick={() => onUpdateUser({ ...u, isApproved: true })}
+                        >
+                          Approve
+                        </Button>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="admin-mobile-action-button text-red-600 hover:text-red-700 hover:bg-red-50 text-xs px-3 py-2"
+                            >
+                              Reject
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Reject User Application?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                This action cannot be undone. This will permanently reject and remove{' '}
+                                <strong>{u.name || 'this user'}</strong>&apos;s application.
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancel</AlertDialogCancel>
+                              <AlertDialogAction
+                                onClick={() => onRejectUser(u.id)}
+                                className="bg-destructive hover:bg-destructive/90"
+                              >
+                                Reject Application
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </>
                     )}
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
@@ -294,14 +327,45 @@ export function AdminUsersTab({
                       {u.isApproved ? (
                         <Badge variant="default">Approved</Badge>
                       ) : (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                          onClick={() => onUpdateUser({ ...u, isApproved: true })}
-                        >
-                          Approve
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                            onClick={() => onUpdateUser({ ...u, isApproved: true })}
+                          >
+                            Approve
+                          </Button>
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                Reject
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Reject User Application?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  This action cannot be undone. This will permanently reject and remove{' '}
+                                  <strong>{u.name || 'this user'}</strong>&apos;s application.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction
+                                  onClick={() => onRejectUser(u.id)}
+                                  className="bg-destructive hover:bg-destructive/90"
+                                >
+                                  Reject Application
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
+                        </div>
                       )}
                     </TableCell>
                     <TableCell className="text-right">

@@ -2,10 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 
 import * as firestore from '@/lib/firestore';
 
-export function useUsers(apartment?: string) {
+export function useUsers(apartment?: string, includeAll?: boolean) {
   return useQuery({
-    queryKey: ['users', apartment],
-    queryFn: () => firestore.getUsers(apartment),
+    queryKey: ['users', apartment, includeAll],
+    queryFn: () => includeAll ? firestore.getAllUsers(apartment) : firestore.getUsers(apartment),
     staleTime: 1000 * 60 * 2,
   });
 }

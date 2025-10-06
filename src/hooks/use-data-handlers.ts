@@ -108,6 +108,27 @@ export function useDataHandlers({
     [user, setUsers, toast]
   );
 
+  const handleRejectUser = React.useCallback(
+    async (userId: string) => {
+      if (user?.id === userId) {
+        toast({
+          title: 'Action Prohibited',
+          description: 'You cannot reject your own account.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      await firestore.deleteUser(userId);
+      setUsers(prev => prev.filter(u => u.id !== userId));
+      toast({
+        title: 'User Rejected',
+        description: 'The user application has been rejected and removed.',
+        variant: 'destructive',
+      });
+    },
+    [user, setUsers, toast]
+  );
+
   const handleAddPoll = React.useCallback(
     async (data: { question: string; options: PollOption[]; expiresAt?: string }) => {
       await firestore.addPoll({
@@ -248,6 +269,7 @@ export function useDataHandlers({
     handleAddUser,
     handleUpdateUserFromAdmin,
     handleDeleteUser,
+    handleRejectUser,
     handleAddPoll,
     handleApprovePayment,
     handleRejectPayment,

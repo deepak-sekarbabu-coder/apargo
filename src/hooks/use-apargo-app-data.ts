@@ -47,7 +47,7 @@ export function useApargoAppData(initialCategories: Category[]) {
     });
 
     if (user?.role === 'admin' || !user?.apartment) {
-      unsubscribeUsers = firestore.subscribeToUsers(u => {
+      unsubscribeUsers = firestore.subscribeToAllUsers(u => {
         setUsers(u);
         queryClient.setQueryData(['users', undefined], u);
       });

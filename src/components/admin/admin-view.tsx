@@ -21,6 +21,7 @@ interface AdminViewProps {
   onAddUser: (userData: Omit<User, 'id'>) => void;
   onUpdateUser: (user: User) => void;
   onDeleteUser: (userId: string) => void;
+  onRejectUser: (userId: string) => void;
   onAddCategory: (categoryData: Omit<Category, 'id'>) => void;
   onUpdateCategory: (category: Category) => void;
   onDeleteCategory: (categoryId: string) => void;
@@ -40,6 +41,7 @@ export function AdminView({
   onAddUser,
   onUpdateUser,
   onDeleteUser,
+  onRejectUser,
   onAddCategory,
   onUpdateCategory,
   onDeleteCategory,
@@ -109,6 +111,7 @@ export function AdminView({
             onAddUser={onAddUser}
             onUpdateUser={onUpdateUser}
             onDeleteUser={onDeleteUser}
+            onRejectUser={onRejectUser}
           />
         </TabsContent>
 

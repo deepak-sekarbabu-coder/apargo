@@ -82,10 +82,12 @@ export function ApargoApp({ initialCategories }: ApargoAppProps) {
   // React Query client for cache management
   useQueryClient();
 
+  const role = user?.role || 'user';
+
   // Read core data through react-query hooks so we get caching/deduping and
   // immediate access to cached values populated by the subscription layer in
   // `useApargoAppData`.
-  const usersQuery = useUsers(user?.apartment);
+  const usersQuery = useUsers(user?.apartment, role === 'admin');
   const categoriesQuery = useCategories();
   const expensesQuery = useExpenses(user?.apartment);
   const apartmentsQuery = useRQApartments();
@@ -113,8 +115,6 @@ export function ApargoApp({ initialCategories }: ApargoAppProps) {
     paymentsQuery.isLoading ||
     balanceSheetsQuery.isLoading;
 
-  const role = user?.role || 'user';
-
   // Initialize handlers
   const {
     handleUpdateUser,
@@ -124,6 +124,7 @@ export function ApargoApp({ initialCategories }: ApargoAppProps) {
     handleAddUser,
     handleUpdateUserFromAdmin,
     handleDeleteUser,
+    handleRejectUser,
     handleAddPoll,
     handleApprovePayment,
     handleRejectPayment,
@@ -274,6 +275,7 @@ export function ApargoApp({ initialCategories }: ApargoAppProps) {
             onAddUser={handleAddUser}
             onUpdateUserFromAdmin={handleUpdateUserFromAdmin}
             onDeleteUser={handleDeleteUser}
+            onRejectUser={handleRejectUser}
             onAddCategory={handleAddCategory}
             onUpdateCategory={handleUpdateCategory}
             onDeleteCategory={handleDeleteCategory}
