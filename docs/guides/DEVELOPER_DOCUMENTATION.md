@@ -6,7 +6,7 @@ Welcome, developer! This guide provides a technical overview of the Apargo appli
 
 This project is a modern web application built with the following technologies:
 
-- **Framework**: Next.js 15.5.4 (App Router)
+- **Framework**: Next.js ^15.5.4 (App Router)
 - **Language**: TypeScript 5.x
 - **UI Library**: React 18
 - **Styling**: Tailwind CSS 3.4.1
@@ -149,8 +149,6 @@ The codebase is organized into the following key directories:
   - `testing/`: Testing documentation
 - `tests/`: Test files and utilities
 - `scripts/`: Database initialization scripts
-- `.netlify/`: Netlify functions and configuration
-- `.github/`: GitHub workflows and Copilot instructions
 
 ## 4. Key Concepts
 

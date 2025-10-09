@@ -10,7 +10,7 @@ Apargo is a modern web application designed for multi-apartment communities to m
 
 ### Technology Stack
 
-- **Frontend**: Next.js 15.3.3 with React 18.3.1 and TypeScript
+- **Frontend**: Next.js 15.5.4 with React 18.3.1 and TypeScript
 - **Backend**: Firebase (Firestore, Auth, Cloud Messaging)
 - **UI Framework**: ShadCN UI components built on Radix UI
 - **Styling**: Tailwind CSS with custom design system

@@ -42,9 +42,6 @@ NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 FIREBASE_ADMIN_PROJECT_ID=your_project_id
 FIREBASE_ADMIN_CLIENT_EMAIL=your_service_account_email
 FIREBASE_ADMIN_PRIVATE_KEY=your_private_key_with_newlines
-
-NEXTAUTH_SECRET=your_random_secret
-NEXTAUTH_URL=https://your-site-name.netlify.app
 ```
 
 ### 4. Deploy

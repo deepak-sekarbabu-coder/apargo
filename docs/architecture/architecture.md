@@ -8,7 +8,7 @@ Apargo is a modern web application designed to manage shared apartment expenses,
 
 ```mermaid
 graph TD
-    A[Frontend - Next.js 15.3.3 App Router] -->|API Calls| B(Backend - Firebase Services)
+    A[Frontend - Next.js 15.5.4 App Router] -->|API Calls| B(Backend - Firebase Services)
     A -->|Authentication| B
     A -->|Real-time Updates| B
     B -->|Push Notifications| A

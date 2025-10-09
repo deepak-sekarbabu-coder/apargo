@@ -569,7 +569,7 @@ const adminApp = initializeApp({
 
 ## Security Rules
 
-**Note**: Security rules file not included in codebase but should include:
+**Note**: The security rules are defined in `firebase/firestore.rules` and should include:
 
 1. **User Authentication**: All operations require authenticated users
 2. **Role-based Access**: Admin operations restricted to admin users

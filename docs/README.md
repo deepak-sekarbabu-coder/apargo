@@ -33,6 +33,8 @@ This `docs/` folder contains comprehensive project documentation for developers 
   - [`DEVELOPER_DOCUMENTATION.md`](guides/DEVELOPER_DOCUMENTATION.md) - Comprehensive developer setup and workflow
   - [`AUTHENTICATION_FLOW.md`](guides/AUTHENTICATION_FLOW.md) - Authentication system guide
   - [`ROLE_STRUCTURE.md`](guides/ROLE_STRUCTURE.md) - User roles and permissions
+  - [`CODING_STYLE_GUIDE.md`](guides/CODING_STYLE_GUIDE.md) - Coding style and conventions
+  - [`TESTING_STRATEGY.md`](guides/TESTING_STRATEGY.md) - Testing strategy
 
 - [`features/`](features/) - Feature specifications and behavioral documentation
   - [`EXPENSE_DIVISION_FEATURE.md`](features/EXPENSE_DIVISION_FEATURE.md) - Expense splitting logic
@@ -48,6 +50,7 @@ This `docs/` folder contains comprehensive project documentation for developers 
   - [`ENHANCED_STORAGE_SYSTEM.md`](features/ENHANCED_STORAGE_SYSTEM.md) - File upload and storage management
   - [`MOBILE_RESPONSIVENESS_UX.md`](features/MOBILE_RESPONSIVENESS_UX.md) - Mobile optimization and UX improvements
   - [`LEDGER_PAYMENTS_FILTERING.md`](features/LEDGER_PAYMENTS_FILTERING.md) - Ledger payments filtering
+  - [`SEARCH_FILTERING.md`](features/SEARCH_FILTERING.md) - Search and filtering
 
 ### Operations & Deployment
 

@@ -7,7 +7,7 @@ This document provides an overview of the React components in the Apargo applica
 Components are organized into the following directories within `src/components/`:
 
 -   **`ui/`**: 53 base UI components (ShadCN/Radix primitives)
--   **`admin/`**: Contains components, hooks, and utilities for the admin panel.
+-   **`admin/`**: 24 components, hooks, and utilities for the admin panel.
 -   **`analytics/`**: 1 analytics dashboard component
 -   **`community/`**: 6 components for community features
 -   **`dashboard/`**: 4 main dashboard components
@@ -16,11 +16,11 @@ Components are organized into the following directories within `src/components/`
 -   **`expenses/`**: 3 expense management components
 -   **`fault-reporting/`**: 5 components for fault reporting and management
 -   **`icons/`**: 2 icon utility components
--   **`layout/`**: 2 layout and navigation components
+-   **`layout/`**: 3 layout and navigation components
 -   **`ledger/`**: 2 payment ledger components
--   **`maintenance/`**: 8 maintenance management components
+-   **`maintenance/`**: 14 maintenance management components
 -   **`payment-events/`**: 2 payment events components
--   **Root level**: 6 core application components
+-   **Root level**: 14 core application components
 
 ---
 

@@ -33,11 +33,13 @@ Features:
 │   ├── context/       # React Contexts (e.g., AuthContext for global auth state)
 │   ├── hooks/         # Custom React hooks (e.g., use-toast, use-apartments)
 │   ├── lib/           # Firestore logic, type definitions, utilities, backend logic
+│   └── pages/         # Next.js Pages Router: API routes
 │
 ├── public/            # Static assets, favicon, service workers (FCM)
 ├── docs/              # User and developer documentation (see below)
-├── .netlify/          # Netlify functions and config
-├── .github/           # Copilot and workflow instructions
+├── firebase/          # Firebase configuration files
+├── scripts/           # Node.js scripts for various tasks
+├── tests/             # Jest test files
 ├── package.json       # Project dependencies and scripts
 ├── tailwind.config.ts # Tailwind CSS config
 ├── netlify.toml       # Netlify deployment config
@@ -51,7 +53,7 @@ Features:
 - `src/lib/expense-utils.ts`: Expense division and per-apartment payment tracking logic
 - `src/lib/storage-enhanced.ts`: Enhanced Firebase Storage service with validation and metadata
 - `src/components/outstanding-balance.tsx`: Outstanding balance display (dashboard)
-- `src/components/expense-item.tsx`: Expense display and payment status
+- `src/components/expenses/expense-item.tsx`: Expense display and payment status
 - `src/components/dialogs/`: Dialogs for add/edit flows (ShadCN UI)
 - `src/lib/push-notifications.ts` & `public/firebase-messaging-sw.js`: FCM push notification logic
 - `src/components/admin/`: Admin panel features (announcements, polls, file management, user management)
