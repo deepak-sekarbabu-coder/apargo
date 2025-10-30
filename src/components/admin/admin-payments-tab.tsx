@@ -42,108 +42,108 @@ export function AdminPaymentsTab({
         </div>
       </CardHeader>
       <CardContent className="px-4 pb-4 sm:px-6 md:px-6 md:pb-6">
-        {/* Mobile Card Layout for Pending Payments */}
+        {/* Mobile Card Layout for Pending Payments - Improved */}
         <div className="block md:hidden space-y-4">
-          {pendingPayments.map(payment => {
-            const payer = getUserById(payment.payerId);
-            return (
-              <Card key={payment.id} className="p-4 rounded-lg shadow-sm border border-gray-200">
-                <div className="space-y-4">
-                  {/* Header section with apartment and status */}
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <p className="font-semibold text-base">
-                        Apartment: {payer ? payer.apartment || 'N/A' : payment.payerId}
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        Payer:{' '}
-                        {payer ? payer.name || payer.apartment || payment.payerId : payment.payerId}
-                      </p>
-                    </div>
-                    <Badge variant="secondary" className="text-sm py-1 px-2">
-                      Pending
-                    </Badge>
-                  </div>
-
-                  {/* Payment details grid */}
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide">Type</p>
-                      <p className="font-medium">
-                        {payment.category
-                          ? payment.category === 'income'
-                            ? 'Income'
-                            : 'Expense'
-                          : '—'}
-                      </p>
-                    </div>
-
-                    <div className="space-y-1">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide">
-                        Amount
-                      </p>
-                      <p className="font-semibold text-lg">₹{payment.amount}</p>
-                    </div>
-
-                    <div className="space-y-1 col-span-2">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide">
-                        Reason
-                      </p>
-                      <p className="text-sm">{payment.reason || '—'}</p>
-                    </div>
-
-                    <div className="space-y-1 col-span-2">
-                      <p className="text-xs text-muted-foreground uppercase tracking-wide">
-                        Receipt
-                      </p>
-                      {payment.receiptURL ? (
-                        <a
-                          href={payment.receiptURL}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium"
-                          aria-label={`View receipt for payment ${payment.id}`}
-                        >
-                          <FileText className="h-4 w-4" />
-                          <span>View Receipt</span>
-                        </a>
-                      ) : (
-                        <span className="text-muted-foreground">No receipt</span>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Action buttons */}
-                  <div className="flex gap-3 pt-2">
-                    <Button
-                      size="sm"
-                      variant="default"
-                      className="flex-1 h-11 items-center justify-center"
-                      onClick={() => onApprovePayment && onApprovePayment(payment.id)}
-                      aria-label={`Approve payment ${payment.id}`}
-                    >
-                      <Check className="h-4 w-4 mr-2" />
-                      Approve
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      className="flex-1 h-11 items-center justify-center"
-                      onClick={() => onRejectPayment && onRejectPayment(payment.id)}
-                      aria-label={`Reject payment ${payment.id}`}
-                    >
-                      <X className="h-4 w-4 mr-2" />
-                      Reject
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
-          {pendingPayments.length === 0 && (
+          {pendingPayments.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground text-base">No pending payments to review.</p>
             </div>
+          ) : (
+            pendingPayments.map(payment => {
+              const payer = getUserById(payment.payerId);
+              return (
+                <Card key={payment.id} className="shadow-sm border-border/60">
+                  <div className="p-4 space-y-4">
+                    {/* Header section with apartment and status */}
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-1 min-w-0 flex-1">
+                        <p className="font-semibold text-base truncate">
+                          {payer ? payer.name || payer.apartment || payment.payerId : payment.payerId}
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          Apartment: {payer ? payer.apartment || 'N/A' : payment.payerId}
+                        </p>
+                      </div>
+                      <Badge variant="secondary" className="text-xs py-1 px-2 ml-2 flex-shrink-0">
+                        Pending
+                      </Badge>
+                    </div>
+
+                    {/* Payment details grid - Simplified */}
+                    <div className="grid grid-cols-1 gap-3">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide">Type</p>
+                          <p className="font-medium">
+                            {payment.category
+                              ? payment.category === 'income'
+                                ? 'Income'
+                                : 'Expense'
+                              : '—'}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                            Amount
+                          </p>
+                          <p className="font-bold text-lg">₹{payment.amount}</p>
+                        </div>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                          Reason
+                        </p>
+                        <p className="text-sm mt-1">{payment.reason || 'No reason provided'}</p>
+                      </div>
+
+                      <div>
+                        <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                          Receipt
+                        </p>
+                        {payment.receiptURL ? (
+                          <a
+                            href={payment.receiptURL}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium text-sm mt-1"
+                            aria-label={`View receipt for payment ${payment.id}`}
+                          >
+                            <FileText className="h-4 w-4" />
+                            <span>View Receipt</span>
+                          </a>
+                        ) : (
+                          <span className="text-muted-foreground text-sm mt-1">No receipt attached</span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Action buttons - Improved Touch Targets */}
+                    <div className="flex gap-3 pt-2 border-t border-border/60">
+                      <Button
+                        size="sm"
+                        className="flex-1 h-11 items-center justify-center bg-green-600 hover:bg-green-700 text-white font-medium"
+                        onClick={() => onApprovePayment && onApprovePayment(payment.id)}
+                        aria-label={`Approve payment ${payment.id}`}
+                      >
+                        <Check className="h-4 w-4 mr-2" />
+                        Approve
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        className="flex-1 h-11 items-center justify-center font-medium"
+                        onClick={() => onRejectPayment && onRejectPayment(payment.id)}
+                        aria-label={`Reject payment ${payment.id}`}
+                      >
+                        <X className="h-4 w-4 mr-2" />
+                        Reject
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              );
+            })
           )}
         </div>
 
