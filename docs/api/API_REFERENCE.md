@@ -270,3 +270,11 @@ Quick user data fixes (Admin only).
 Test Netlify deployment functionality.
 
 -   **Authentication:** None
+
+### Webhooks
+
+#### `POST /api/webhooks/payment-approved`
+
+Handle payment approval webhooks.
+
+-   **Authentication:** None (webhook)
