@@ -53,3 +53,8 @@ firebase.json
 .kiro/settings/mcp.json
 apartgo.json
 WARP.md
+.idea/.gitignore
+.idea/apargo.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
