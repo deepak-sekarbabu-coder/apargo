@@ -313,76 +313,122 @@ export function LedgerView({ payments, users }: LedgerViewProps) {
             </CardHeader>
             <CardContent>
               {/* Month and Type Filters */}
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
-                  <label htmlFor="payment-month" className="text-sm font-medium whitespace-nowrap">
-                    Filter by Month:
-                  </label>
-                  <Select value={filterMonth} onValueChange={setFilterMonth}>
-                    <SelectTrigger className="w-full sm:w-[180px]" id="payment-month">
-                      <SelectValue placeholder="Select month" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Months</SelectItem>
-                      {paymentMonths.map(month => (
-                        <SelectItem key={month} value={month}>
-                          {format(new Date(month + '-01'), 'MMMM yyyy')}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+              <div className="space-y-4 mb-6">
+                {/* Filter Controls */}
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                  {/* Month Filter */}
+                  <div className="space-y-2">
+                    <label htmlFor="payment-month" className="text-sm font-medium whitespace-nowrap">
+                      Filter by Month:
+                    </label>
+                    <Select value={filterMonth} onValueChange={setFilterMonth}>
+                      <SelectTrigger className="w-full" id="payment-month">
+                        <SelectValue placeholder="Select month" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Months</SelectItem>
+                        {paymentMonths.map(month => (
+                          <SelectItem key={month} value={month}>
+                            {format(new Date(month + '-01'), 'MMMM yyyy')}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
 
-                  <label htmlFor="payment-type" className="text-sm font-medium whitespace-nowrap">
-                    Payment Type:
-                  </label>
-                  <Select value={filterType} onValueChange={setFilterType}>
-                    <SelectTrigger className="w-full sm:w-[180px]" id="payment-type">
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Payments</SelectItem>
-                      <SelectItem value="regular">Regular Payments</SelectItem>
-                      <SelectItem value="payment-events">Payment Events</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  {/* Payment Type Filter */}
+                  <div className="space-y-2">
+                    <label htmlFor="payment-type" className="text-sm font-medium whitespace-nowrap">
+                      Payment Type:
+                    </label>
+                    <Select value={filterType} onValueChange={setFilterType}>
+                      <SelectTrigger className="w-full" id="payment-type">
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Payments</SelectItem>
+                        <SelectItem value="regular">Regular Payments</SelectItem>
+                        <SelectItem value="payment-events">Payment Events</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
 
+                  {/* Clear Filters Button */}
                   {(filterMonth !== 'all' || filterType !== 'all') && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={handleClearFilter}
-                      className="w-full sm:w-auto"
-                    >
-                      Clear Filters
-                    </Button>
+                    <div className="space-y-2 sm:col-span-2 lg:col-span-1">
+                      <label className="text-sm font-medium text-transparent">Clear</label>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={handleClearFilter}
+                        className="w-full touch-manipulation"
+                      >
+                        Clear Filters
+                      </Button>
+                    </div>
+                  )}
+
+                  {/* Responsive spacer */}
+                  {(filterMonth === 'all' && filterType === 'all') && (
+                    <div className="hidden lg:block"></div>
                   )}
                 </div>
 
-                {/* Payment Event Summary for current filter */}
+                {/* Payment Summary Cards */}
                 {filterType === 'payment-events' && (
-                  <div className="bg-blue-50 p-3 rounded-lg border">
-                    <p className="text-sm font-medium text-blue-900">Payment Events Summary</p>
-                    <p className="text-xs text-blue-700">
-                      {filteredPaymentsWithType.length} payment events
-                      {filterMonth !== 'all' &&
-                        ` for ${format(new Date(filterMonth + '-01'), 'MMMM yyyy')}`}
-                    </p>
-                    <p className="text-xs text-blue-700">
-                      Total: ₹{filteredPaymentsWithType.reduce((sum, p) => sum + p.amount, 0)}
-                    </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium text-blue-900">Payment Events</p>
+                        <div className="text-2xl font-bold text-blue-600">
+                          {filteredPaymentsWithType.length}
+                        </div>
+                      </div>
+                      <p className="text-xs text-blue-700 mt-1">
+                        {filterMonth !== 'all' &&
+                          `for ${format(new Date(filterMonth + '-01'), 'MMMM yyyy')}`}
+                      </p>
+                      <p className="text-sm font-medium text-blue-800 mt-2">
+                        Total: ₹{filteredPaymentsWithType.reduce((sum, p) => sum + p.amount, 0)}
+                      </p>
+                    </div>
                   </div>
                 )}
+                
                 {filterType === 'regular' && (
-                  <div className="bg-green-50 p-3 rounded-lg border">
-                    <p className="text-sm font-medium text-green-900">Regular Payments Summary</p>
-                    <p className="text-xs text-green-700">
-                      {filteredPaymentsWithType.length} regular payments
-                      {filterMonth !== 'all' &&
-                        ` for ${format(new Date(filterMonth + '-01'), 'MMMM yyyy')}`}
-                    </p>
-                    <p className="text-xs text-green-700">
-                      Total: ₹{filteredPaymentsWithType.reduce((sum, p) => sum + p.amount, 0)}
-                    </p>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium text-green-900">Regular Payments</p>
+                        <div className="text-2xl font-bold text-green-600">
+                          {filteredPaymentsWithType.length}
+                        </div>
+                      </div>
+                      <p className="text-xs text-green-700 mt-1">
+                        {filterMonth !== 'all' &&
+                          `for ${format(new Date(filterMonth + '-01'), 'MMMM yyyy')}`}
+                      </p>
+                      <p className="text-sm font-medium text-green-800 mt-2">
+                        Total: ₹{filteredPaymentsWithType.reduce((sum, p) => sum + p.amount, 0)}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* All payments summary */}
+                {filterType === 'all' && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="bg-gray-50 p-4 rounded-lg border">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm font-medium text-gray-900">Total Payments</p>
+                        <div className="text-2xl font-bold text-gray-600">
+                          {filteredPaymentsWithType.length}
+                        </div>
+                      </div>
+                      <p className="text-sm font-medium text-gray-800 mt-2">
+                        Amount: ₹{filteredPaymentsWithType.reduce((sum, p) => sum + p.amount, 0)}
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -422,50 +468,74 @@ export function LedgerView({ payments, users }: LedgerViewProps) {
               {/* Mobile Card Layout for Monthly Balance Sheets (aggregated) */}
               <div className="block lg:hidden space-y-4">
                 {aggregatedSheets.map(sheet => (
-                  <Card key={sheet.monthYear} className="p-4 rounded-lg shadow-sm">
-                    <div className="space-y-3">
+                  <Card key={sheet.monthYear} className="p-4 sm:p-6 rounded-lg shadow-sm border-border/60">
+                    <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-medium text-sm">{sheet.monthYear}</p>
+                          <h3 className="font-semibold text-base">{sheet.monthYear}</h3>
                         </div>
                         <Badge
                           variant={sheet.closing >= 0 ? 'default' : 'destructive'}
-                          className="text-xs"
+                          className="text-sm font-medium px-3 py-1"
                         >
-                          ₹{sheet.closing}
+                          {sheet.closing >= 0 ? '₹+' : '₹-'}
+                          {Math.abs(sheet.closing)}
                         </Badge>
                       </div>
 
-                      <div className="grid grid-cols-2 gap-3 text-sm">
-                        <div className="space-y-1">
-                          <span className="text-muted-foreground">Opening:</span>
-                          <p className="font-medium">₹{sheet.opening}</p>
+                      {/* Responsive Grid for Balance Details */}
+                      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 text-sm">
+                        <div className="space-y-2">
+                          <span className="text-muted-foreground text-xs uppercase tracking-wide">Opening</span>
+                          <p className="font-medium text-base">₹{sheet.opening}</p>
                         </div>
-                        <div className="space-y-1">
-                          <span className="text-muted-foreground">Income:</span>
-                          <p className="font-medium text-green-600">₹{sheet.income}</p>
+                        <div className="space-y-2">
+                          <span className="text-muted-foreground text-xs uppercase tracking-wide">Income</span>
+                          <p className="font-medium text-base text-green-600">₹{sheet.income}</p>
                         </div>
-                        <div className="space-y-1">
-                          <span className="text-muted-foreground">Expenses:</span>
-                          <p className="font-medium text-red-600">₹{sheet.expenses}</p>
+                        <div className="space-y-2">
+                          <span className="text-muted-foreground text-xs uppercase tracking-wide">Expenses</span>
+                          <p className="font-medium text-base text-red-600">₹{sheet.expenses}</p>
                         </div>
-                        <div className="space-y-1">
-                          <span className="text-muted-foreground">Net:</span>
-                          <p
-                            className={`font-medium ${sheet.closing >= 0 ? 'text-green-600' : 'text-red-600'}`}
-                          >
-                            {sheet.closing >= 0 ? '₹+' : '₹-'}
+                        <div className="space-y-2">
+                          <span className="text-muted-foreground text-xs uppercase tracking-wide">Net Change</span>
+                          <p className={`font-medium text-base ${sheet.closing >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                            {sheet.closing >= 0 ? '+₹' : '-₹'}
                             {Math.abs(sheet.closing)}
                           </p>
+                        </div>
+                      </div>
+
+                      {/* Progress Bar for Visual Representation */}
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-xs text-muted-foreground">
+                          <span>Financial Overview</span>
+                          <span>₹{sheet.income} - ₹{sheet.expenses} = ₹{sheet.closing}</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className={`h-2 rounded-full transition-all duration-300 ${
+                              sheet.closing >= 0 ? 'bg-green-500' : 'bg-red-500'
+                            }`}
+                            style={{
+                              width: `${Math.min(
+                                Math.abs(sheet.closing) / (Math.abs(sheet.income) + Math.abs(sheet.expenses) + Math.abs(sheet.closing) + 1) * 100,
+                                100
+                              )}%`,
+                            }}
+                          />
                         </div>
                       </div>
                     </div>
                   </Card>
                 ))}
                 {aggregatedSheets.length === 0 && (
-                  <p className="text-center text-muted-foreground py-8">
-                    No balance sheets available yet.
-                  </p>
+                  <div className="text-center py-12">
+                    <p className="text-muted-foreground">No balance sheets available yet.</p>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Balance sheets will appear once there are payments and expenses.
+                    </p>
+                  </div>
                 )}
               </div>
 
@@ -474,24 +544,24 @@ export function LedgerView({ payments, users }: LedgerViewProps) {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>Month</TableHead>
-                      <TableHead>Opening</TableHead>
-                      <TableHead>Income</TableHead>
-                      <TableHead>Expenses</TableHead>
-                      <TableHead>Closing</TableHead>
+                      <TableHead className="font-semibold">Month</TableHead>
+                      <TableHead className="font-semibold">Opening</TableHead>
+                      <TableHead className="font-semibold">Income</TableHead>
+                      <TableHead className="font-semibold">Expenses</TableHead>
+                      <TableHead className="font-semibold">Closing</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {aggregatedSheets.map(sheet => (
-                      <TableRow key={sheet.monthYear}>
+                      <TableRow key={sheet.monthYear} className="hover:bg-muted/50">
                         <TableCell className="font-medium">{sheet.monthYear}</TableCell>
                         <TableCell>₹{sheet.opening}</TableCell>
-                        <TableCell className="text-green-600">₹{sheet.income}</TableCell>
-                        <TableCell className="text-red-600">₹{sheet.expenses}</TableCell>
+                        <TableCell className="text-green-600 font-medium">₹{sheet.income}</TableCell>
+                        <TableCell className="text-red-600 font-medium">₹{sheet.expenses}</TableCell>
                         <TableCell>
                           <Badge
                             variant={sheet.closing >= 0 ? 'default' : 'destructive'}
-                            className="font-medium"
+                            className="font-medium px-3 py-1"
                           >
                             {sheet.closing >= 0 ? '₹+' : '₹-'}
                             {Math.abs(sheet.closing)}
@@ -501,13 +571,40 @@ export function LedgerView({ payments, users }: LedgerViewProps) {
                     ))}
                     {aggregatedSheets.length === 0 && (
                       <TableRow>
-                        <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
-                          No balance sheets available yet.
+                        <TableCell colSpan={5} className="text-center text-muted-foreground py-12">
+                          <div className="space-y-2">
+                            <p>No balance sheets available yet.</p>
+                            <p className="text-sm">
+                              Balance sheets will appear once there are payments and expenses.
+                            </p>
+                          </div>
                         </TableCell>
                       </TableRow>
                     )}
                   </TableBody>
                 </Table>
+
+                {/* Desktop Summary Stats */}
+                {aggregatedSheets.length > 0 && (
+                  <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 p-4 bg-muted/50 rounded-lg">
+                    <div className="text-center">
+                      <p className="text-sm text-muted-foreground">Total Months</p>
+                      <p className="text-2xl font-bold">{aggregatedSheets.length}</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm text-muted-foreground">Total Income</p>
+                      <p className="text-2xl font-bold text-green-600">
+                        ₹{aggregatedSheets.reduce((sum, sheet) => sum + sheet.income, 0)}
+                      </p>
+                    </div>
+                    <div className="text-center">
+                      <p className="text-sm text-muted-foreground">Total Expenses</p>
+                      <p className="text-2xl font-bold text-red-600">
+                        ₹{aggregatedSheets.reduce((sum, sheet) => sum + sheet.expenses, 0)}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

@@ -26,6 +26,7 @@ import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
   DropdownMenuContent,
+  DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
@@ -136,21 +137,25 @@ const PaymentCard = React.memo(({
   }
 
   return (
-        <Card className="p-4 rounded-lg shadow-sm" data-testid="payment-card">
-      <div className="space-y-3">
+    <Card className="p-3 sm:p-4 rounded-lg shadow-sm border-border/60" data-testid="payment-card">
+      <div className="space-y-3 sm:space-y-4">
         {/* Header: Apartment / Owner (if visible) & Amount / Status */}
         {(showApartment || showOwner || showAmount || showStatus) && (
-          <div className="flex items-start justify-between gap-4">
-            <div className="text-sm space-y-0.5">
-              {showApartment && <p className="font-medium">{payer?.apartment || '-'}</p>}
+          <div className="flex items-start justify-between gap-3 sm:gap-4">
+            <div className="text-sm space-y-1 min-w-0 flex-1">
+              {showApartment && (
+                <p className="font-medium text-base truncate">{payer?.apartment || '-'}</p>
+              )}
               {showOwner && (
-                <p className="text-xs text-muted-foreground">
+                <p className="text-xs text-muted-foreground truncate">
                   {payer?.name || payment.payerId}
                 </p>
               )}
             </div>
-            <div className="text-right space-y-1">
-              {showAmount && <p className="font-medium text-base">{amountFormatted}</p>}
+            <div className="text-right space-y-1 flex-shrink-0">
+              {showAmount && (
+                <p className="font-medium text-sm sm:text-base">{amountFormatted}</p>
+              )}
               {showStatus && (
                 <Badge
                   variant={
@@ -160,7 +165,7 @@ const PaymentCard = React.memo(({
                         ? 'destructive'
                         : 'secondary'
                   }
-                  className="capitalize text-xs"
+                  className="capitalize text-xs px-2 py-1"
                 >
                   {payment.status}
                 </Badge>
@@ -170,61 +175,64 @@ const PaymentCard = React.memo(({
         )}
 
         {/* Details grid for remaining visible fields */}
-        <div className="grid grid-cols-2 gap-3 text-sm">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
           {showCategory && (
             <div className="space-y-1">
-              <span className="text-muted-foreground">Category:</span>
-              <p className="font-medium capitalize">{category}</p>
+              <span className="text-muted-foreground text-xs">Category:</span>
+              <p className="font-medium capitalize truncate">{category}</p>
             </div>
           )}
           {showMonth && (
             <div className="space-y-1">
-              <span className="text-muted-foreground">Month:</span>
-              <p className="font-medium">{payment.monthYear}</p>
+              <span className="text-muted-foreground text-xs">Month:</span>
+              <p className="font-medium truncate">{payment.monthYear}</p>
             </div>
           )}
           {showReason && payment.reason && (
-            <div className="space-y-1 col-span-2">
-              <span className="text-muted-foreground">Reason:</span>
-              <p className="font-medium text-sm">{payment.reason}</p>
+            <div className="space-y-1 sm:col-span-2">
+              <span className="text-muted-foreground text-xs">Reason:</span>
+              <p className="font-medium text-sm break-words">{payment.reason}</p>
             </div>
           )}
           {showReceipt && (
-            <div className="space-y-1 col-span-2 flex items-center gap-2">
-              <span className="text-muted-foreground">Receipt:</span>
-              {payment.receiptURL ? (
-                <a
-                  href={payment.receiptURL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="View receipt"
-                  className="inline-flex items-center justify-center rounded hover:bg-muted p-1"
-                >
-                  <Eye className="h-4 w-4 text-blue-600" />
-                </a>
-              ) : (
-                <p className="text-xs text-muted-foreground">-</p>
-              )}
+            <div className="space-y-1 sm:col-span-2">
+              <span className="text-muted-foreground text-xs">Receipt:</span>
+              <div className="flex items-center gap-2">
+                {payment.receiptURL ? (
+                  <a
+                    href={payment.receiptURL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="View receipt"
+                    className="inline-flex items-center justify-center rounded hover:bg-muted p-2 touch-manipulation"
+                  >
+                    <Eye className="h-4 w-4 text-blue-600" />
+                    <span className="sr-only">View receipt</span>
+                  </a>
+                ) : (
+                  <p className="text-xs text-muted-foreground">No receipt</p>
+                )}
+              </div>
             </div>
           )}
           {showApprovedBy && approvedByDisplay && (
-            <div className="space-y-1 col-span-2">
-              <span className="text-muted-foreground">Approved By:</span>
-              <p className="font-medium text-sm">{approvedByDisplay}</p>
+            <div className="space-y-1 sm:col-span-2">
+              <span className="text-muted-foreground text-xs">Approved By:</span>
+              <p className="font-medium text-sm truncate">{approvedByDisplay}</p>
             </div>
           )}
         </div>
 
         {/* Actions (if column toggled on) */}
         {showActions && (
-          <div className="flex gap-2 justify-end pt-2 border-t">
+          <div className="pt-3 border-t border-border/60">
             {payment.status === 'pending' ? (
-              <>
+              <div className="grid grid-cols-2 gap-2">
                 <Button
                   size="sm"
                   variant="default"
                   onClick={() => onApprovePayment(payment.id)}
-                  className="flex-1"
+                  className="touch-manipulation h-11"
                 >
                   <Check className="h-4 w-4 mr-1" />
                   Approve
@@ -233,26 +241,29 @@ const PaymentCard = React.memo(({
                   size="sm"
                   variant="destructive"
                   onClick={() => onRejectPayment(payment.id)}
-                  className="flex-1"
+                  className="touch-manipulation h-11"
                 >
                   <X className="h-4 w-4 mr-1" />
                   Reject
                 </Button>
-              </>
+              </div>
             ) : (
-              <span className="text-sm text-muted-foreground flex-1 text-center">
-                {payment.status === 'approved' ? 'Approved' : 'Rejected'}
-              </span>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-muted-foreground">
+                  {payment.status === 'approved' ? 'Approved' : 'Rejected'}
+                </span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-red-500 text-red-600 hover:bg-red-50 touch-manipulation h-10 px-3"
+                  onClick={() => setDeleteId(payment.id)}
+                  disabled={isDeleting}
+                  aria-label="Delete payment"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
             )}
-            <Button
-              size="sm"
-              variant="outline"
-              className="border-red-500 text-red-600 hover:bg-red-50"
-              onClick={() => setDeleteId(payment.id)}
-              disabled={isDeleting}
-            >
-              <Trash2 className="h-4 w-4" />
-            </Button>
           </div>
         )}
       </div>
@@ -639,90 +650,124 @@ export function PaymentsTable({
 
   return (
     <div className="w-full">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-4">
-        <div className="flex flex-col gap-2 sm:flex-row sm:flex-1 sm:items-center sm:space-x-2">
-          <Input
-            placeholder="Filter by apartment..."
-            value={(table.getColumn('apartment')?.getFilterValue() as string) ?? ''}
-            onChange={event => table.getColumn('apartment')?.setFilterValue(event.target.value)}
-            className="max-w-sm"
-          />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-full sm:w-auto sm:ml-2">
-                Owner
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuRadioGroup
-                value={(table.getColumn('owner')?.getFilterValue() as string) ?? ''}
-                onValueChange={value =>
-                  table.getColumn('owner')?.setFilterValue(value === 'all' ? null : value)
-                }
-              >
-                <DropdownMenuRadioItem value="all">All</DropdownMenuRadioItem>
-                {Array.from(new Set(payments.map(p => getUserName(p.payerId)))).map(owner => (
-                  <DropdownMenuRadioItem key={owner} value={owner}>
-                    {owner}
-                  </DropdownMenuRadioItem>
-                ))}
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-full sm:w-auto sm:ml-auto">
-                Columns
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              {table
-                .getAllColumns()
-                .filter(column => column.getCanHide())
-                .map(column => {
-                  return (
-                    <DropdownMenuCheckboxItem
-                      key={column.id}
-                      className="capitalize"
-                      checked={column.getIsVisible()}
-                      onCheckedChange={value => column.toggleVisibility(!!value)}
-                    >
-                      {column.id}
-                    </DropdownMenuCheckboxItem>
-                  );
-                })}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="w-full sm:w-auto sm:ml-2">
-                Status
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuRadioGroup
-                value={(table.getColumn('status')?.getFilterValue() as string) ?? ''}
-                onValueChange={value =>
-                  table.getColumn('status')?.setFilterValue(value === 'all' ? null : value)
-                }
-              >
-                <DropdownMenuRadioItem value="all">All</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="approved">Approved</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="rejected">Rejected</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="paid">Paid</DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </DropdownMenuContent>
-          </DropdownMenu>
+      {/* Table Controls */}
+      <div className="space-y-4 mb-6">
+        {/* Search and Primary Filters */}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="space-y-2">
+            <label htmlFor="apartment-filter" className="text-sm font-medium">
+              Search
+            </label>
+            <Input
+              id="apartment-filter"
+              placeholder="Filter by apartment..."
+              value={(table.getColumn('apartment')?.getFilterValue() as string) ?? ''}
+              onChange={event => table.getColumn('apartment')?.setFilterValue(event.target.value)}
+              className="w-full touch-manipulation"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Owner</label>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full justify-between touch-manipulation h-10">
+                  {(table.getColumn('owner')?.getFilterValue() as string) || 'All Owners'}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuRadioGroup
+                  value={(table.getColumn('owner')?.getFilterValue() as string) ?? ''}
+                  onValueChange={value =>
+                    table.getColumn('owner')?.setFilterValue(value === 'all' ? null : value)
+                  }
+                >
+                  <DropdownMenuRadioItem value="all">All Owners</DropdownMenuRadioItem>
+                  {Array.from(new Set(payments.map(p => getUserName(p.payerId)))).map(owner => (
+                    <DropdownMenuRadioItem key={owner} value={owner}>
+                      {owner}
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Status</label>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full justify-between touch-manipulation h-10">
+                  {(table.getColumn('status')?.getFilterValue() as string) || 'All Statuses'}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuRadioGroup
+                  value={(table.getColumn('status')?.getFilterValue() as string) ?? ''}
+                  onValueChange={value =>
+                    table.getColumn('status')?.setFilterValue(value === 'all' ? null : value)
+                  }
+                >
+                  <DropdownMenuRadioItem value="all">All Statuses</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="approved">Approved</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="rejected">Rejected</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="paid">Paid</DropdownMenuRadioItem>
+                  <DropdownMenuRadioItem value="pending">Pending</DropdownMenuRadioItem>
+                </DropdownMenuRadioGroup>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <AddPaymentDialog users={users} onAddPayment={onAddPayment}>
-            <Button className="w-full sm:w-auto">
-              <PlusCircle className="mr-2 h-4 w-4" /> Add Payment
+
+        {/* Column Visibility and Actions */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="touch-manipulation h-10 px-4">
+                  <span className="sr-only sm:not-sr-only sm:mr-2">Columns</span>
+                  <Eye className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-56">
+                <DropdownMenuLabel>Show/Hide Columns</DropdownMenuLabel>
+                {table
+                  .getAllColumns()
+                  .filter(column => column.getCanHide())
+                  .map(column => {
+                    return (
+                      <DropdownMenuCheckboxItem
+                        key={column.id}
+                        className="capitalize"
+                        checked={column.getIsVisible()}
+                        onCheckedChange={value => column.toggleVisibility(!!value)}
+                      >
+                        {column.id}
+                      </DropdownMenuCheckboxItem>
+                    );
+                  })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <AddPaymentDialog users={users} onAddPayment={onAddPayment}>
+              <Button className="touch-manipulation h-10 w-full sm:w-auto">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                <span className="sr-only sm:not-sr-only">Add Payment</span>
+                <span className="sm:hidden ml-2">Add</span>
+              </Button>
+            </AddPaymentDialog>
+            <Button
+              onClick={handleExportPaymentsPDF}
+              variant="outline"
+              className="touch-manipulation h-10 w-full sm:w-auto"
+            >
+              <Download className="mr-2 h-4 w-4" />
+              <span className="sr-only sm:not-sr-only">Export PDF</span>
+              <span className="sm:hidden ml-2">Export</span>
             </Button>
-          </AddPaymentDialog>
-          <Button onClick={handleExportPaymentsPDF} variant="outline" className="w-full sm:w-auto">
-            <Download className="mr-2 h-4 w-4" /> Export PDF
-          </Button>
+          </div>
         </div>
       </div>
 
@@ -784,49 +829,73 @@ export function PaymentsTable({
           </Table>
         </div>
       )}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between py-4">
+      {/* Pagination and Results Info */}
+      <div className="space-y-4">
         <div className="text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} of{' '}
-          {table.getFilteredRowModel().rows.length} row(s) selected.
+          Showing {table.getRowModel().rows.length} of {payments.length} payments
+          {table.getFilteredRowModel().rows.length !== payments.length && (
+            <span className="ml-2">
+              (filtered from {payments.length} total)
+            </span>
+          )}
         </div>
-        <div className="flex gap-2 justify-center sm:justify-end">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-            className="flex-1 sm:flex-none"
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-            className="flex-1 sm:flex-none"
-          >
-            Next
-          </Button>
+        
+        {/* Mobile-Optimized Pagination */}
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center justify-between sm:justify-start sm:gap-4">
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground hidden sm:inline">Page</span>
+              <span className="text-sm font-medium">
+                {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+              </span>
+            </div>
+          </div>
+          
+          <div className="flex gap-2 justify-center">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+              className="touch-manipulation flex-1 sm:flex-none h-10 px-4"
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+              className="touch-manipulation flex-1 sm:flex-none h-10 px-4"
+            >
+              Next
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* Delete confirmation dialog */}
+      {/* Delete confirmation dialog - Enhanced Mobile */}
       {deleteId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm mx-4">
-            <h2 className="text-lg font-semibold mb-2">Delete Payment</h2>
-            <p className="mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm mx-auto">
+            <h2 className="text-lg font-semibold mb-3">Delete Payment</h2>
+            <p className="mb-6 text-sm text-muted-foreground">
               Are you sure you want to delete this payment? This action cannot be undone.
             </p>
-            <div className="flex gap-2 justify-end">
-              <Button variant="outline" onClick={() => setDeleteId(null)} disabled={isDeleting}>
+            <div className="flex gap-3 justify-end">
+              <Button
+                variant="outline"
+                onClick={() => setDeleteId(null)}
+                disabled={isDeleting}
+                className="touch-manipulation h-11 px-6 flex-1 sm:flex-none"
+              >
                 Cancel
               </Button>
               <Button
                 variant="destructive"
                 onClick={() => handleDeletePayment(deleteId)}
                 disabled={isDeleting}
+                className="touch-manipulation h-11 px-6 flex-1 sm:flex-none"
               >
                 {isDeleting ? 'Deleting...' : 'Delete'}
               </Button>
