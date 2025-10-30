@@ -92,11 +92,12 @@ export function PageHeader(props: PageHeaderProps) {
             isLoadingApartments={isLoadingApartments}
           >
             <Button
-              className="bg-accent hover:bg-accent/90 h-8 sm:h-9 px-2 sm:px-3"
+              className="bg-accent hover:bg-accent/90 h-10 w-10 sm:h-8 sm:w-auto sm:px-3 rounded-full sm:rounded-md touch-manipulation"
               disabled={isLoadingApartments}
+              aria-label="Add Expense"
             >
-              <PlusCircle className="h-4 w-4 sm:mr-2" />
-              <span className="hidden sm:inline ml-1">Add Expense</span>
+              <PlusCircle className="h-5 w-5 sm:mr-2" />
+              <span className="hidden sm:inline ml-1 text-sm font-medium">Add Expense</span>
             </Button>
           </AddExpenseDialog>
         )}
@@ -106,11 +107,12 @@ export function PageHeader(props: PageHeaderProps) {
             onAddPayment={onAddPayment}
           >
             <Button
-              className="bg-primary hover:bg-primary/90 h-8 sm:h-9 px-2 sm:px-3"
+              className="bg-primary hover:bg-primary/90 h-10 w-10 sm:h-8 sm:w-auto sm:px-3 rounded-full sm:rounded-md touch-manipulation"
               disabled={isLoadingApartments}
+              aria-label="Add Payment"
             >
-              <PlusCircle className="h-4 w-4 sm:mr-2" />
-              <span className="hidden sm:inline ml-1">Add Ledger Entry</span>
+              <PlusCircle className="h-5 w-5 sm:mr-2" />
+              <span className="hidden sm:inline ml-1 text-sm font-medium">Add Payment</span>
             </Button>
           </AddPaymentDialog>
         )}

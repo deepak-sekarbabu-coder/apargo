@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
+import { Bell, TrendingDown, TrendingUp, Wallet, Plus, CreditCard } from 'lucide-react';
 
 import * as React from 'react';
 
@@ -11,6 +11,8 @@ import { FeatureGrid } from '@/components/dashboard/feature-grid';
 import { MaintenancePaymentStatus } from '@/components/dashboard/maintenance-payment-status';
 import type { ExpensesListProps } from '@/components/expenses/expenses-list';
 import { OutstandingBalance } from '@/components/outstanding-balance';
+import { AddExpenseDialog } from '@/components/dialogs/add-expense-dialog';
+import { AddPaymentDialog } from '@/components/dialogs/add-payment-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -34,10 +36,21 @@ interface DashboardViewProps {
   >;
   onExpenseUpdate: (expense: Expense) => void;
   onExpenseDelete?: (expenseId: string) => void;
+  onAddExpense: (expenseData: Omit<Expense, 'id' | 'date'>) => Promise<void>;
+  onAddPayment: (data: {
+    payeeId: string;
+    amount: number;
+    receiptFile?: File;
+    expenseId?: string;
+    monthYear: string;
+    category?: 'income' | 'expense';
+    reason?: string;
+  }) => Promise<void>;
   ExpensesList: React.ComponentType<ExpensesListProps>;
   apartmentsCount?: number;
   unpaidBillsCount?: number;
   onNavigateToExpenses?: () => void;
+  isLoadingApartments?: boolean;
   // Payment status widget removed
 }
 
@@ -52,16 +65,20 @@ export function DashboardView({
   apartmentBalances,
   onExpenseUpdate,
   onExpenseDelete,
+  onAddExpense,
+  onAddPayment,
   ExpensesList,
   apartmentsCount = 0,
   unpaidBillsCount = 0,
   onNavigateToExpenses,
+  isLoadingApartments = false,
 }: DashboardViewProps) {
   const currentApartmentBalance = currentUserApartment
     ? apartmentBalances[currentUserApartment]
     : null;
 
   const loggedInUserBalance = currentApartmentBalance ? currentApartmentBalance.balance : 0;
+  const [showMobileActions, setShowMobileActions] = React.useState(false);
 
   return (
     <div className="grid gap-6" suppressHydrationWarning>
@@ -288,6 +305,43 @@ export function DashboardView({
           </CardContent>
         </Card>
       </div>
+
+      {/* Mobile Floating Action Buttons */}
+      {user && (
+        <div className="fixed bottom-4 right-4 z-50 sm:hidden">
+          <div className="flex flex-col gap-3">
+            {/* Quick Add Expense Button */}
+            <AddExpenseDialog
+              categories={categories}
+              onAddExpense={onAddExpense}
+              currentUser={user}
+              isLoadingApartments={isLoadingApartments}
+            >
+              <Button
+                className="w-14 h-14 rounded-full bg-accent hover:bg-accent/90 shadow-lg active:shadow-md transition-all duration-200 active:scale-95"
+                disabled={isLoadingApartments}
+                aria-label="Quick Add Expense"
+              >
+                <Plus className="h-6 w-6" />
+              </Button>
+            </AddExpenseDialog>
+
+            {/* Quick Add Payment Button */}
+            <AddPaymentDialog
+              users={users}
+              onAddPayment={onAddPayment}
+            >
+              <Button
+                className="w-14 h-14 rounded-full bg-primary hover:bg-primary/90 shadow-lg active:shadow-md transition-all duration-200 active:scale-95"
+                disabled={isLoadingApartments}
+                aria-label="Quick Add Payment"
+              >
+                <CreditCard className="h-6 w-6" />
+              </Button>
+            </AddPaymentDialog>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

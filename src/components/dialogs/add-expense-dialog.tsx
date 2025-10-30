@@ -188,23 +188,27 @@ export function AddExpenseDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Add New Expense</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="w-[95vw] max-w-[425px] max-h-[90vh] overflow-y-auto mx-auto p-4 sm:p-6">
+        <DialogHeader className="space-y-3 pb-4">
+          <DialogTitle className="text-lg sm:text-xl font-semibold">Add New Expense</DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
             Add a new shared expense. It will be automatically split among all apartment members.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
+                <FormItem className="space-y-2">
+                  <FormLabel className="text-sm font-medium">Description</FormLabel>
                   <FormControl>
-                    <Input placeholder="e.g., Monthly electricity bill" {...field} />
+                    <Input
+                      placeholder="e.g., Monthly electricity bill"
+                      {...field}
+                      className="h-12 text-base touch-manipulation"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -214,10 +218,16 @@ export function AddExpenseDialog({
               control={form.control}
               name="amount"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Amount</FormLabel>
+                <FormItem className="space-y-2">
+                  <FormLabel className="text-sm font-medium">Amount</FormLabel>
                   <FormControl>
-                    <Input type="number" step="0.01" placeholder="120.50" {...field} />
+                    <Input
+                      type="number"
+                      step="0.01"
+                      placeholder="120.50"
+                      {...field}
+                      className="h-12 text-base touch-manipulation"
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -227,17 +237,17 @@ export function AddExpenseDialog({
               control={form.control}
               name="categoryId"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Category</FormLabel>
+                <FormItem className="space-y-2">
+                  <FormLabel className="text-sm font-medium">Category</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="h-12 text-base touch-manipulation">
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
                       {categories.map(category => (
-                        <SelectItem key={category.id} value={category.id}>
+                        <SelectItem key={category.id} value={category.id} className="py-3">
                           {category.name}
                         </SelectItem>
                       ))}
@@ -251,58 +261,75 @@ export function AddExpenseDialog({
               control={form.control}
               name="paid"
               render={({ field }) => (
-                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-lg border p-4 touch-manipulation">
                   <FormControl>
-                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                      className="h-5 w-5 mt-1"
+                    />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel>Mark as Paid</FormLabel>
+                    <FormLabel className="text-sm font-medium">Mark as Paid</FormLabel>
                   </div>
                 </FormItem>
               )}
             />
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Receipt (Optional){' '}
-                <span className="text-xs text-muted-foreground">
-                  (Max {MAX_FILE_SIZE_MB}MB per file, .jpg, .jpeg, .png, .webp, .pdf)
-                </span>
-              </label>
-              <Input
-                type="file"
-                accept={ACCEPTED_FILE_TYPES.join(',')}
-                multiple
-                onChange={handleFileChange}
-                disabled={loading}
-              />
-              <div className="flex flex-wrap gap-2 mt-2">
-                {uploadedUrls.map((fileUrl, i) =>
-                  fileUrl.includes('.pdf') || selectedFiles[i]?.type === 'application/pdf' ? (
-                    <a
-                      key={i}
-                      href={fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs text-blue-600 underline"
-                    >
-                      PDF {i + 1}
-                    </a>
-                  ) : (
-                    <Image
-                      key={i}
-                      src={fileUrl}
-                      alt="Receipt preview"
-                      width={64}
-                      height={64}
-                      className="w-16 h-16 object-cover rounded border"
-                    />
-                  )
-                )}
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Receipt (Optional){' '}
+                  <span className="text-xs text-muted-foreground">
+                    (Max {MAX_FILE_SIZE_MB}MB per file, .jpg, .jpeg, .png, .webp, .pdf)
+                  </span>
+                </label>
+                <Input
+                  type="file"
+                  accept={ACCEPTED_FILE_TYPES.join(',')}
+                  multiple
+                  onChange={handleFileChange}
+                  disabled={loading}
+                  className="h-12 text-base touch-manipulation"
+                />
               </div>
-              {fileError && <div className="text-red-500 text-sm mt-1">{fileError}</div>}
+              {uploadedUrls.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {uploadedUrls.map((fileUrl, i) =>
+                    fileUrl.includes('.pdf') || selectedFiles[i]?.type === 'application/pdf' ? (
+                      <a
+                        key={i}
+                        href={fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center px-3 py-2 text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-lg border border-blue-200 dark:border-blue-800 hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors touch-manipulation"
+                      >
+                        PDF {i + 1}
+                      </a>
+                    ) : (
+                      <Image
+                        key={i}
+                        src={fileUrl}
+                        alt="Receipt preview"
+                        width={64}
+                        height={64}
+                        className="w-16 h-16 object-cover rounded border"
+                      />
+                    )
+                  )}
+                </div>
+              )}
+              {fileError && (
+                <div className="text-red-500 text-sm p-3 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
+                  {fileError}
+                </div>
+              )}
             </div>
-            <DialogFooter className="flex flex-col gap-3">
-              <Button type="submit" disabled={loading || isLoadingApartments} className="w-full">
+            <DialogFooter className="flex flex-col-reverse gap-3 sm:flex-row sm:gap-2 pt-4">
+              <Button
+                type="submit"
+                disabled={loading || isLoadingApartments}
+                className="w-full h-12 text-base font-medium touch-manipulation"
+              >
                 {loading ? (
                   <span className="flex items-center gap-2">
                     <Spinner className="w-4 h-4" /> Adding...
@@ -316,7 +343,7 @@ export function AddExpenseDialog({
                 )}
               </Button>
               <Button
-                variant="ghost"
+                variant="outline"
                 type="button"
                 onClick={() => {
                   // Clean up preview URLs
@@ -328,7 +355,7 @@ export function AddExpenseDialog({
                   setOpen(false);
                 }}
                 disabled={loading}
-                className="w-full"
+                className="w-full h-12 text-base font-medium touch-manipulation"
               >
                 Cancel
               </Button>
