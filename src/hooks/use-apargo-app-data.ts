@@ -7,121 +7,231 @@ import * as firestore from '@/lib/firestore';
 import { requestNotificationPermission } from '@/lib/push-notifications';
 import type { Apartment, BalanceSheet, Category, Expense, Payment, User } from '@/lib/types';
 
-export function useApargoAppData(initialCategories: Category[]) {
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
+// Custom hook for apartment data
+function useApartmentsData(queryClient: ReturnType<typeof useQueryClient>) {
+  const [apartments, setApartments] = useState<Apartment[]>([]);
 
-  // Show onboarding dialog if user is missing apartment/propertyRole
+  useEffect(() => {
+    const fetchApartments = async () => {
+      try {
+        const allApartments = await firestore.getApartments();
+        setApartments(allApartments);
+        queryClient.setQueryData(['apartments'], allApartments);
+      } catch (err) {
+        console.error('Error fetching apartments:', err);
+      }
+    };
+    
+    void fetchApartments();
+  }, [queryClient]);
+
+  return apartments;
+}
+
+// Custom hook for categories subscription
+function useCategoriesSubscription(queryClient: ReturnType<typeof useQueryClient>) {
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    const unsubscribe = firestore.subscribeToCategories(cats => {
+      setCategories(cats);
+      queryClient.setQueryData(['categories'], cats);
+    });
+
+    return unsubscribe;
+  }, [queryClient]);
+
+  return categories;
+}
+
+// Custom hook for users subscription
+function useUsersSubscription(user: any, queryClient: ReturnType<typeof useQueryClient>) {
+  const [users, setUsers] = useState<User[]>([]);
+
+  useEffect(() => {
+    let unsubscribe: (() => void) | null = null;
+
+    if (user?.role === 'admin' || !user?.apartment) {
+      // Admin or no apartment: subscribe to all users
+      unsubscribe = firestore.subscribeToAllUsers(u => {
+        setUsers(u);
+        queryClient.setQueryData(['users', undefined], u);
+      });
+    } else if (user?.apartment) {
+      // Regular user: subscribe to apartment users only
+      unsubscribe = firestore.subscribeToUsers(u => {
+        setUsers(u);
+        queryClient.setQueryData(['users', user.apartment], u);
+      }, user.apartment);
+    }
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [user, queryClient]);
+
+  return users;
+}
+
+// Custom hook for expenses subscription
+function useExpensesSubscription(user: any, queryClient: ReturnType<typeof useQueryClient>) {
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+
+  useEffect(() => {
+    let unsubscribe: (() => void) | null = null;
+
+    if (user?.role === 'admin' || !user?.apartment) {
+      // Admin or no apartment: subscribe to all expenses
+      unsubscribe = firestore.subscribeToExpenses(e => {
+        setExpenses(e);
+        queryClient.setQueryData(['expenses', undefined], e);
+      });
+    } else if (user?.apartment) {
+      // Regular user: subscribe to relevant expenses only
+      unsubscribe = firestore.subscribeToRelevantExpenses(e => {
+        setExpenses(e);
+        queryClient.setQueryData(['expenses', user.apartment], e);
+      }, user.apartment);
+    }
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [user, queryClient]);
+
+  return expenses;
+}
+
+// Custom hook for payments subscription
+function usePaymentsSubscription(user: any, queryClient: ReturnType<typeof useQueryClient>) {
+  const [payments, setPayments] = useState<Payment[]>([]);
+
+  useEffect(() => {
+    let unsubscribe: (() => void) | null = null;
+
+    if (user?.role === 'admin' || !user?.apartment) {
+      // Admin or no apartment: subscribe to all payments
+      unsubscribe = firestore.subscribeToPayments(p => {
+        setPayments(p);
+        queryClient.setQueryData(['payments', undefined], p);
+      });
+    } else if (user?.apartment) {
+      // Regular user: subscribe to apartment payments only
+      unsubscribe = firestore.subscribeToPayments(p => {
+        setPayments(p);
+        queryClient.setQueryData(['payments', user.apartment], p);
+      }, user.apartment);
+    }
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [user, queryClient]);
+
+  return payments;
+}
+
+// Custom hook for balance sheets subscription
+function useBalanceSheetsSubscription(user: any, queryClient: ReturnType<typeof useQueryClient>) {
+  const [balanceSheets, setBalanceSheets] = useState<BalanceSheet[]>([]);
+
+  useEffect(() => {
+    let unsubscribe: (() => void) | null = null;
+
+    if (user?.role === 'admin' || !user?.apartment) {
+      // Admin or no apartment: subscribe to all balance sheets
+      unsubscribe = firestore.subscribeToBalanceSheets(b => {
+        setBalanceSheets(b);
+        queryClient.setQueryData(['balanceSheets', undefined], b);
+      });
+    } else if (user?.apartment) {
+      // Regular user: subscribe to apartment balance sheets only
+      unsubscribe = firestore.subscribeToBalanceSheets(b => {
+        setBalanceSheets(b);
+        queryClient.setQueryData(['balanceSheets', user.apartment], b);
+      }, user.apartment);
+    }
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
+  }, [user, queryClient]);
+
+  return balanceSheets;
+}
+
+// Custom hook for FCM notifications
+function useFCMNotifications(user: any) {
+  useEffect(() => {
+    if (user && !user.fcmToken) {
+      requestNotificationPermission(user.id);
+    }
+  }, [user]);
+}
+
+// Custom hook for apartment setup dialog
+function useApartmentSetupDialog(user: any) {
+  const [showApartmentDialog, setShowApartmentDialog] = useState(false);
+
   useEffect(() => {
     if (user && (!user.apartment || !user.propertyRole)) {
       setShowApartmentDialog(true);
     }
   }, [user]);
 
-  // Firestore subscriptions for all core data
-  useEffect(() => {
-    setIsLoadingData(true);
-    let unsubscribeExpenses: (() => void) | null = null;
-    let unsubscribeUsers: (() => void) | null = null;
-    let unsubscribeCategories: (() => void) | null = null;
-    let unsubscribePayments: (() => void) | null = null;
-    let unsubscribeBalanceSheets: (() => void) | null = null;
+  return { showApartmentDialog, setShowApartmentDialog };
+}
 
-    const fetchApartments = async () => {
-      try {
-        const allApartments = await firestore.getApartments();
-        setApartments(allApartments);
-        // populate react-query cache so components using useQuery get the data
-        queryClient.setQueryData(['apartments'], allApartments);
-      } catch (err) {
-        // Ignore fetch errors here; subscription listeners will surface real-time data
-        console.error('Error fetching apartments:', err);
-      }
-    };
-    void fetchApartments();
+// Main consolidated hook
+export function useApargoAppData(initialCategories: Category[]) {
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-    // Subscribe and forward updates into react-query cache + local state
-    unsubscribeCategories = firestore.subscribeToCategories(cats => {
-      setCategories(cats);
-      queryClient.setQueryData(['categories'], cats);
-    });
+  // State for data setters (needed by handlers)
+  const [setUsersState, setUsers] = useState<User[]>([]);
+  const [setCategoriesState, setCategories] = useState<Category[]>(initialCategories);
+  const [setExpensesState, setExpenses] = useState<Expense[]>([]);
+  const [setApartmentsState, setApartments] = useState<Apartment[]>([]);
+  const [setPaymentsState, setPayments] = useState<Payment[]>([]);
+  const [setBalanceSheetsState, setBalanceSheets] = useState<BalanceSheet[]>([]);
 
-    if (user?.role === 'admin' || !user?.apartment) {
-      unsubscribeUsers = firestore.subscribeToAllUsers(u => {
-        setUsers(u);
-        queryClient.setQueryData(['users', undefined], u);
-      });
+  // Use individual focused hooks
+  const apartments = useApartmentsData(queryClient);
+  const categories = useCategoriesSubscription(queryClient);
+  const users = useUsersSubscription(user, queryClient);
+  const expenses = useExpensesSubscription(user, queryClient);
+  const payments = usePaymentsSubscription(user, queryClient);
+  const balanceSheets = useBalanceSheetsSubscription(user, queryClient);
+  
+  // Use specialized hooks
+  useFCMNotifications(user);
+  const { showApartmentDialog, setShowApartmentDialog } = useApartmentSetupDialog(user);
 
-      unsubscribeExpenses = firestore.subscribeToExpenses(e => {
-        setExpenses(e);
-        queryClient.setQueryData(['expenses', undefined], e);
-      });
-
-      unsubscribePayments = firestore.subscribeToPayments(p => {
-        setPayments(p);
-        queryClient.setQueryData(['payments', undefined], p);
-      });
-
-      unsubscribeBalanceSheets = firestore.subscribeToBalanceSheets(b => {
-        setBalanceSheets(b);
-        queryClient.setQueryData(['balanceSheets', undefined], b);
-      });
-    } else {
-      unsubscribeUsers = firestore.subscribeToUsers(u => {
-        setUsers(u);
-        queryClient.setQueryData(['users', user.apartment], u);
-      }, user.apartment);
-
-      unsubscribeExpenses = firestore.subscribeToRelevantExpenses(e => {
-        setExpenses(e);
-        queryClient.setQueryData(['expenses', user.apartment], e);
-      }, user.apartment);
-
-      unsubscribePayments = firestore.subscribeToPayments(p => {
-        setPayments(p);
-        queryClient.setQueryData(['payments', user.apartment], p);
-      }, user.apartment);
-
-      unsubscribeBalanceSheets = firestore.subscribeToBalanceSheets(b => {
-        setBalanceSheets(b);
-        queryClient.setQueryData(['balanceSheets', user.apartment], b);
-      }, user.apartment);
-    }
-
-    setIsLoadingData(false);
-    return () => {
-      if (unsubscribeExpenses) unsubscribeExpenses();
-      if (unsubscribeUsers) unsubscribeUsers();
-      if (unsubscribeCategories) unsubscribeCategories();
-      if (unsubscribePayments) unsubscribePayments();
-      if (unsubscribeBalanceSheets) unsubscribeBalanceSheets();
-    };
-  }, [user, queryClient]);
-
-  // FCM notification permission
-  useEffect(() => {
-    if (user && !user.fcmToken) {
-      requestNotificationPermission(user.id);
-    }
-  }, [user]);
-  const [users, setUsers] = useState<User[]>([]);
-  const [categories, setCategories] = useState<Category[]>(initialCategories);
-  const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [apartments, setApartments] = useState<Apartment[]>([]);
-  const [payments, setPayments] = useState<Payment[]>([]);
-  const [balanceSheets, setBalanceSheets] = useState<BalanceSheet[]>([]);
+  // State for UI interactions
   const [isLoadingData, setIsLoadingData] = useState(true);
-  const [showApartmentDialog, setShowApartmentDialog] = useState(false);
   const [expenseSearch, setExpenseSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState('all');
   const [filterPaidBy, setFilterPaidBy] = useState('all');
   const [filterMonth, setFilterMonth] = useState('all');
   const [analyticsMonth, setAnalyticsMonth] = useState('all');
   const [userSearch, setUserSearch] = useState('');
-  const [activeExpenseTab, setActiveExpenseTab] = useState('analytics'); // Tab state for ExpenseAnalyticsView
+  const [activeExpenseTab, setActiveExpenseTab] = useState('analytics');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // ...existing code for setSafeUsers, effects, filtering, analytics, etc. (to be moved from ApargoApp)
+  // Sync subscription data with local state for handlers
+  useEffect(() => setUsers(users), [users]);
+  useEffect(() => setCategories(categories), [categories]);
+  useEffect(() => setExpenses(expenses), [expenses]);
+  useEffect(() => setApartments(apartments), [apartments]);
+  useEffect(() => setPayments(payments), [payments]);
+  useEffect(() => setBalanceSheets(balanceSheets), [balanceSheets]);
+
+  // Set loading to false once core data is loaded
+  useEffect(() => {
+    if (categories.length > 0) {
+      setIsLoadingData(false);
+    }
+  }, [categories]);
 
   return {
     user,
@@ -156,6 +266,5 @@ export function useApargoAppData(initialCategories: Category[]) {
     activeExpenseTab,
     setActiveExpenseTab,
     textareaRef,
-    // Add more as needed
   };
 }

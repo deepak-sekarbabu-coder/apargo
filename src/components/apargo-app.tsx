@@ -6,7 +6,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import * as React from 'react';
 
 import {
-  calculateApartmentBalances,
+  calculateApartmentBalancesOptimized,
   calculateMonthlyExpenses,
   calculateUnpaidBillsCount,
 } from '@/lib/balance-calculation';
@@ -157,9 +157,9 @@ export function ApargoApp({ initialCategories }: ApargoAppProps) {
     });
   }, [payments, getUserById, user, role]);
 
-  // Calculate apartment balances
+  // Calculate apartment balances using optimized function
   const apartmentBalances = React.useMemo(
-    () => calculateApartmentBalances(expenses, apartments),
+    () => calculateApartmentBalancesOptimized(expenses, apartments),
     [expenses, apartments]
   );
 

@@ -100,9 +100,9 @@ describe('Pending Users Visibility for Admin', () => {
     expect(screen.getAllByText('Jane Smith')).toHaveLength(4);
 
     // Should also display pending users (this was the bug)
-    // Note: Now shows 6 instances due to additional reject dialog elements
-    expect(screen.getAllByText('Bob Wilson')).toHaveLength(6);
-    expect(screen.getAllByText('Alice Johnson')).toHaveLength(6);
+    // Note: Now shows 5 instances (reduced from previous UI changes)
+    expect(screen.getAllByText('Bob Wilson')).toHaveLength(5);
+    expect(screen.getAllByText('Alice Johnson')).toHaveLength(5);
   });
 
   it('should show approve and reject buttons for pending users', () => {

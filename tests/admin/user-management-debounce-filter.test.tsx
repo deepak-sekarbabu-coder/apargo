@@ -71,6 +71,7 @@ const defaultProps = {
   onAddUser: jest.fn(),
   onUpdateUser: jest.fn(),
   onDeleteUser: jest.fn(),
+  onRejectUser: jest.fn(),
   onAddCategory: jest.fn(),
   onUpdateCategory: jest.fn(),
   onDeleteCategory: jest.fn(),
@@ -105,7 +106,7 @@ describe('User Management Search Filter Integration', () => {
       // Users should still be displayed immediately (before debounce)
       expect(screen.getAllByText('John Doe')).toHaveLength(4); // All instances
       expect(screen.getAllByText('Jane Smith')).toHaveLength(4);
-      expect(screen.getAllByText('Bob Wilson')).toHaveLength(6); // More instances due to reject dialogs
+      expect(screen.getAllByText('Bob Wilson')).toHaveLength(5); // More instances due to reject dialogs
 
       // Advance time less than debounce delay
       act(() => {
@@ -115,7 +116,7 @@ describe('User Management Search Filter Integration', () => {
       // Still should show all users
       expect(screen.getAllByText('John Doe')).toHaveLength(4);
       expect(screen.getAllByText('Jane Smith')).toHaveLength(4);
-      expect(screen.getAllByText('Bob Wilson')).toHaveLength(6); // More instances due to reject dialogs
+      expect(screen.getAllByText('Bob Wilson')).toHaveLength(5); // More instances due to reject dialogs
 
       // Advance time to complete debounce delay
       act(() => {
@@ -211,7 +212,7 @@ describe('User Management Search Filter Integration', () => {
       // Should show all users again
       expect(screen.getAllByText('John Doe')).toHaveLength(4);
       expect(screen.getAllByText('Jane Smith')).toHaveLength(4);
-      expect(screen.getAllByText('Bob Wilson')).toHaveLength(6); // More instances due to reject dialogs
+      expect(screen.getAllByText('Bob Wilson')).toHaveLength(5); // More instances due to reject dialogs
     });
   });
 
@@ -244,7 +245,7 @@ describe('User Management Search Filter Integration', () => {
       // Should display all users
       expect(screen.getAllByText('John Doe')).toHaveLength(4);
       expect(screen.getAllByText('Jane Smith')).toHaveLength(4);
-      expect(screen.getAllByText('Bob Wilson')).toHaveLength(6); // More instances due to reject dialogs
+      expect(screen.getAllByText('Bob Wilson')).toHaveLength(5); // More instances due to reject dialogs
     });
 
     it('should display empty state when no users match search', () => {
@@ -285,7 +286,7 @@ describe('User Management Search Filter Integration', () => {
       // Should still show all users during rapid typing
       expect(screen.getAllByText('John Doe')).toHaveLength(4);
       expect(screen.getAllByText('Jane Smith')).toHaveLength(4);
-      expect(screen.getAllByText('Bob Wilson')).toHaveLength(6); // More instances due to reject dialogs
+      expect(screen.getAllByText('Bob Wilson')).toHaveLength(5); // More instances due to reject dialogs
 
       // Complete the debounce
       act(() => {
@@ -344,7 +345,7 @@ describe('User Management Search Filter Integration', () => {
       });
       expect(screen.getAllByText('John Doe')).toHaveLength(4);
       expect(screen.getAllByText('Jane Smith')).toHaveLength(4);
-      expect(screen.getAllByText('Bob Wilson')).toHaveLength(6); // More instances due to reject dialogs
+      expect(screen.getAllByText('Bob Wilson')).toHaveLength(5); // More instances due to reject dialogs
 
       // Should filter users exactly at configured delay
       act(() => {

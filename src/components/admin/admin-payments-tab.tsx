@@ -70,7 +70,7 @@ export function AdminPaymentsTab({
                     </div>
 
                     {/* Payment details grid - Simplified */}
-                    <div className="grid grid-cols-1 gap-3">
+                    <div className="grid grid-cols-2 gap-3">
                       <div className="flex justify-between items-center">
                         <div>
                           <p className="text-xs text-muted-foreground uppercase tracking-wide">Type</p>
