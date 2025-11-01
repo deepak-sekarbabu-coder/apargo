@@ -7,157 +7,114 @@ import * as firestore from '@/lib/firestore';
 import { requestNotificationPermission } from '@/lib/push-notifications';
 import type { Apartment, BalanceSheet, Category, Expense, Payment, User } from '@/lib/types';
 
-// Custom hook for apartment data
-function useApartmentsData(queryClient: ReturnType<typeof useQueryClient>) {
-  const [apartments, setApartments] = useState<Apartment[]>([]);
+// Simplified subscription manager for data streams
+interface DataStreams {
+  apartments: Apartment[];
+  categories: Category[];
+  users: User[];
+  expenses: Expense[];
+  payments: Payment[];
+  balanceSheets: BalanceSheet[];
+}
+
+interface SubscriptionHandlers {
+  onApartments: (apartments: Apartment[]) => void;
+  onCategories: (categories: Category[]) => void;
+  onUsers: (users: User[]) => void;
+  onExpenses: (expenses: Expense[]) => void;
+  onPayments: (payments: Payment[]) => void;
+  onBalanceSheets: (balanceSheets: BalanceSheet[]) => void;
+}
+
+function useDataSubscriptionManager(user: any, queryClient: ReturnType<typeof useQueryClient>) {
+  const [dataStreams, setDataStreams] = useState<DataStreams>({
+    apartments: [],
+    categories: [],
+    users: [],
+    expenses: [],
+    payments: [],
+    balanceSheets: [],
+  });
 
   useEffect(() => {
-    const fetchApartments = async () => {
+    // Single subscription manager that handles all data streams
+    const handlers: SubscriptionHandlers = {
+      onApartments: (apartments) => {
+        setDataStreams(prev => ({ ...prev, apartments }));
+        queryClient.setQueryData(['apartments'], apartments);
+      },
+      onCategories: (categories) => {
+        setDataStreams(prev => ({ ...prev, categories }));
+        queryClient.setQueryData(['categories'], categories);
+      },
+      onUsers: (users) => {
+        setDataStreams(prev => ({ ...prev, users }));
+        const queryKey = user?.role === 'admin' || !user?.apartment ? ['users', undefined] : ['users', user.apartment];
+        queryClient.setQueryData(queryKey, users);
+      },
+      onExpenses: (expenses) => {
+        setDataStreams(prev => ({ ...prev, expenses }));
+        const queryKey = user?.role === 'admin' || !user?.apartment ? ['expenses', undefined] : ['expenses', user.apartment];
+        queryClient.setQueryData(queryKey, expenses);
+      },
+      onPayments: (payments) => {
+        setDataStreams(prev => ({ ...prev, payments }));
+        const queryKey = user?.role === 'admin' || !user?.apartment ? ['payments', undefined] : ['payments', user.apartment];
+        queryClient.setQueryData(queryKey, payments);
+      },
+      onBalanceSheets: (balanceSheets) => {
+        setDataStreams(prev => ({ ...prev, balanceSheets }));
+        const queryKey = user?.role === 'admin' || !user?.apartment ? ['balanceSheets', undefined] : ['balanceSheets', user.apartment];
+        queryClient.setQueryData(queryKey, balanceSheets);
+      },
+    };
+
+    // Single cleanup function for all subscriptions
+    const unsubscribes: (() => void)[] = [];
+
+    // Single apartments subscription
+    const apartmentsUnsubscribe = (async () => {
       try {
-        const allApartments = await firestore.getApartments();
-        setApartments(allApartments);
-        queryClient.setQueryData(['apartments'], allApartments);
+        const apartments = await firestore.getApartments();
+        handlers.onApartments(apartments);
       } catch (err) {
         console.error('Error fetching apartments:', err);
       }
-    };
-    
-    void fetchApartments();
-  }, [queryClient]);
-
-  return apartments;
-}
-
-// Custom hook for categories subscription
-function useCategoriesSubscription(queryClient: ReturnType<typeof useQueryClient>) {
-  const [categories, setCategories] = useState<Category[]>([]);
-
-  useEffect(() => {
-    const unsubscribe = firestore.subscribeToCategories(cats => {
-      setCategories(cats);
-      queryClient.setQueryData(['categories'], cats);
     });
+    
+    // Single categories subscription
+    const categoriesUnsubscribe = firestore.subscribeToCategories(handlers.onCategories);
+    unsubscribes.push(categoriesUnsubscribe);
 
-    return unsubscribe;
-  }, [queryClient]);
-
-  return categories;
-}
-
-// Custom hook for users subscription
-function useUsersSubscription(user: any, queryClient: ReturnType<typeof useQueryClient>) {
-  const [users, setUsers] = useState<User[]>([]);
-
-  useEffect(() => {
-    let unsubscribe: (() => void) | null = null;
-
+    // Conditional subscriptions based on user role/apartment
     if (user?.role === 'admin' || !user?.apartment) {
-      // Admin or no apartment: subscribe to all users
-      unsubscribe = firestore.subscribeToAllUsers(u => {
-        setUsers(u);
-        queryClient.setQueryData(['users', undefined], u);
-      });
+      // Admin subscriptions
+      const usersUnsubscribe = firestore.subscribeToAllUsers(handlers.onUsers);
+      const expensesUnsubscribe = firestore.subscribeToExpenses(handlers.onExpenses);
+      const paymentsUnsubscribe = firestore.subscribeToPayments(handlers.onPayments);
+      const balanceSheetsUnsubscribe = firestore.subscribeToBalanceSheets(handlers.onBalanceSheets);
+      
+      unsubscribes.push(usersUnsubscribe, expensesUnsubscribe, paymentsUnsubscribe, balanceSheetsUnsubscribe);
     } else if (user?.apartment) {
-      // Regular user: subscribe to apartment users only
-      unsubscribe = firestore.subscribeToUsers(u => {
-        setUsers(u);
-        queryClient.setQueryData(['users', user.apartment], u);
-      }, user.apartment);
+      // Regular user subscriptions
+      const usersUnsubscribe = firestore.subscribeToUsers(handlers.onUsers, user.apartment);
+      const expensesUnsubscribe = firestore.subscribeToRelevantExpenses(handlers.onExpenses, user.apartment);
+      const paymentsUnsubscribe = firestore.subscribeToPayments(handlers.onPayments, user.apartment);
+      const balanceSheetsUnsubscribe = firestore.subscribeToBalanceSheets(handlers.onBalanceSheets, user.apartment);
+      
+      unsubscribes.push(usersUnsubscribe, expensesUnsubscribe, paymentsUnsubscribe, balanceSheetsUnsubscribe);
     }
 
+    // Initialize apartments data
+    void apartmentsUnsubscribe();
+
+    // Single cleanup function
     return () => {
-      if (unsubscribe) unsubscribe();
+      unsubscribes.forEach(unsubscribe => unsubscribe());
     };
   }, [user, queryClient]);
 
-  return users;
-}
-
-// Custom hook for expenses subscription
-function useExpensesSubscription(user: any, queryClient: ReturnType<typeof useQueryClient>) {
-  const [expenses, setExpenses] = useState<Expense[]>([]);
-
-  useEffect(() => {
-    let unsubscribe: (() => void) | null = null;
-
-    if (user?.role === 'admin' || !user?.apartment) {
-      // Admin or no apartment: subscribe to all expenses
-      unsubscribe = firestore.subscribeToExpenses(e => {
-        setExpenses(e);
-        queryClient.setQueryData(['expenses', undefined], e);
-      });
-    } else if (user?.apartment) {
-      // Regular user: subscribe to relevant expenses only
-      unsubscribe = firestore.subscribeToRelevantExpenses(e => {
-        setExpenses(e);
-        queryClient.setQueryData(['expenses', user.apartment], e);
-      }, user.apartment);
-    }
-
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
-  }, [user, queryClient]);
-
-  return expenses;
-}
-
-// Custom hook for payments subscription
-function usePaymentsSubscription(user: any, queryClient: ReturnType<typeof useQueryClient>) {
-  const [payments, setPayments] = useState<Payment[]>([]);
-
-  useEffect(() => {
-    let unsubscribe: (() => void) | null = null;
-
-    if (user?.role === 'admin' || !user?.apartment) {
-      // Admin or no apartment: subscribe to all payments
-      unsubscribe = firestore.subscribeToPayments(p => {
-        setPayments(p);
-        queryClient.setQueryData(['payments', undefined], p);
-      });
-    } else if (user?.apartment) {
-      // Regular user: subscribe to apartment payments only
-      unsubscribe = firestore.subscribeToPayments(p => {
-        setPayments(p);
-        queryClient.setQueryData(['payments', user.apartment], p);
-      }, user.apartment);
-    }
-
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
-  }, [user, queryClient]);
-
-  return payments;
-}
-
-// Custom hook for balance sheets subscription
-function useBalanceSheetsSubscription(user: any, queryClient: ReturnType<typeof useQueryClient>) {
-  const [balanceSheets, setBalanceSheets] = useState<BalanceSheet[]>([]);
-
-  useEffect(() => {
-    let unsubscribe: (() => void) | null = null;
-
-    if (user?.role === 'admin' || !user?.apartment) {
-      // Admin or no apartment: subscribe to all balance sheets
-      unsubscribe = firestore.subscribeToBalanceSheets(b => {
-        setBalanceSheets(b);
-        queryClient.setQueryData(['balanceSheets', undefined], b);
-      });
-    } else if (user?.apartment) {
-      // Regular user: subscribe to apartment balance sheets only
-      unsubscribe = firestore.subscribeToBalanceSheets(b => {
-        setBalanceSheets(b);
-        queryClient.setQueryData(['balanceSheets', user.apartment], b);
-      }, user.apartment);
-    }
-
-    return () => {
-      if (unsubscribe) unsubscribe();
-    };
-  }, [user, queryClient]);
-
-  return balanceSheets;
+  return dataStreams;
 }
 
 // Custom hook for FCM notifications
@@ -182,26 +139,20 @@ function useApartmentSetupDialog(user: any) {
   return { showApartmentDialog, setShowApartmentDialog };
 }
 
-// Main consolidated hook
 export function useApargoAppData(initialCategories: Category[]) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
   // State for data setters (needed by handlers)
-  const [setUsersState, setUsers] = useState<User[]>([]);
-  const [setCategoriesState, setCategories] = useState<Category[]>(initialCategories);
-  const [setExpensesState, setExpenses] = useState<Expense[]>([]);
-  const [setApartmentsState, setApartments] = useState<Apartment[]>([]);
-  const [setPaymentsState, setPayments] = useState<Payment[]>([]);
-  const [setBalanceSheetsState, setBalanceSheets] = useState<BalanceSheet[]>([]);
+  const [usersState, setUsers] = useState<User[]>([]);
+  const [categoriesState, setCategories] = useState<Category[]>(initialCategories);
+  const [expensesState, setExpenses] = useState<Expense[]>([]);
+  const [apartmentsState, setApartments] = useState<Apartment[]>([]);
+  const [paymentsState, setPayments] = useState<Payment[]>([]);
+  const [balanceSheetsState, setBalanceSheets] = useState<BalanceSheet[]>([]);
 
-  // Use individual focused hooks
-  const apartments = useApartmentsData(queryClient);
-  const categories = useCategoriesSubscription(queryClient);
-  const users = useUsersSubscription(user, queryClient);
-  const expenses = useExpensesSubscription(user, queryClient);
-  const payments = usePaymentsSubscription(user, queryClient);
-  const balanceSheets = useBalanceSheetsSubscription(user, queryClient);
+  // Use simplified subscription manager
+  const dataStreams = useDataSubscriptionManager(user, queryClient);
   
   // Use specialized hooks
   useFCMNotifications(user);
@@ -218,34 +169,36 @@ export function useApargoAppData(initialCategories: Category[]) {
   const [activeExpenseTab, setActiveExpenseTab] = useState('analytics');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Sync subscription data with local state for handlers
-  useEffect(() => setUsers(users), [users]);
-  useEffect(() => setCategories(categories), [categories]);
-  useEffect(() => setExpenses(expenses), [expenses]);
-  useEffect(() => setApartments(apartments), [apartments]);
-  useEffect(() => setPayments(payments), [payments]);
-  useEffect(() => setBalanceSheets(balanceSheets), [balanceSheets]);
-
-  // Set loading to false once core data is loaded
+  // Sync subscription data with local state for handlers (single effect)
   useEffect(() => {
+    const { apartments, categories, users, expenses, payments, balanceSheets } = dataStreams;
+    
+    setApartments(apartments);
+    setCategories(categories);
+    setUsers(users);
+    setExpenses(expenses);
+    setPayments(payments);
+    setBalanceSheets(balanceSheets);
+
+    // Set loading to false once core data is loaded
     if (categories.length > 0) {
       setIsLoadingData(false);
     }
-  }, [categories]);
+  }, [dataStreams]);
 
   return {
     user,
-    users,
+    users: dataStreams.users,
     setUsers,
-    categories,
+    categories: dataStreams.categories,
     setCategories,
-    expenses,
+    expenses: dataStreams.expenses,
     setExpenses,
-    apartments,
+    apartments: dataStreams.apartments,
     setApartments,
-    payments,
+    payments: dataStreams.payments,
     setPayments,
-    balanceSheets,
+    balanceSheets: dataStreams.balanceSheets,
     setBalanceSheets,
     isLoadingData,
     setIsLoadingData,

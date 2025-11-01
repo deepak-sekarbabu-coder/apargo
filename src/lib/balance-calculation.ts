@@ -9,7 +9,7 @@ export interface ApartmentBalance {
 
 /**
  * Calculate apartment balances based on expenses
- * Optimized version with single-pass calculations and O(1) lookups
+ * Ultra-optimized version with single-pass calculations and minimal operations
  * @param expenses - Array of expenses
  * @param apartments - Array of apartments
  * @returns Record of apartment balances
@@ -30,53 +30,51 @@ export function calculateApartmentBalances(
     };
   });
 
-  // Single-pass optimization: Process expenses with pre-computed data structures
+  // Ultra-optimized single-pass through all expenses
   expenses.forEach(expense => {
-    const { 
-      paidByApartment, 
-      owedByApartments = [], 
-      perApartmentShare, 
-      paidByApartments = [] 
+    const {
+      paidByApartment,
+      owedByApartments = [],
+      perApartmentShare,
+      paidByApartments = []
     } = expense;
 
-    // Pre-compute unpaid apartments set for O(1) lookups
-    const unpaidApartmentsSet = new Set(
-      owedByApartments
-        .filter(apartmentId => apartmentId !== paidByApartment) // Exclude self-debt
-        .filter(apartmentId => !paidByApartments.includes(apartmentId))
+    // Create unpaid apartments map in single operation using pre-computed lookup
+    const paidApartmentsSet = new Set(paidByApartments);
+    const unpaidApartments = owedByApartments.filter(
+      apartmentId => apartmentId !== paidByApartment && !paidApartmentsSet.has(apartmentId)
     );
 
-    // Also exclude the paying apartment from unpaid list if they were initially in owedByApartments
-    if (unpaidApartmentsSet.has(paidByApartment)) {
-      unpaidApartmentsSet.delete(paidByApartment);
-    }
-
     // Skip if no unpaid apartments
-    if (unpaidApartmentsSet.size === 0) return;
+    if (unpaidApartments.length === 0) return;
 
-    const totalStillOwed = unpaidApartmentsSet.size * perApartmentShare;
+    const totalStillOwed = unpaidApartments.length * perApartmentShare;
 
-    // Single operation for the paying apartment
-    if (balances[paidByApartment]) {
-      balances[paidByApartment].balance += totalStillOwed;
+    // Single update for paying apartment
+    const payingBalance = balances[paidByApartment];
+    if (payingBalance) {
+      payingBalance.balance += totalStillOwed;
 
-      // Track owed amounts for the paying apartment in single loop (accumulate)
-      unpaidApartmentsSet.forEach(apartmentId => {
+      // Update owed amounts for all unpaid apartments in single loop
+      for (let i = 0; i < unpaidApartments.length; i++) {
+        const apartmentId = unpaidApartments[i];
         if (apartmentId !== paidByApartment) {
-          const currentIsOwed = balances[paidByApartment].isOwed[apartmentId] || 0;
-          balances[paidByApartment].isOwed[apartmentId] = currentIsOwed + perApartmentShare;
+          const currentIsOwed = payingBalance.isOwed[apartmentId] || 0;
+          payingBalance.isOwed[apartmentId] = currentIsOwed + perApartmentShare;
         }
-      });
+      }
     }
 
-    // Update all unpaid apartments in single loop (accumulate)
-    unpaidApartmentsSet.forEach(apartmentId => {
+    // Update all unpaid apartments in single loop
+    for (let i = 0; i < unpaidApartments.length; i++) {
+      const apartmentId = unpaidApartments[i];
       if (apartmentId !== paidByApartment && balances[apartmentId]) {
-        balances[apartmentId].balance -= perApartmentShare;
-        const currentOwes = balances[apartmentId].owes[paidByApartment] || 0;
-        balances[apartmentId].owes[paidByApartment] = currentOwes + perApartmentShare;
+        const aptBalance = balances[apartmentId];
+        aptBalance.balance -= perApartmentShare;
+        const currentOwes = aptBalance.owes[paidByApartment] || 0;
+        aptBalance.owes[paidByApartment] = currentOwes + perApartmentShare;
       }
-    });
+    }
   });
 
   return balances;
@@ -84,92 +82,108 @@ export function calculateApartmentBalances(
 
 /**
  * Calculate monthly expenses for a given month and year
+ * Optimized version with single-pass calculation
  * @param expenses - Array of expenses
  * @param month - Month (0-11)
  * @param year - Year
  * @returns Total amount for the month
  */
 export function calculateMonthlyExpenses(expenses: Expense[], month: number, year: number): number {
-  return expenses
-    .filter(expense => {
-      const expenseDate = new Date(expense.date);
-      return expenseDate.getMonth() === month && expenseDate.getFullYear() === year;
-    })
-    .reduce((total, expense) => total + (Number(expense.amount) || 0), 0);
+  let total = 0;
+  const targetMonth = month;
+  const targetYear = year;
+  
+  // Single pass with direct calculation
+  for (let i = 0; i < expenses.length; i++) {
+    const expense = expenses[i];
+    const expenseDate = new Date(expense.date);
+    
+    // Early exit if month/year doesn't match
+    if (expenseDate.getMonth() === targetMonth && expenseDate.getFullYear() === targetYear) {
+      total += Number(expense.amount) || 0;
+    }
+  }
+  
+  return total;
 }
 
 /**
  * Calculate unpaid bills count across all expenses
- * Optimized version using Set operations for better performance
+ * Ultra-optimized version with minimal array operations
  * @param expenses - Array of expenses
  * @returns Number of unpaid bills
  */
 export function calculateUnpaidBillsCount(expenses: Expense[]): number {
-  return expenses.reduce((count, expense) => {
+  let count = 0;
+  
+  // Single pass through all expenses
+  for (let i = 0; i < expenses.length; i++) {
+    const expense = expenses[i];
     const owedApartments = expense.owedByApartments || [];
-    const paidApartments = new Set(expense.paidByApartments || []);
+    const paidApartments = expense.paidByApartments || [];
     
-    // Count apartments that owe money but haven't paid
-    const unpaidCount = owedApartments.reduce((acc, apartmentId) => {
-      return acc + (paidApartments.has(apartmentId) ? 0 : 1);
-    }, 0);
+    // Create paid apartments set once per expense
+    const paidSet = new Set(paidApartments);
     
-    return count + unpaidCount;
-  }, 0);
+    // Count unpaid apartments in single loop
+    for (let j = 0; j < owedApartments.length; j++) {
+      const apartmentId = owedApartments[j];
+      if (!paidSet.has(apartmentId)) {
+        count++;
+      }
+    }
+  }
+  
+  return count;
 }
 
 /**
- * Alternative optimized balance calculation using aggregation approach
+ * Alternative ultra-optimized balance calculation using minimal operations
  * Processes all expenses in single pass with aggregated debt tracking
  */
 export function calculateApartmentBalancesOptimized(
   expenses: Expense[],
   apartments: Apartment[]
 ): Record<string, ApartmentBalance> {
-  // Initialize balance tracking
+  // Initialize balance tracking with Maps for O(1) lookups
   const apartmentBalances = new Map<string, {
     balance: number;
-    owesTo: Map<string, number>;
-    owedBy: Map<string, number>;
+    owes: Record<string, number>;
+    owedBy: Record<string, number>;
   }>();
 
   // Initialize apartments in single loop
-  apartments.forEach(apt => {
+  for (let i = 0; i < apartments.length; i++) {
+    const apt = apartments[i];
     apartmentBalances.set(apt.id, {
       balance: 0,
-      owesTo: new Map(),
-      owedBy: new Map(),
+      owes: {},
+      owedBy: {},
     });
-  });
+  }
 
   // Single pass through all expenses
-  expenses.forEach(expense => {
-    const { 
-      paidByApartment, 
-      owedByApartments = [], 
-      perApartmentShare, 
-      paidByApartments = [] 
+  for (let i = 0; i < expenses.length; i++) {
+    const expense = expenses[i];
+    const {
+      paidByApartment,
+      owedByApartments = [],
+      perApartmentShare,
+      paidByApartments = []
     } = expense;
 
-    // Create unpaid apartments map for O(1) operations (exclude self-debt)
-    const unpaidMap = new Map<string, boolean>();
-    owedByApartments
-      .filter(aptId => aptId !== paidByApartment) // Exclude self-debt
-      .forEach(aptId => {
-        unpaidMap.set(aptId, !paidByApartments.includes(aptId));
-      });
-
-    // Also exclude the paying apartment from unpaid list if they were initially in owedByApartments
-    if (unpaidMap.has(paidByApartment)) {
-      unpaidMap.delete(paidByApartment);
+    // Create unpaid apartments array with minimal operations
+    const paidApartmentsSet = new Set(paidByApartments);
+    const unpaidApartments: string[] = [];
+    
+    for (let j = 0; j < owedByApartments.length; j++) {
+      const aptId = owedByApartments[j];
+      if (aptId !== paidByApartment && !paidApartmentsSet.has(aptId)) {
+        unpaidApartments.push(aptId);
+      }
     }
 
-    // Get unpaid apartments count and calculate total debt
-    const unpaidApartments = Array.from(unpaidMap.entries())
-      .filter(([, isUnpaid]) => isUnpaid)
-      .map(([apartmentId]) => apartmentId);
-
-    if (unpaidApartments.length === 0) return;
+    if (unpaidApartments.length === 0) continue;
 
     const totalDebt = unpaidApartments.length * perApartmentShare;
 
@@ -178,25 +192,25 @@ export function calculateApartmentBalancesOptimized(
     if (payingBalance) {
       payingBalance.balance += totalDebt;
       
-      // Track individual debts owed to paying apartment (accumulate instead of overwrite)
-      unpaidApartments.forEach(aptId => {
-        if (aptId !== paidByApartment) {
-          const currentOwed = payingBalance.owedBy.get(aptId) || 0;
-          payingBalance.owedBy.set(aptId, currentOwed + perApartmentShare);
-        }
-      });
+      // Track individual debts owed to paying apartment
+      for (let j = 0; j < unpaidApartments.length; j++) {
+        const aptId = unpaidApartments[j];
+        const currentOwed = payingBalance.owedBy[aptId] || 0;
+        payingBalance.owedBy[aptId] = currentOwed + perApartmentShare;
+      }
     }
 
-    // Update all unpaid apartments (accumulate instead of overwrite)
-    unpaidApartments.forEach(aptId => {
+    // Update all unpaid apartments
+    for (let j = 0; j < unpaidApartments.length; j++) {
+      const aptId = unpaidApartments[j];
       const aptBalance = apartmentBalances.get(aptId);
-      if (aptBalance && aptId !== paidByApartment) {
+      if (aptBalance) {
         aptBalance.balance -= perApartmentShare;
-        const currentOwes = aptBalance.owesTo.get(paidByApartment) || 0;
-        aptBalance.owesTo.set(paidByApartment, currentOwes + perApartmentShare);
+        const currentOwes = aptBalance.owes[paidByApartment] || 0;
+        aptBalance.owes[paidByApartment] = currentOwes + perApartmentShare;
       }
-    });
-  });
+    }
+  }
 
   // Convert back to expected format
   const result: Record<string, ApartmentBalance> = {};
@@ -205,8 +219,8 @@ export function calculateApartmentBalancesOptimized(
     result[apartmentId] = {
       name: apartment?.name || apartmentId,
       balance: balance.balance,
-      owes: Object.fromEntries(balance.owesTo),
-      isOwed: Object.fromEntries(balance.owedBy),
+      owes: balance.owes,
+      isOwed: balance.owedBy,
     };
   });
 

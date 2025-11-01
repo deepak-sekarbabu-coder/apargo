@@ -269,6 +269,8 @@ export function ApargoApp({ initialCategories }: ApargoAppProps) {
             setView={setView}
             onExpenseUpdate={handleExpenseUpdate}
             onExpenseDelete={handleDeleteExpense}
+            onExpenseAdd={handleAddExpense}
+            onPaymentAdd={handleAddPayment}
             onAddPoll={handleAddPoll}
             onApprovePayment={handleApprovePayment}
             onRejectPayment={handleRejectPayment}

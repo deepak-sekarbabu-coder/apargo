@@ -67,6 +67,16 @@ interface MainContentProps {
   setView: (view: View) => void;
   onExpenseUpdate: (expense: Expense) => void;
   onExpenseDelete: (expenseId: string) => Promise<void>;
+  onExpenseAdd: (expenseData: Omit<Expense, 'id' | 'date'>) => Promise<void>;
+  onPaymentAdd: (data: {
+    payeeId: string;
+    amount: number;
+    receiptFile?: File;
+    expenseId?: string;
+    monthYear: string;
+    category?: 'income' | 'expense';
+    reason?: string;
+  }) => Promise<void>;
   onAddPoll: (data: {
     question: string;
     options: PollOption[];
@@ -113,6 +123,8 @@ export function MainContent({
   setView,
   onExpenseUpdate,
   onExpenseDelete,
+  onExpenseAdd,
+  onPaymentAdd,
   onAddPoll,
   onApprovePayment,
   onRejectPayment,
@@ -209,6 +221,8 @@ export function MainContent({
             apartmentBalances={apartmentBalances}
             onExpenseUpdate={onExpenseUpdate}
             onExpenseDelete={onExpenseDelete}
+            onAddExpense={onExpenseAdd}
+            onAddPayment={onPaymentAdd}
             ExpensesList={ExpensesListComponent}
             apartmentsCount={apartmentsCount}
             unpaidBillsCount={unpaidBillsCount}
@@ -293,6 +307,8 @@ export function MainContent({
           apartmentBalances={apartmentBalances}
           onExpenseUpdate={onExpenseUpdate}
           onExpenseDelete={onExpenseDelete}
+          onAddExpense={onExpenseAdd}
+          onAddPayment={onPaymentAdd}
           ExpensesList={ExpensesListComponent}
           apartmentsCount={apartmentsCount}
           unpaidBillsCount={unpaidBillsCount}
