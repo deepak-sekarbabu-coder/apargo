@@ -223,6 +223,13 @@ export function AddPaymentDialog({ users, onAddPayment, children }: AddPaymentDi
           )}
           <DialogFooter className="flex flex-col-reverse gap-3 sm:flex-row sm:gap-2 pt-4">
             <Button
+              type="submit"
+              disabled={!payeeId || !amount || !selectedDate}
+              className="w-full h-12 text-base font-medium touch-manipulation"
+            >
+              Add Payment
+            </Button>
+            <Button
               variant="outline"
               type="button"
               onClick={() => {
@@ -237,13 +244,6 @@ export function AddPaymentDialog({ users, onAddPayment, children }: AddPaymentDi
               className="w-full h-12 text-base font-medium touch-manipulation"
             >
               Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={!payeeId || !amount || !selectedDate}
-              className="w-full h-12 text-base font-medium touch-manipulation"
-            >
-              Add Payment
             </Button>
           </DialogFooter>
         </form>
