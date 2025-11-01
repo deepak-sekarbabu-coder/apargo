@@ -120,6 +120,8 @@ export function ExpenseAnalyticsView({
             setAnalyticsMonth={setAnalyticsMonth}
             expenseMonths={expenseMonths}
             analyticsData={analyticsData}
+            isRealTime={analyticsData.isRealTime}
+            lastUpdated={analyticsData.lastUpdated}
           />
         </TabsContent>
       </Tabs>

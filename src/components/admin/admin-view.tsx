@@ -77,26 +77,31 @@ export function AdminView({
     <div className="space-y-4 md:space-y-6 px-2 md:px-0">
       {/* Admin Navigation Tabs */}
       <Tabs value={activeAdminTab} onValueChange={updateActiveAdminTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-5 h-auto">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 h-auto">
           <TabsTrigger value="users" className="admin-mobile-tab">
             <Users className="w-4 h-4 md:mr-2" />
-            <span className="hidden md:inline">Users</span>
+            <span className="hidden sm:inline">Users</span>
+            <span className="sm:hidden">Usr</span>
           </TabsTrigger>
           <TabsTrigger value="categories" className="admin-mobile-tab">
             <FileText className="w-4 h-4 md:mr-2" />
-            <span className="hidden md:inline">Categories</span>
+            <span className="hidden sm:inline">Categories</span>
+            <span className="sm:hidden">Cat</span>
           </TabsTrigger>
           <TabsTrigger value="payments" className="admin-mobile-tab">
             <CreditCard className="w-4 h-4 md:mr-2" />
-            <span className="hidden md:inline">Payments</span>
+            <span className="hidden sm:inline">Payments</span>
+            <span className="sm:hidden">Pay</span>
           </TabsTrigger>
           <TabsTrigger value="payment-events" className="admin-mobile-tab">
             <Calendar className="w-4 h-4 md:mr-2" />
-            <span className="hidden md:inline">Payment Events</span>
+            <span className="hidden sm:inline">Events</span>
+            <span className="sm:hidden">Evt</span>
           </TabsTrigger>
           <TabsTrigger value="community" className="admin-mobile-tab">
             <Megaphone className="w-4 h-4 md:mr-2" />
-            <span className="hidden md:inline">Community</span>
+            <span className="hidden lg:inline">Community</span>
+            <span className="lg:hidden">Comm</span>
           </TabsTrigger>
           {/* <TabsTrigger value="files" className="admin-mobile-tab">
             <HardDrive className="w-4 h-4 md:mr-2" />
