@@ -4,6 +4,7 @@
  */
 import {
   DocumentData,
+  Query,
   QuerySnapshot,
   collection,
   onSnapshot,
@@ -71,11 +72,11 @@ export class NotificationListener {
     this.setupFallbackListeners();
   }
 
-  private setupSingleListener(query: any, source: string): void {
+  private setupSingleListener(query: Query<DocumentData>, source: string): void {
     const unsubscribe = onSnapshot(
       query,
-      (snapshot) => this.handleSnapshot(snapshot, source),
-      (error) => this.handleError(error, source)
+      (snapshot: QuerySnapshot<DocumentData>) => this.handleSnapshot(snapshot, source),
+      (error: unknown) => this.handleError(error, source)
     );
     this.unsubscribes.push(unsubscribe);
   }
@@ -115,47 +116,17 @@ export class NotificationListener {
     
     snapshot.docs.forEach(doc => {
       const data = doc.data() as Omit<Notification, 'id'>;
-      
-      // Debug logging for T2 apartment
-      if (this.apartment === 'T2') {
-        console.log(`🔍 Processing notification for T2 (${source}):`, {
-          id: doc.id,
-          title: data.title,
-          type: data.type,
-          toApartmentId: data.toApartmentId,
-          isRead: data.isRead,
-          source
-        });
-      }
-      
-      // Filter out expired announcements
-      if (data.type === 'announcement' && data.expiresAt) {
-        const expiryDate = new Date(data.expiresAt);
-        if (expiryDate < now) {
-          if (this.apartment === 'T2') {
-            console.log(`🔍 Filtering out expired notification:`, doc.id);
-          }
-          return;
-        }
+
+      this.logNotificationProcessing(this.apartment, source || '', doc.id, data);
+
+      if (this.isNotificationExpired(data, now)) {
+        this.logExpiredNotification(this.apartment, doc.id);
+        return;
       }
 
-      // Normalize read status for current apartment
-      let isReadForUser = false;
-      if (data.type === 'announcement' && typeof data.isRead === 'object' && data.isRead !== null) {
-        isReadForUser = Boolean((data.isRead as Record<string, boolean>)[this.apartment]);
-        if (this.apartment === 'T2') {
-          console.log(`🔍 T2 isRead processing:`, {
-            isReadObject: data.isRead,
-            apartmentKey: this.apartment,
-            isReadForUser
-          });
-        }
-      } else {
-        isReadForUser = Boolean(data.isRead);
-        if (this.apartment === 'T2') {
-          console.log(`🔍 T2 simple isRead:`, { isRead: data.isRead, isReadForUser });
-        }
-      }
+      const isReadForUser = this.normalizeReadStatus(data, this.apartment);
+
+      this.logReadStatus(this.apartment, data, isReadForUser);
 
       const notification = {
         id: doc.id,
@@ -164,14 +135,8 @@ export class NotificationListener {
       } as Notification;
 
       targetMap.set(doc.id, notification);
-      
-      if (this.apartment === 'T2') {
-        console.log(`🔍 Added notification to T2 ${source} map:`, {
-          id: doc.id,
-          title: notification.title,
-          isRead: notification.isRead
-        });
-      }
+
+      this.logAddedNotification(this.apartment, source || '', notification);
     });
 
     this.emitNotifications();
@@ -218,53 +183,79 @@ export class NotificationListener {
     const errorMessage = source ? `${source} listener error` : 'Notification listener error';
     console.error(`🚫 ${errorMessage}:`, error);
 
-    // Type guard to check if error is Error-like
-    const isErrorLike = (err: unknown): err is { message?: string; code?: number } => 
-      typeof err === 'object' && err !== null;
+    const errorType = this.classifyError(error);
 
-    // Check if this is an idle timeout error (common and recoverable)
-    const isIdleTimeout = isErrorLike(error) && (
-      error.message?.includes('CANCELLED') || 
-      error.message?.includes('Timed out waiting for new targets') ||
-      error.code === 1
-    ); // CANCELLED error code
-
-    if (isIdleTimeout) {
-      console.log('🔄 Detected idle timeout, restarting listener immediately');
-      // For idle timeouts, restart immediately without counting as a retry
-      if (this.isActive) {
-        this.cleanup();
-        setTimeout(() => {
-          if (this.isActive) {
-            this.setupListeners();
-          }
-        }, 1000); // Short delay to avoid rapid reconnection
-      }
+    if (errorType === 'idle-timeout') {
+      this.handleIdleTimeout();
       return;
     }
 
+    this.callOnError(error);
+
+    if (this.shouldRetry(this.currentRetries, this.maxRetries)) {
+      this.performRetry();
+    } else {
+      this.handleMaxRetriesReached();
+    }
+  }
+
+  private classifyError(error: unknown): string {
+    const isErrorLike = (err: unknown): err is { message?: string; code?: number } =>
+      typeof err === 'object' && err !== null;
+
+    const isIdleTimeout = isErrorLike(error) && (
+      error.message?.includes('CANCELLED') ||
+      error.message?.includes('Timed out waiting for new targets') ||
+      error.code === 1
+    );
+
+    return isIdleTimeout ? 'idle-timeout' : 'other';
+  }
+
+  private handleIdleTimeout(): void {
+    console.log('🔄 Detected idle timeout, restarting listener immediately');
+    if (this.isActive) {
+      this.cleanup();
+      setTimeout(() => {
+        if (this.isActive) {
+          this.setupListeners();
+        }
+      }, 1000);
+    }
+  }
+
+  private callOnError(error: unknown): void {
     if (this.onError) {
       const errorObj = error instanceof Error ? error : new Error(String(error));
       this.onError(errorObj);
     }
+  }
 
-    // Implement exponential backoff retry for other errors
-    if (this.isActive && this.currentRetries < this.maxRetries) {
-      this.currentRetries++;
-      const delay = this.retryDelay * Math.pow(2, this.currentRetries - 1);
-      
-      console.log(`🔄 Retrying notification listener in ${delay}ms (attempt ${this.currentRetries}/${this.maxRetries})`);
-      
-      this.retryTimeout = setTimeout(() => {
-        if (this.isActive) {
-          this.cleanup();
-          this.setupListeners();
-        }
-      }, delay);
-    } else if (this.currentRetries >= this.maxRetries) {
-      console.error('🚫 Max retries reached for notification listener');
-      this.stop();
-    }
+  private shouldRetry(currentRetries: number, maxRetries: number): boolean {
+    return currentRetries < maxRetries;
+  }
+
+  private performRetry(): void {
+    this.currentRetries++;
+    const delay = this.calculateRetryDelay(this.currentRetries, this.retryDelay);
+
+    console.log(`🔄 Retrying notification listener in ${delay}ms (attempt ${this.currentRetries}/${this.maxRetries})`);
+
+    this.retryTimeout = setTimeout(() => {
+      if (this.isActive) {
+        this.cleanup();
+        this.setupListeners();
+      }
+    }, delay);
+  }
+
+  private calculateRetryDelay(retryCount: number, baseDelay: number): number {
+    return baseDelay * Math.pow(2, retryCount - 1);
+  }
+
+  private handleMaxRetriesReached(): void {
+    console.error('🚫 Max retries reached for notification listener');
+    this.stop();
   }
 
   private startKeepAlive(): void {
@@ -276,6 +267,65 @@ export class NotificationListener {
         this.setupListeners();
       }
     }, 5 * 60 * 1000); // 5 minutes
+  }
+
+  private isNotificationExpired(data: Omit<Notification, 'id'>, now: Date): boolean {
+    if (data.type === 'announcement' && data.expiresAt) {
+      const expiryDate = new Date(data.expiresAt);
+      return expiryDate < now;
+    }
+    return false;
+  }
+
+  private normalizeReadStatus(data: Omit<Notification, 'id'>, apartmentId: string): boolean {
+    if (data.type === 'announcement' && typeof data.isRead === 'object' && data.isRead !== null) {
+      return Boolean((data.isRead as Record<string, boolean>)[apartmentId]);
+    } else {
+      return Boolean(data.isRead);
+    }
+  }
+
+  private logNotificationProcessing(apartmentId: string, source: string, docId: string, data: Omit<Notification, 'id'>): void {
+    if (apartmentId === 'T2') {
+      console.log(`🔍 Processing notification for T2 (${source}):`, {
+        id: docId,
+        title: data.title,
+        type: data.type,
+        toApartmentId: data.toApartmentId,
+        isRead: data.isRead,
+        source
+      });
+    }
+  }
+
+  private logExpiredNotification(apartmentId: string, docId: string): void {
+    if (apartmentId === 'T2') {
+      console.log(`🔍 Filtering out expired notification:`, docId);
+    }
+  }
+
+  private logReadStatus(apartmentId: string, data: Omit<Notification, 'id'>, isReadForUser: boolean): void {
+    if (apartmentId === 'T2') {
+      if (data.type === 'announcement' && typeof data.isRead === 'object' && data.isRead !== null) {
+        console.log(`🔍 T2 isRead processing:`, {
+          isReadObject: data.isRead,
+          apartmentKey: apartmentId,
+          isReadForUser
+        });
+      } else {
+        console.log(`🔍 T2 simple isRead:`, { isRead: data.isRead, isReadForUser });
+      }
+    }
+  }
+
+  private logAddedNotification(apartmentId: string, source: string, notification: Notification): void {
+    if (apartmentId === 'T2') {
+      console.log(`🔍 Added notification to T2 ${source} map:`, {
+        id: notification.id,
+        title: notification.title,
+        isRead: notification.isRead
+      });
+    }
   }
 
   private cleanup(): void {

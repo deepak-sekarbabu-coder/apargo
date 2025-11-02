@@ -10,33 +10,18 @@ interface ValidationResult {
   suggestions: string[];
 }
 
-export function validateFirebaseConfig(): ValidationResult {
-  const result: ValidationResult = {
-    isValid: true,
-    errors: [],
-    warnings: [],
-    suggestions: [],
-  };
+interface Config {
+  apiKey: string;
+  authDomain: string;
+  projectId: string;
+  storageBucket: string;
+  messagingSenderId: string;
+  appId: string;
+}
 
-  // Check if we're in browser environment
-  if (typeof window === 'undefined') {
-    result.warnings.push('Running in server environment - some checks skipped');
-    return result;
-  }
-
-  // Check Firebase configuration using environment variables with fallback to hardcoded values
-  const config = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'AIzaSyA7g7daznFO-dDWYv8-jT08DDZlJSFT1lE',
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'unicorndev-b532a.firebaseapp.com',
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'unicorndev-b532a',
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'unicorndev-b532a.firebasestorage.app',
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '1047490636656',
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '1:1047490636656:web:851d9f253f1c7da6057db5',
-  };
-
-  // Validate required fields
+function validateConfigFields(config: Config, result: ValidationResult): void {
   const requiredFields = ['apiKey', 'authDomain', 'projectId', 'messagingSenderId', 'appId'];
-  
+
   for (const field of requiredFields) {
     if (!config[field as keyof typeof config]) {
       result.errors.push(`Missing required Firebase config field: ${field}`);
@@ -54,8 +39,9 @@ export function validateFirebaseConfig(): ValidationResult {
     result.errors.push('Firebase project ID appears to be invalid or placeholder');
     result.isValid = false;
   }
+}
 
-  // Check environment variables
+function validateEnvironmentSetup(result: ValidationResult): void {
   const envVars = {
     NEXT_PUBLIC_FIREBASE_API_KEY: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
     NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -65,7 +51,6 @@ export function validateFirebaseConfig(): ValidationResult {
     NEXT_PUBLIC_FIREBASE_APP_ID: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   };
 
-  // Check if environment variables are set
   let hasEnvVars = false;
   for (const [, value] of Object.entries(envVars)) {
     if (value) {
@@ -79,14 +64,14 @@ export function validateFirebaseConfig(): ValidationResult {
     result.suggestions.push('Consider using environment variables for Firebase configuration');
   }
 
-  // Check for VAPID key for push notifications
   const vapidKey = process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY;
   if (!vapidKey || vapidKey === 'YOUR_VAPID_KEY_HERE') {
     result.warnings.push('VAPID key not configured - push notifications will not work');
     result.suggestions.push('Set NEXT_PUBLIC_FIREBASE_VAPID_KEY for push notification support');
   }
+}
 
-  // Check browser compatibility
+function validateBrowserSupport(result: ValidationResult): void {
   if (!window.indexedDB) {
     result.errors.push('IndexedDB not supported - Firestore offline persistence unavailable');
     result.isValid = false;
@@ -96,12 +81,13 @@ export function validateFirebaseConfig(): ValidationResult {
     result.warnings.push('WebSocket not supported - will fall back to long polling');
   }
 
-  // Check for service worker support
   if (!('serviceWorker' in navigator)) {
     result.warnings.push('Service Worker not supported - push notifications unavailable');
   }
+}
 
-  // Check network conditions
+function validateNetworkAndExtensions(result: ValidationResult): void {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const connection = (navigator as {
     connection?: {
       effectiveType?: string;
@@ -120,14 +106,45 @@ export function validateFirebaseConfig(): ValidationResult {
     }
   }
 
-  // Check for ad blockers or extensions that might interfere
   if (window.navigator.plugins.length === 0) {
     result.warnings.push('Possible ad blocker detected - may interfere with Firebase connections');
   }
+}
 
-  // Validate Firestore rules (basic check)
+function addSecuritySuggestions(result: ValidationResult): void {
   result.suggestions.push('Ensure Firestore security rules allow authenticated users to read/write notifications');
   result.suggestions.push('Test Firestore rules in Firebase Console simulator');
+}
+
+export function validateFirebaseConfig(): ValidationResult {
+  const result: ValidationResult = {
+    isValid: true,
+    errors: [],
+    warnings: [],
+    suggestions: [],
+  };
+
+  // Check if we're in browser environment
+  if (typeof window === 'undefined') {
+    result.warnings.push('Running in server environment - some checks skipped');
+    return result;
+  }
+
+  // Check Firebase configuration using environment variables with fallback to hardcoded values
+  const config: Config = {
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'AIzaSyA7g7daznFO-dDWYv8-jT08DDZlJSFT1lE',
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'unicorndev-b532a.firebaseapp.com',
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'unicorndev-b532a',
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'unicorndev-b532a.firebasestorage.app',
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '1047490636656',
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '1:1047490636656:web:851d9f253f1c7da6057db5',
+  };
+
+  validateConfigFields(config, result);
+  validateEnvironmentSetup(result);
+  validateBrowserSupport(result);
+  validateNetworkAndExtensions(result);
+  addSecuritySuggestions(result);
 
   return result;
 }

@@ -41,6 +41,15 @@ import type {
   Vendor,
 } from './types';
 
+type DeltaCalculation = {
+  oldMonth: string;
+  newMonth: string;
+  oldDeltas: Record<string, { totalIncomeDelta: number; totalExpensesDelta: number }>;
+  newDeltas: Record<string, { totalIncomeDelta: number; totalExpensesDelta: number }>;
+  negOldDeltas: Record<string, { totalIncomeDelta: number; totalExpensesDelta: number }>;
+  mergedDeltas: Record<string, { totalIncomeDelta: number; totalExpensesDelta: number }>;
+};
+
 // Helper: derive monthYear (YYYY-MM) from ISO date or now
 const getMonthYearFromDate = (isoDate?: string) => {
   const d = isoDate ? new Date(isoDate) : new Date();
@@ -89,6 +98,57 @@ export const computeExpenseDeltas = (expense: Expense) => {
   applyIncomeToPayer(payer, totalIncoming, deltas);
 
   return { monthYear, deltas };
+};
+
+const calculateDeltaChanges = (oldExpense: Expense, newExpense: Expense): DeltaCalculation => {
+  const { monthYear: oldMonth, deltas: oldD } = computeExpenseDeltas(oldExpense);
+  const { monthYear: newMonth, deltas: newD } = computeExpenseDeltas(newExpense);
+
+  // Apply negative of old deltas
+  const negOld: Record<string, { totalIncomeDelta: number; totalExpensesDelta: number }> = {};
+  Object.entries(oldD).forEach(([k, v]) => {
+    negOld[k] = {
+      totalIncomeDelta: -v.totalIncomeDelta,
+      totalExpensesDelta: -v.totalExpensesDelta,
+    };
+  });
+
+  const merged: Record<string, { totalIncomeDelta: number; totalExpensesDelta: number }> = {};
+  if (oldMonth === newMonth) {
+    // Merge negOld and newD
+    Object.entries(negOld).forEach(([k, v]) => {
+      merged[k] = {
+        ...(merged[k] || { totalIncomeDelta: 0, totalExpensesDelta: 0 }),
+        totalIncomeDelta: (merged[k]?.totalIncomeDelta || 0) + v.totalIncomeDelta,
+        totalExpensesDelta: (merged[k]?.totalExpensesDelta || 0) + v.totalExpensesDelta,
+      };
+    });
+    Object.entries(newD).forEach(([k, v]) => {
+      merged[k] = {
+        ...(merged[k] || { totalIncomeDelta: 0, totalExpensesDelta: 0 }),
+        totalIncomeDelta: (merged[k]?.totalIncomeDelta || 0) + v.totalIncomeDelta,
+        totalExpensesDelta: (merged[k]?.totalExpensesDelta || 0) + v.totalExpensesDelta,
+      };
+    });
+  }
+
+  return {
+    oldMonth,
+    newMonth,
+    oldDeltas: oldD,
+    newDeltas: newD,
+    negOldDeltas: negOld,
+    mergedDeltas: merged,
+  };
+};
+
+const updateBalanceSheets = async (deltas: DeltaCalculation): Promise<void> => {
+  if (deltas.oldMonth === deltas.newMonth) {
+    await applyDeltasToBalanceSheets(deltas.mergedDeltas, deltas.newMonth);
+  } else {
+    await applyDeltasToBalanceSheets(deltas.negOldDeltas, deltas.oldMonth);
+    await applyDeltasToBalanceSheets(deltas.newDeltas, deltas.newMonth);
+  }
 };
 
 // Apply deltas (positive or negative) to balanceSheets documents using updateDoc/addDoc
@@ -400,44 +460,9 @@ export const updateExpense = async (id: string, expense: Partial<Expense>): Prom
   await updateDoc(expenseDoc, cleanExpense);
 
   try {
-    // Recompute deltas: subtract old, add new
-    const { monthYear: oldMonth, deltas: oldD } = computeExpenseDeltas(oldExpense);
     const newExpense = { ...oldExpense, ...cleanExpense } as Expense;
-    const { monthYear: newMonth, deltas: newD } = computeExpenseDeltas(newExpense);
-
-    // Apply negative of old deltas
-    const negOld: Record<string, { totalIncomeDelta: number; totalExpensesDelta: number }> = {};
-    Object.entries(oldD).forEach(([k, v]) => {
-      negOld[k] = {
-        totalIncomeDelta: -v.totalIncomeDelta,
-        totalExpensesDelta: -v.totalExpensesDelta,
-      };
-    });
-
-    // Apply: remove old, add new
-    if (oldMonth === newMonth) {
-      // Merge negOld and newD
-      const merged: Record<string, { totalIncomeDelta: number; totalExpensesDelta: number }> = {};
-      Object.entries(negOld).forEach(([k, v]) => {
-        merged[k] = {
-          ...(merged[k] || { totalIncomeDelta: 0, totalExpensesDelta: 0 }),
-          totalIncomeDelta: (merged[k]?.totalIncomeDelta || 0) + v.totalIncomeDelta,
-          totalExpensesDelta: (merged[k]?.totalExpensesDelta || 0) + v.totalExpensesDelta,
-        };
-      });
-      Object.entries(newD).forEach(([k, v]) => {
-        merged[k] = {
-          ...(merged[k] || { totalIncomeDelta: 0, totalExpensesDelta: 0 }),
-          totalIncomeDelta: (merged[k]?.totalIncomeDelta || 0) + v.totalIncomeDelta,
-          totalExpensesDelta: (merged[k]?.totalExpensesDelta || 0) + v.totalExpensesDelta,
-        };
-      });
-      await applyDeltasToBalanceSheets(merged, newMonth);
-    } else {
-      // Different months: subtract old from oldMonth, add new to newMonth
-      await applyDeltasToBalanceSheets(negOld, oldMonth);
-      await applyDeltasToBalanceSheets(newD, newMonth);
-    }
+    const deltaCalc = calculateDeltaChanges(oldExpense, newExpense);
+    await updateBalanceSheets(deltaCalc);
   } catch (err) {
     console.error('Error updating balanceSheets after updateExpense:', err);
   }
@@ -821,11 +846,9 @@ export const subscribeToPayments = (
 
 // --- Payment Events ---
 // Generate monthly payment events for configured categories
-export const generatePaymentEvents = async (
-  categoryId: string,
-  monthYear: string
-): Promise<Payment[]> => {
-  // Get the category configuration
+
+// Helper function to validate category
+const validateCategory = async (categoryId: string): Promise<Category> => {
   const categoryDoc = await getDoc(doc(db, 'categories', categoryId));
   if (!categoryDoc.exists()) {
     throw new Error(`Category ${categoryId} not found`);
@@ -833,22 +856,61 @@ export const generatePaymentEvents = async (
 
   const category = { id: categoryDoc.id, ...categoryDoc.data() } as Category;
 
-  // Validate category is configured for payment events
   if (!category.isPaymentEvent || !category.monthlyAmount || typeof category.monthlyAmount !== 'number' || category.monthlyAmount <= 0) {
     throw new Error(`Category ${category.name} is not configured for payment events or has invalid monthlyAmount: ${category.monthlyAmount}`);
   }
 
-  // Get all apartments
-  const apartments = await getApartments();
+  return category;
+};
 
-  // Get all apartment members
+// Helper function to check if payment event exists
+const checkExistingPayment = async (apartmentId: string, monthYear: string, categoryName: string): Promise<boolean> => {
+  const existingPayments = await getPayments(apartmentId, monthYear);
+  return existingPayments.some(
+    payment =>
+      payment.reason?.includes('Monthly maintenance fee') ||
+      payment.reason?.includes(categoryName)
+  );
+};
+
+// Helper function to create apartment payment
+const createApartmentPayment = async (apartment: Apartment, category: Category, firstMember: User, monthYear: string): Promise<Payment | null> => {
+  const monthlyAmount = typeof category.monthlyAmount === 'number' ? category.monthlyAmount : 0;
+  if (monthlyAmount <= 0) {
+    console.warn(`Skipping payment event for category ${category.name} with invalid amount: ${monthlyAmount}`);
+    return null;
+  }
+
+  const paymentEventData: Omit<Payment, 'id' | 'createdAt'> = {
+    payerId: firstMember.id,
+    payeeId: firstMember.id,
+    apartmentId: apartment.id,
+    category: 'income',
+    amount: monthlyAmount,
+    status: 'pending',
+    monthYear,
+    reason: `Monthly maintenance fee - ${category.name}`,
+  };
+
+  try {
+    const createdPayment = await addPayment(paymentEventData);
+    return createdPayment;
+  } catch (error) {
+    console.error(`Failed to create payment event for apartment ${apartment.id}:`, error);
+    return null;
+  }
+};
+export const generatePaymentEvents = async (
+  categoryId: string,
+  monthYear: string
+): Promise<Payment[]> => {
+  const category = await validateCategory(categoryId);
+  const apartments = await getApartments();
   const allUsers = await getUsers();
 
   const createdPayments: Payment[] = [];
 
-  // Create payment events for each apartment
   for (const apartment of apartments) {
-    // Find the first member of the apartment to use as payee (they need to pay)
     const apartmentMembers = allUsers.filter(user => user.apartment === apartment.id);
     if (apartmentMembers.length === 0) {
       console.warn(
@@ -859,42 +921,14 @@ export const generatePaymentEvents = async (
 
     const firstMember = apartmentMembers[0];
 
-    // Check if payment event already exists for this apartment and month
-    const existingPayments = await getPayments(apartment.id, monthYear);
-    const paymentEventExists = existingPayments.some(
-      payment =>
-        payment.reason?.includes('Monthly maintenance fee') ||
-        payment.reason?.includes(category.name)
-    );
-
-    if (paymentEventExists) {
+    if (await checkExistingPayment(apartment.id, monthYear, category.name)) {
       console.log(`Payment event already exists for apartment ${apartment.id} in ${monthYear}`);
       continue;
     }
 
-    // Validate amount and create payment event record
-    const monthlyAmount = typeof category.monthlyAmount === 'number' ? category.monthlyAmount : 0;
-    if (monthlyAmount <= 0) {
-      console.warn(`Skipping payment event for category ${category.name} with invalid amount: ${monthlyAmount}`);
-      continue;
-    }
-
-    const paymentEventData: Omit<Payment, 'id' | 'createdAt'> = {
-      payerId: firstMember.id, // The apartment member who needs to pay
-      payeeId: firstMember.id, // Same person (system-generated payment event)
-      apartmentId: apartment.id,
-      category: 'income',
-      amount: monthlyAmount,
-      status: 'pending',
-      monthYear,
-      reason: `Monthly maintenance fee - ${category.name}`,
-    };
-
-    try {
-      const createdPayment = await addPayment(paymentEventData);
-      createdPayments.push(createdPayment);
-    } catch (error) {
-      console.error(`Failed to create payment event for apartment ${apartment.id}:`, error);
+    const payment = await createApartmentPayment(apartment, category, firstMember, monthYear);
+    if (payment) {
+      createdPayments.push(payment);
     }
   }
 
