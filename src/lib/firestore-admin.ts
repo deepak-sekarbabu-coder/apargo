@@ -126,12 +126,9 @@ export const getApartmentsAdmin = async (): Promise<Apartment[]> => {
   }
 };
 
-// Get payment event summary for admin dashboard
-export const getPaymentEventSummary = async (monthYear: string) => {
-  const paymentEvents = await getPaymentEvents(monthYear);
-  const apartments = await getApartmentsAdmin();
-
-  const summary = {
+// Helper to calculate summary totals
+function calculateSummaryTotals(paymentEvents: Payment[]) {
+  return {
     totalEvents: paymentEvents.length,
     totalAmount: paymentEvents.reduce((sum, payment) => sum + payment.amount, 0),
     paidCount: paymentEvents.filter(
@@ -139,25 +136,38 @@ export const getPaymentEventSummary = async (monthYear: string) => {
     ).length,
     pendingCount: paymentEvents.filter(payment => payment.status === 'pending').length,
     overdueCount: 0, // Could add logic for overdue payments based on due date
-    apartmentStatus: apartments.map(apartment => {
-      const apartmentPayments = paymentEvents.filter(
-        payment => payment.apartmentId === apartment.id
-      );
-      const totalOwed = apartmentPayments.reduce((sum, payment) => sum + payment.amount, 0);
-      const totalPaid = apartmentPayments
-        .filter(payment => payment.status === 'paid' || payment.status === 'approved')
-        .reduce((sum, payment) => sum + payment.amount, 0);
+  };
+}
 
-      return {
-        apartmentId: apartment.id,
-        apartmentName: apartment.name,
-        totalOwed,
-        totalPaid,
-        pendingAmount: totalOwed - totalPaid,
-        isPaid: totalPaid >= totalOwed,
-        payments: apartmentPayments,
-      };
-    }),
+// Helper to build apartment status
+function buildApartmentStatus(apartment: Apartment, paymentEvents: Payment[]) {
+  const apartmentPayments = paymentEvents.filter(
+    payment => payment.apartmentId === apartment.id
+  );
+  const totalOwed = apartmentPayments.reduce((sum, payment) => sum + payment.amount, 0);
+  const totalPaid = apartmentPayments
+    .filter(payment => payment.status === 'paid' || payment.status === 'approved')
+    .reduce((sum, payment) => sum + payment.amount, 0);
+
+  return {
+    apartmentId: apartment.id,
+    apartmentName: apartment.name,
+    totalOwed,
+    totalPaid,
+    pendingAmount: totalOwed - totalPaid,
+    isPaid: totalPaid >= totalOwed,
+    payments: apartmentPayments,
+  };
+}
+
+// Get payment event summary for admin dashboard
+export const getPaymentEventSummary = async (monthYear: string) => {
+  const paymentEvents = await getPaymentEvents(monthYear);
+  const apartments = await getApartmentsAdmin();
+
+  const summary = {
+    ...calculateSummaryTotals(paymentEvents),
+    apartmentStatus: apartments.map(apartment => buildApartmentStatus(apartment, paymentEvents)),
   };
 
   return summary;

@@ -115,6 +115,48 @@ export class StorageService {
   }
 
   /**
+   * Create file metadata object
+   */
+  private createFileMetadata(
+    file: File,
+    storagePath: string,
+    downloadURL: string,
+    category: FileMetadata['category'],
+    userId: string,
+    relatedId?: string,
+    apartmentId?: string
+  ): Omit<FileMetadata, 'id'> {
+    return {
+      originalName: file.name,
+      fileName: storagePath.split('/').pop() || file.name,
+      storagePath,
+      downloadURL,
+      fileSize: file.size,
+      mimeType: file.type,
+      uploadedBy: userId,
+      uploadedAt: new Date().toISOString(),
+      category,
+      ...(relatedId !== undefined && { relatedId }),
+      ...(apartmentId !== undefined && { apartmentId }),
+    };
+  }
+
+  /**
+   * Handle upload error
+   */
+  private handleUploadError(error: unknown, fileName: string): never {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    if (errorMessage.includes('storage') || errorMessage.includes('bucket')) {
+      throw new Error(
+        'Upload failed. Verify Firebase Storage bucket configuration and rules allow authenticated writes.'
+      );
+    }
+
+    throw new Error(`Upload failed: ${errorMessage}`);
+  }
+
+  /**
    * Upload file with metadata storage
    */
   async uploadFileWithMetadata(
@@ -160,20 +202,8 @@ export class StorageService {
       // Get download URL
       const downloadURL = await getDownloadURL(uploadResult.ref);
 
-      // Create file metadata - filter out undefined values for Firestore
-      const fileMetadata: Omit<FileMetadata, 'id'> = {
-        originalName: file.name,
-        fileName: storagePath.split('/').pop() || file.name,
-        storagePath,
-        downloadURL,
-        fileSize: file.size,
-        mimeType: file.type,
-        uploadedBy: userId,
-        uploadedAt: new Date().toISOString(),
-        category,
-        ...(relatedId !== undefined && { relatedId }),
-        ...(apartmentId !== undefined && { apartmentId }),
-      };
+      // Create file metadata
+      const fileMetadata = this.createFileMetadata(file, storagePath, downloadURL, category, userId, relatedId, apartmentId);
 
       // Store metadata in Firestore
       const metadataCollection = collection(db, 'fileMetadata');
@@ -188,15 +218,7 @@ export class StorageService {
       return finalMetadata;
     } catch (error) {
       log.error('File upload failed:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-
-      if (errorMessage.includes('storage') || errorMessage.includes('bucket')) {
-        throw new Error(
-          'Upload failed. Verify Firebase Storage bucket configuration and rules allow authenticated writes.'
-        );
-      }
-
-      throw new Error(`Upload failed: ${errorMessage}`);
+      this.handleUploadError(error, file.name);
     }
   }
 

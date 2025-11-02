@@ -64,6 +64,30 @@ export function distributePayment(
   };
 }
 
+// Helper to create a payment request notification
+function createPaymentRequestNotification(
+  payment: PaymentDistribution,
+  apartment: { apartment: Apartment; share: number },
+  dueDate: string,
+  userId?: string
+): Omit<Notification, 'id'> {
+  return {
+    type: 'payment_request',
+    title: `Payment Request from ${payment.payingApartment.name}`,
+    message: `${payment.description || 'Shared expense'}. Your share: ₹${apartment.share.toFixed(2)}`,
+    amount: apartment.share,
+    currency: '₹',
+    fromApartmentId: payment.payingApartment.id,
+    toApartmentId: apartment.apartment.id,
+    isRead: false,
+    createdAt: new Date().toISOString(),
+    dueDate,
+    status: 'pending',
+    category: typeof payment.category === 'object' ? payment.category.name : payment.category,
+    requestedBy: userId,
+  };
+}
+
 export async function sendPaymentRequests(
   payment: PaymentDistribution,
   userId?: string
@@ -74,25 +98,10 @@ export async function sendPaymentRequests(
     payment.dueDate?.toISOString() || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // Default to 7 days from now
 
   // Create a notification for each owing apartment
-  payment.otherApartments.forEach(({ apartment, share }) => {
-    if (apartment.id === payment.payingApartment.id) return; // Skip the paying apartment
+  payment.otherApartments.forEach((apartmentData) => {
+    if (apartmentData.apartment.id === payment.payingApartment.id) return; // Skip the paying apartment
 
-    const notification: Omit<Notification, 'id'> = {
-      type: 'payment_request',
-      title: `Payment Request from ${payment.payingApartment.name}`,
-      message: `${payment.description || 'Shared expense'}. Your share: ₹${share.toFixed(2)}`,
-      amount: share,
-      currency: '₹',
-      fromApartmentId: payment.payingApartment.id,
-      toApartmentId: apartment.id,
-      isRead: false,
-      createdAt: now,
-      dueDate,
-      status: 'pending',
-      category: typeof payment.category === 'object' ? payment.category.name : payment.category,
-      requestedBy: userId,
-    };
-
+    const notification = createPaymentRequestNotification(payment, apartmentData, dueDate, userId);
     batch.push(addDoc(collection(db, 'notifications'), notification));
   });
 

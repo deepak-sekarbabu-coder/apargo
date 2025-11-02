@@ -458,6 +458,22 @@ export const deleteExpense = async (id: string): Promise<void> => {
   await deleteDoc(expenseDoc);
 };
 
+// Helper for handling snapshot updates in relevant expenses subscription
+const createExpenseSnapshotHandler = (
+  expenseMap: Map<string, Expense>,
+  emitMerged: () => void
+) => {
+  return (snapshot: QuerySnapshot<DocumentData>) => {
+    snapshot.docs.forEach(doc => expenseMap.set(doc.id, { id: doc.id, ...doc.data() } as Expense));
+    // Remove any docs that were deleted from this snapshot
+    const currentIds = new Set(snapshot.docs.map(d => d.id));
+    Array.from(expenseMap.keys()).forEach(id => {
+      if (!currentIds.has(id)) expenseMap.delete(id);
+    });
+    emitMerged();
+  };
+};
+
 export const subscribeToRelevantExpenses = (
   callback: (expenses: Expense[]) => void,
   apartment: string
@@ -481,24 +497,8 @@ export const subscribeToRelevantExpenses = (
     callback(Array.from(merged.values()));
   };
 
-  const paidUnsub = onSnapshot(paidByQuery, (snapshot: QuerySnapshot<DocumentData>) => {
-    snapshot.docs.forEach(doc => paidMap.set(doc.id, { id: doc.id, ...doc.data() } as Expense));
-    // Remove any docs that were deleted from this snapshot
-    const currentIds = new Set(snapshot.docs.map(d => d.id));
-    Array.from(paidMap.keys()).forEach(id => {
-      if (!currentIds.has(id)) paidMap.delete(id);
-    });
-    emitMerged();
-  });
-
-  const owedUnsub = onSnapshot(owedByQuery, (snapshot: QuerySnapshot<DocumentData>) => {
-    snapshot.docs.forEach(doc => owedMap.set(doc.id, { id: doc.id, ...doc.data() } as Expense));
-    const currentIds = new Set(snapshot.docs.map(d => d.id));
-    Array.from(owedMap.keys()).forEach(id => {
-      if (!currentIds.has(id)) owedMap.delete(id);
-    });
-    emitMerged();
-  });
+  const paidUnsub = onSnapshot(paidByQuery, createExpenseSnapshotHandler(paidMap, emitMerged));
+  const owedUnsub = onSnapshot(owedByQuery, createExpenseSnapshotHandler(owedMap, emitMerged));
 
   // Return a combined unsubscribe
   return () => {

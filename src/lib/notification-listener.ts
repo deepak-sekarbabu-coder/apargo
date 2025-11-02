@@ -71,6 +71,15 @@ export class NotificationListener {
     this.setupFallbackListeners();
   }
 
+  private setupSingleListener(query: any, source: string): void {
+    const unsubscribe = onSnapshot(
+      query,
+      (snapshot) => this.handleSnapshot(snapshot, source),
+      (error) => this.handleError(error, source)
+    );
+    this.unsubscribes.push(unsubscribe);
+  }
+
   private setupFallbackListeners(): void {
     if (!this.isActive) return;
 
@@ -86,25 +95,12 @@ export class NotificationListener {
     );
 
     // Setup first listener
-    const unsubscribe1 = onSnapshot(
-      stringQuery,
-      (snapshot) => this.handleSnapshot(snapshot, 'string'),
-      (error) => this.handleError(error, 'string')
-    );
-
-    this.unsubscribes.push(unsubscribe1);
+    this.setupSingleListener(stringQuery, 'string');
 
     // Setup second listener with slight delay to avoid conflicts
     setTimeout(() => {
       if (!this.isActive) return;
-
-      const unsubscribe2 = onSnapshot(
-        arrayQuery,
-        (snapshot) => this.handleSnapshot(snapshot, 'array'),
-        (error) => this.handleError(error, 'array')
-      );
-
-      this.unsubscribes.push(unsubscribe2);
+      this.setupSingleListener(arrayQuery, 'array');
     }, 100);
   }
 
@@ -326,11 +322,35 @@ export class AdminNotificationListener {
     this.onError = onError;
   }
 
+  private handleAdminSnapshot(snapshot: QuerySnapshot<DocumentData>): void {
+    const now = new Date();
+    const notifications = snapshot.docs
+      .map(doc => {
+        const data = doc.data() as Omit<Notification, 'id'>;
+
+        // Filter out expired announcements
+        if (data.expiresAt) {
+          const expiryDate = new Date(data.expiresAt);
+          if (expiryDate < now) return null;
+        }
+
+        return {
+          id: doc.id,
+          ...data,
+          isRead: false, // Admins see all as unread
+        } as Notification;
+      })
+      .filter((n): n is Notification => n !== null)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    this.onNotifications(notifications);
+  }
+
   start(): void {
     if (this.isActive) return;
 
     this.isActive = true;
-    
+
     const announcementsQuery = query(
       collection(db, 'notifications'),
       where('type', '==', 'announcement')
@@ -338,29 +358,7 @@ export class AdminNotificationListener {
 
     this.unsubscribe = onSnapshot(
       announcementsQuery,
-      (snapshot) => {
-        const now = new Date();
-        const notifications = snapshot.docs
-          .map(doc => {
-            const data = doc.data() as Omit<Notification, 'id'>;
-            
-            // Filter out expired announcements
-            if (data.expiresAt) {
-              const expiryDate = new Date(data.expiresAt);
-              if (expiryDate < now) return null;
-            }
-
-            return {
-              id: doc.id,
-              ...data,
-              isRead: false, // Admins see all as unread
-            } as Notification;
-          })
-          .filter((n): n is Notification => n !== null)
-          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-        this.onNotifications(notifications);
-      },
+      (snapshot) => this.handleAdminSnapshot(snapshot),
       (error) => {
         console.error('🚫 Admin notification listener error:', error);
         if (this.onError) {

@@ -102,15 +102,54 @@ export class FirebaseHealthMonitor {
         this.performHealthCheck();
     }
 
+    private handleUnauthenticatedHealthCheck(): void {
+        this.updateHealth({
+            isConnected: false,
+            lastSuccessfulOperation: null,
+            errorCount: 0,
+            lastError: null, // Don't show error for unauthenticated state
+        });
+    }
+
+    private handleSuccessfulHealthCheck(): void {
+        this.updateHealth({
+            isConnected: true,
+            lastSuccessfulOperation: new Date(),
+            errorCount: 0,
+            lastError: null,
+        });
+
+        // Test real-time listener if not already active
+        if (!this.testUnsubscribe) {
+            this.setupTestListener();
+        }
+    }
+
+    private handleHealthCheckError(error: unknown): void {
+        // Handle permission errors more gracefully
+        const isPermissionError = (error as any)?.code === 'permission-denied';
+
+        if (isPermissionError) {
+            // Silently handle permission errors for unauthenticated users
+            this.updateHealth({
+                isConnected: false,
+                errorCount: 0, // Don't count permission errors
+                lastError: null, // Don't show permission errors to user
+            });
+        } else {
+            console.error('Firebase health check failed:', error);
+            this.updateHealth({
+                isConnected: false,
+                errorCount: this.health.errorCount + 1,
+                lastError: error as Error,
+            });
+        }
+    }
+
     private async performHealthCheck(): Promise<void> {
         // Skip health check if user is not authenticated
         if (!auth.currentUser) {
-            this.updateHealth({
-                isConnected: false,
-                lastSuccessfulOperation: null,
-                errorCount: 0,
-                lastError: null, // Don't show error for unauthenticated state
-            });
+            this.handleUnauthenticatedHealthCheck();
             return;
         }
 
@@ -119,36 +158,9 @@ export class FirebaseHealthMonitor {
             const testQuery = query(collection(db, 'notifications'), limit(1));
             await getDocs(testQuery);
 
-            this.updateHealth({
-                isConnected: true,
-                lastSuccessfulOperation: new Date(),
-                errorCount: 0,
-                lastError: null,
-            });
-
-            // Test real-time listener if not already active
-            if (!this.testUnsubscribe) {
-                this.setupTestListener();
-            }
+            this.handleSuccessfulHealthCheck();
         } catch (error) {
-            // Handle permission errors more gracefully
-            const isPermissionError = (error as any)?.code === 'permission-denied';
-            
-            if (isPermissionError) {
-                // Silently handle permission errors for unauthenticated users
-                this.updateHealth({
-                    isConnected: false,
-                    errorCount: 0, // Don't count permission errors
-                    lastError: null, // Don't show permission errors to user
-                });
-            } else {
-                console.error('Firebase health check failed:', error);
-                this.updateHealth({
-                    isConnected: false,
-                    errorCount: this.health.errorCount + 1,
-                    lastError: error as Error,
-                });
-            }
+            this.handleHealthCheckError(error);
         }
     }
 
@@ -305,14 +317,33 @@ export const diagnostics = {
         }
     },
 
-    // Generate diagnostic report
-    generateReport: async (): Promise<string> => {
+    // Collect diagnostic data
+    collectDiagnosticData: async () => {
         const health = FirebaseHealthMonitor.getInstance().getHealth();
         const networkInfo = diagnostics.getNetworkInfo();
         const isQuic = diagnostics.isQuicEnabled();
         const hasProxy = await diagnostics.detectProxyOrFirewall();
 
+        return {
+            health,
+            networkInfo,
+            isQuic,
+            hasProxy,
+        };
+    },
+
+    // Format diagnostic report
+    formatReport: (data: Awaited<ReturnType<typeof diagnostics.collectDiagnosticData>>): string => {
+        const { health, networkInfo, isQuic, hasProxy } = data;
+
         return `
+    },
+    },
+
+    // Generate diagnostic report
+    generateReport: async (): Promise<string> => {
+        const data = await diagnostics.collectDiagnosticData();
+        return diagnostics.formatReport(data);
 Firebase Connection Diagnostic Report
 =====================================
 Connection Status: ${health.isConnected ? 'Connected' : 'Disconnected'}
