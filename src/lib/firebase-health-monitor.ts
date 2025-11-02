@@ -164,6 +164,34 @@ export class FirebaseHealthMonitor {
         }
     }
 
+    private handleTestListenerSuccess = () => {
+        this.updateHealth({
+            isConnected: true,
+            lastSuccessfulOperation: new Date(),
+            connectionType: this.detectConnectionType(),
+        });
+    };
+
+    private handleTestListenerError = (error: any) => {
+        const isPermissionError = error?.code === 'permission-denied';
+
+        if (!isPermissionError) {
+            console.error('Firebase test listener error:', error);
+        }
+
+        this.updateHealth({
+            isConnected: false,
+            errorCount: this.health.errorCount + 1,
+            lastError: error,
+        });
+
+        // Clean up failed listener
+        if (this.testUnsubscribe) {
+            this.testUnsubscribe();
+            this.testUnsubscribe = undefined;
+        }
+    };
+
     private setupTestListener(): void {
         // Skip listener setup if user is not authenticated
         if (!auth.currentUser) {
@@ -176,33 +204,8 @@ export class FirebaseHealthMonitor {
 
             this.testUnsubscribe = onSnapshot(
                 testQuery,
-                () => {
-                    // Successful listener connection
-                    this.updateHealth({
-                        isConnected: true,
-                        lastSuccessfulOperation: new Date(),
-                        connectionType: this.detectConnectionType(),
-                    });
-                },
-                (error) => {
-                    const isPermissionError = (error as any)?.code === 'permission-denied';
-                    
-                    if (!isPermissionError) {
-                        console.error('Firebase test listener error:', error);
-                    }
-                    
-                    this.updateHealth({
-                        isConnected: false,
-                        errorCount: this.health.errorCount + 1,
-                        lastError: error,
-                    });
-
-                    // Clean up failed listener
-                    if (this.testUnsubscribe) {
-                        this.testUnsubscribe();
-                        this.testUnsubscribe = undefined;
-                    }
-                }
+                this.handleTestListenerSuccess,
+                this.handleTestListenerError
             );
         } catch (error) {
             console.error('Failed to setup test listener:', error);

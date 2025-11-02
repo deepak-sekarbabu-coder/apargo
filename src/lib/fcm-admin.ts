@@ -21,6 +21,96 @@ export interface SendNotificationResult {
   errors: string[];
 }
 
+async function collectFcmTokens(apartmentIds: string[]): Promise<{tokens: string[], tokenToUserMap: Map<string, {id: string, name: string, apartment: string}>}> {
+  const adminDb = getFirestore(getFirebaseAdminApp());
+  const usersSnapshot = await adminDb.collection('users').get();
+  const fcmTokens: string[] = [];
+  const tokenToUserMap = new Map<string, { id: string; name: string; apartment: string }>();
+
+  usersSnapshot.forEach(doc => {
+    const userData = doc.data();
+    if (userData.apartment && apartmentIds.includes(userData.apartment) && userData.fcmToken) {
+      fcmTokens.push(userData.fcmToken);
+      tokenToUserMap.set(userData.fcmToken, {
+        id: doc.id,
+        name: userData.name,
+        apartment: userData.apartment,
+      });
+    }
+  });
+
+  return { tokens: fcmTokens, tokenToUserMap };
+}
+
+function prepareMessage(notification: FCMNotificationPayload, tokens: string[]) {
+  return {
+    notification: {
+      title: notification.title,
+      body: notification.body,
+    },
+    data: {
+      ...notification.data,
+      clickAction: notification.clickAction || '/',
+      type: 'announcement',
+      icon: notification.icon || '/icon-192x192.png',
+    },
+    tokens,
+  };
+}
+
+async function processResponse(
+  response: any,
+  fcmTokens: string[],
+  tokenToUserMap: Map<string, {id: string, name: string, apartment: string}>
+): Promise<{successfulDeliveries: number, failedDeliveries: number, failedTokens: string[], errors: string[]}> {
+  const result = {
+    successfulDeliveries: response.successCount,
+    failedDeliveries: response.failureCount,
+    failedTokens: [] as string[],
+    errors: [] as string[],
+  };
+
+  if (response.failureCount > 0) {
+    response.responses.forEach((resp: any, idx: number) => {
+      if (!resp.success) {
+        const failedToken = fcmTokens[idx];
+        result.failedTokens.push(failedToken);
+
+        const user = tokenToUserMap.get(failedToken);
+        const errorCode = resp.error?.code || 'unknown';
+        const errorMessage = resp.error?.message || 'Unknown error';
+
+        console.error(
+          `FCM delivery failed for user ${user?.name} (${user?.apartment}): ${errorCode} - ${errorMessage}`
+        );
+        result.errors.push(`Failed for ${user?.name}: ${errorCode}`);
+
+        if (
+          errorCode === 'messaging/registration-token-not-registered' ||
+          errorCode === 'messaging/invalid-registration-token'
+        ) {
+          removeInvalidToken(user?.id || '');
+        }
+      }
+    });
+  }
+
+  return result;
+}
+
+async function removeInvalidToken(userId: string) {
+  const adminDb = getFirestore(getFirebaseAdminApp());
+  adminDb
+    .collection('users')
+    .doc(userId)
+    .update({
+      fcmToken: null,
+    })
+    .catch(err => {
+      console.error('Error removing invalid FCM token:', err);
+    });
+}
+
 /**
  * Send push notifications to multiple users by their apartment IDs
  */
@@ -38,27 +128,7 @@ export async function sendPushNotificationToApartments(
   };
 
   try {
-    const adminApp = getFirebaseAdminApp();
-    const adminDb = getFirestore(adminApp);
-    const messaging = getMessaging(adminApp);
-
-    // Get all users with FCM tokens in the specified apartments
-    const usersSnapshot = await adminDb.collection('users').get();
-    const fcmTokens: string[] = [];
-    const tokenToUserMap = new Map<string, { id: string; name: string; apartment: string }>();
-
-    usersSnapshot.forEach(doc => {
-      const userData = doc.data();
-      if (userData.apartment && apartmentIds.includes(userData.apartment) && userData.fcmToken) {
-        fcmTokens.push(userData.fcmToken);
-        tokenToUserMap.set(userData.fcmToken, {
-          id: doc.id,
-          name: userData.name,
-          apartment: userData.apartment,
-        });
-      }
-    });
-
+    const { tokens: fcmTokens, tokenToUserMap } = await collectFcmTokens(apartmentIds);
     result.totalTokens = fcmTokens.length;
 
     if (fcmTokens.length === 0) {
@@ -67,63 +137,15 @@ export async function sendPushNotificationToApartments(
       return result;
     }
 
-    // Prepare the FCM message
-    const message = {
-      notification: {
-        title: notification.title,
-        body: notification.body,
-      },
-      data: {
-        ...notification.data,
-        clickAction: notification.clickAction || '/',
-        type: 'announcement',
-        icon: notification.icon || '/icon-192x192.png',
-      },
-      tokens: fcmTokens,
-    };
-
-    // Send the multicast message
+    const message = prepareMessage(notification, fcmTokens);
+    const messaging = getMessaging(getFirebaseAdminApp());
     const response = await messaging.sendEachForMulticast(message);
 
-    result.successfulDeliveries = response.successCount;
-    result.failedDeliveries = response.failureCount;
-
-    // Process failed tokens
-    if (response.failureCount > 0) {
-      response.responses.forEach((resp, idx) => {
-        if (!resp.success) {
-          const failedToken = fcmTokens[idx];
-          result.failedTokens.push(failedToken);
-
-          const user = tokenToUserMap.get(failedToken);
-          const errorCode = resp.error?.code || 'unknown';
-          const errorMessage = resp.error?.message || 'Unknown error';
-
-          console.error(
-            `FCM delivery failed for user ${user?.name} (${user?.apartment}): ${errorCode} - ${errorMessage}`
-          );
-          result.errors.push(`Failed for ${user?.name}: ${errorCode}`);
-
-          // Handle invalid tokens by removing them from user records
-          if (
-            errorCode === 'messaging/registration-token-not-registered' ||
-            errorCode === 'messaging/invalid-registration-token'
-          ) {
-            // Remove invalid token from user's record
-            adminDb
-              .collection('users')
-              .doc(user?.id || '')
-              .update({
-                fcmToken: null,
-              })
-              .catch(err => {
-                console.error('Error removing invalid FCM token:', err);
-              });
-          }
-        }
-      });
-    }
-
+    const { successfulDeliveries, failedDeliveries, failedTokens, errors } = await processResponse(response, fcmTokens, tokenToUserMap);
+    result.successfulDeliveries = successfulDeliveries;
+    result.failedDeliveries = failedDeliveries;
+    result.failedTokens = failedTokens;
+    result.errors = errors;
     result.success = result.successfulDeliveries > 0;
 
     return result;

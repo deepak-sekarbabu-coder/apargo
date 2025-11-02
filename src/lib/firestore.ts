@@ -57,6 +57,23 @@ const getBalanceDocId = (apartmentId: string, monthYear: string) => `${apartment
 // - Only unpaid owed apartments (those not present in paidByApartments) should contribute to deltas.
 // - Owing apartments increase their totalExpenses (they owe money).
 // - The paying apartment increases its totalIncome by the sum of unpaid shares.
+
+function computeUnpaidOwed(owed: string[], paidByApartments: string[]): string[] {
+  return owed.filter(aid => !paidByApartments.includes(aid));
+}
+
+function applyExpensesToOwed(unpaidOwed: string[], perShare: number, deltas: Record<string, { totalIncomeDelta: number; totalExpensesDelta: number }>) {
+  unpaidOwed.forEach(aid => {
+    deltas[aid] = deltas[aid] || { totalIncomeDelta: 0, totalExpensesDelta: 0 };
+    deltas[aid].totalExpensesDelta += perShare;
+  });
+}
+
+function applyIncomeToPayer(payer: string, totalIncoming: number, deltas: Record<string, { totalIncomeDelta: number; totalExpensesDelta: number }>) {
+  deltas[payer] = deltas[payer] || { totalIncomeDelta: 0, totalExpensesDelta: 0 };
+  deltas[payer].totalIncomeDelta += totalIncoming;
+}
+
 export const computeExpenseDeltas = (expense: Expense) => {
   const monthYear = getMonthYearFromDate(expense.date);
   const deltas: Record<string, { totalIncomeDelta: number; totalExpensesDelta: number }> = {};
@@ -66,24 +83,63 @@ export const computeExpenseDeltas = (expense: Expense) => {
   const owed = expense.owedByApartments || [];
   const paidByApartments = expense.paidByApartments || [];
 
-  // Determine which owed apartments still haven't paid their share
-  const unpaidOwed = owed.filter(aid => !paidByApartments.includes(aid));
-
-  // Each unpaid owing apartment should have their expenses increased by their share
-  unpaidOwed.forEach(aid => {
-    deltas[aid] = deltas[aid] || { totalIncomeDelta: 0, totalExpensesDelta: 0 };
-    deltas[aid].totalExpensesDelta += perShare;
-  });
-
-  // Payer receives income equal to the total unpaid shares (others' contributions)
+  const unpaidOwed = computeUnpaidOwed(owed, paidByApartments);
+  applyExpensesToOwed(unpaidOwed, perShare, deltas);
   const totalIncoming = unpaidOwed.length * perShare;
-  deltas[payer] = deltas[payer] || { totalIncomeDelta: 0, totalExpensesDelta: 0 };
-  deltas[payer].totalIncomeDelta += totalIncoming;
+  applyIncomeToPayer(payer, totalIncoming, deltas);
 
   return { monthYear, deltas };
 };
 
 // Apply deltas (positive or negative) to balanceSheets documents using updateDoc/addDoc
+
+async function updateExistingBalanceSheet(sheetDoc: any, delta: {totalIncomeDelta: number, totalExpensesDelta: number}, opening: number) {
+  const data = (await getDoc(sheetDoc)).data() as Partial<BalanceSheet>;
+  const newTotalIncome = (data?.totalIncome || 0) + (delta.totalIncomeDelta || 0);
+  const newTotalExpenses = (data?.totalExpenses || 0) + (delta.totalExpensesDelta || 0);
+  const closingBalance = opening + newTotalIncome - newTotalExpenses;
+  const updated: Partial<BalanceSheet> = {
+    totalIncome: newTotalIncome,
+    totalExpenses: newTotalExpenses,
+    openingBalance: opening,
+    closingBalance,
+  };
+  return updateDoc(sheetDoc, removeUndefined(updated));
+}
+
+async function createNewBalanceSheet(sheetDoc: any, apartmentId: string, monthYear: string, delta: {totalIncomeDelta: number, totalExpensesDelta: number}) {
+  let openingBalance = 0;
+
+  try {
+    const [year, month] = monthYear.split('-').map(Number);
+    const prevDate = new Date(year, month - 1, 1);
+    prevDate.setMonth(prevDate.getMonth() - 1);
+    const prevYear = prevDate.getFullYear();
+    const prevMonth = String(prevDate.getMonth() + 1).padStart(2, '0');
+    const prevMonthYear = `${prevYear}-${prevMonth}`;
+    const prevDocId = getBalanceDocId(apartmentId, prevMonthYear);
+    const prevSheetDoc = doc(db, 'balanceSheets', prevDocId);
+
+    const prevSnap = await getDoc(prevSheetDoc);
+    if (prevSnap.exists()) {
+      const prevData = prevSnap.data() as BalanceSheet;
+      openingBalance = prevData.closingBalance;
+    }
+  } catch (err) {
+    console.warn(`Could not fetch previous month balance sheet for continuity check: ${err}`);
+  }
+
+  const newSheet: BalanceSheet = {
+    apartmentId,
+    monthYear,
+    openingBalance,
+    totalIncome: delta.totalIncomeDelta || 0,
+    totalExpenses: delta.totalExpensesDelta || 0,
+    closingBalance: openingBalance + (delta.totalIncomeDelta || 0) - (delta.totalExpensesDelta || 0),
+  };
+  return setDoc(sheetDoc, newSheet);
+}
+
 const applyDeltasToBalanceSheets = async (
   deltas: Record<string, { totalIncomeDelta: number; totalExpensesDelta: number }>,
   monthYear: string
@@ -94,64 +150,13 @@ const applyDeltasToBalanceSheets = async (
     const docId = getBalanceDocId(apartmentId, monthYear);
     const sheetDoc = doc(db, 'balanceSheets', docId);
 
-    // Try to update existing doc; if fails because doc doesn't exist, create it with initial values.
-    const updatePayload: Partial<BalanceSheet> = {};
-    if (delta.totalIncomeDelta) updatePayload.totalIncome = delta.totalIncomeDelta;
-    if (delta.totalExpensesDelta) updatePayload.totalExpenses = delta.totalExpensesDelta;
-
-    // Use transaction-like approach: read then set with merged values.
     const op = getDoc(sheetDoc).then(async snap => {
       if (snap.exists()) {
-        const data = snap.data() as Partial<BalanceSheet> | undefined;
-        const newTotalIncome = ((data?.totalIncome as number) || 0) + (delta.totalIncomeDelta || 0);
-        const newTotalExpenses =
-          ((data?.totalExpenses as number) || 0) + (delta.totalExpensesDelta || 0);
-        const opening = (data?.openingBalance as number) || 0;
-        const updated: Partial<BalanceSheet> = {
-          totalIncome: newTotalIncome,
-          totalExpenses: newTotalExpenses,
-          openingBalance: opening,
-          // Recompute closing from canonical values to avoid drift when only one side updates
-          closingBalance: opening + newTotalIncome - newTotalExpenses,
-        };
-        return updateDoc(sheetDoc, removeUndefined(updated));
+        const opening = (snap.data()?.openingBalance as number) || 0;
+        return updateExistingBalanceSheet(sheetDoc, delta, opening);
+      } else {
+        return createNewBalanceSheet(sheetDoc, apartmentId, monthYear, delta);
       }
-
-      // Create new sheet doc with deterministic id
-      // For new sheets, we need to check the previous month's closing balance
-      let openingBalance = 0;
-
-      // Get the previous month
-      const [year, month] = monthYear.split('-').map(Number);
-      const prevDate = new Date(year, month - 1, 1); // month is 0-indexed in Date
-      prevDate.setMonth(prevDate.getMonth() - 1);
-      const prevYear = prevDate.getFullYear();
-      const prevMonth = String(prevDate.getMonth() + 1).padStart(2, '0');
-      const prevMonthYear = `${prevYear}-${prevMonth}`;
-      const prevDocId = getBalanceDocId(apartmentId, prevMonthYear);
-      const prevSheetDoc = doc(db, 'balanceSheets', prevDocId);
-
-      try {
-        const prevSnap = await getDoc(prevSheetDoc);
-        if (prevSnap.exists()) {
-          const prevData = prevSnap.data() as BalanceSheet;
-          openingBalance = prevData.closingBalance;
-        }
-      } catch (err) {
-        console.warn(`Could not fetch previous month balance sheet for continuity check: ${err}`);
-      }
-
-      const newSheet: BalanceSheet = {
-        apartmentId,
-        monthYear,
-        openingBalance,
-        totalIncome: delta.totalIncomeDelta || 0,
-        totalExpenses: delta.totalExpensesDelta || 0,
-        closingBalance:
-          openingBalance + (delta.totalIncomeDelta || 0) - (delta.totalExpensesDelta || 0),
-      };
-      // Use set via addDoc with provided id by writing to doc reference
-      return setDoc(sheetDoc, newSheet);
     });
 
     ops.push(op);
@@ -361,6 +366,15 @@ export const subscribeToExpenses = (
   });
 };
 
+async function updateBalanceSheetsForExpense(expense: Expense) {
+  try {
+    const { monthYear, deltas } = computeExpenseDeltas(expense);
+    await applyDeltasToBalanceSheets(deltas, monthYear);
+  } catch (err) {
+    console.error('Error updating balanceSheets after addExpense:', err);
+  }
+}
+
 export const addExpense = async (expense: Omit<Expense, 'id' | 'date'>): Promise<Expense> => {
   const newExpense = {
     ...expense,
@@ -370,16 +384,9 @@ export const addExpense = async (expense: Omit<Expense, 'id' | 'date'>): Promise
   const expensesCol = collection(db, 'expenses');
   const cleanExpense = removeUndefined(newExpense);
   const docRef = await addDoc(expensesCol, cleanExpense);
-  // Update denormalized balance sheets for the month of this expense
-  try {
-    const fullExpense = { id: docRef.id, ...cleanExpense } as Expense;
-    const { monthYear, deltas } = computeExpenseDeltas(fullExpense);
-    await applyDeltasToBalanceSheets(deltas, monthYear);
-    // Note: In case of failure, the expense is still created. Consider compensating writes or transactions if needed.
-  } catch (err) {
-    console.error('Error updating balanceSheets after addExpense:', err);
-  }
-  return { id: docRef.id, ...cleanExpense } as Expense;
+  const fullExpense = { id: docRef.id, ...cleanExpense } as Expense;
+  await updateBalanceSheetsForExpense(fullExpense);
+  return fullExpense;
 };
 
 export const updateExpense = async (id: string, expense: Partial<Expense>): Promise<void> => {
