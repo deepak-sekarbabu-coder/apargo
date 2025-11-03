@@ -74,35 +74,56 @@ function useDataSubscriptionManager(user: any, queryClient: ReturnType<typeof us
 
     // Single apartments subscription
     const apartmentsUnsubscribe = (async () => {
-      try {
-        const apartments = await firestore.getApartments();
-        handlers.onApartments(apartments);
-      } catch (err) {
-        console.error('Error fetching apartments:', err);
-      }
+    try {
+    const apartments = await firestore.getApartments();
+    handlers.onApartments(apartments);
+    } catch (err) {
+    console.error('Error fetching apartments:', err);
+    }
     });
-    
+
     // Single categories subscription
-    const categoriesUnsubscribe = firestore.subscribeToCategories(handlers.onCategories);
-    unsubscribes.push(categoriesUnsubscribe);
+    firestore.subscribeToCategories(handlers.onCategories).then(subscription => {
+      unsubscribes.push(() => subscription.unsubscribe());
+    }).catch(err => {
+      console.error('Error subscribing to categories:', err);
+    });
 
     // Conditional subscriptions based on user role/apartment
     if (user?.role === 'admin' || !user?.apartment) {
-      // Admin subscriptions
-      const usersUnsubscribe = firestore.subscribeToAllUsers(handlers.onUsers);
-      const expensesUnsubscribe = firestore.subscribeToExpenses(handlers.onExpenses);
-      const paymentsUnsubscribe = firestore.subscribeToPayments(handlers.onPayments);
-      const balanceSheetsUnsubscribe = firestore.subscribeToBalanceSheets(handlers.onBalanceSheets);
-      
-      unsubscribes.push(usersUnsubscribe, expensesUnsubscribe, paymentsUnsubscribe, balanceSheetsUnsubscribe);
+    // Admin subscriptions
+    Promise.all([
+      firestore.subscribeToAllUsers(handlers.onUsers),
+      firestore.subscribeToExpenses(handlers.onExpenses),
+        firestore.subscribeToPayments(handlers.onPayments),
+      firestore.subscribeToBalanceSheets(handlers.onBalanceSheets),
+    ]).then(([usersSub, expensesSub, paymentsSub, balanceSheetsSub]) => {
+      unsubscribes.push(
+        () => usersSub.unsubscribe(),
+        () => expensesSub.unsubscribe(),
+        () => paymentsSub.unsubscribe(),
+        () => balanceSheetsSub.unsubscribe()
+        );
+      }).catch(err => {
+        console.error('Error setting up admin subscriptions:', err);
+      });
     } else if (user?.apartment) {
       // Regular user subscriptions
-      const usersUnsubscribe = firestore.subscribeToUsers(handlers.onUsers, user.apartment);
-      const expensesUnsubscribe = firestore.subscribeToRelevantExpenses(handlers.onExpenses, user.apartment);
-      const paymentsUnsubscribe = firestore.subscribeToPayments(handlers.onPayments, user.apartment);
-      const balanceSheetsUnsubscribe = firestore.subscribeToBalanceSheets(handlers.onBalanceSheets, user.apartment);
-      
-      unsubscribes.push(usersUnsubscribe, expensesUnsubscribe, paymentsUnsubscribe, balanceSheetsUnsubscribe);
+      Promise.all([
+        firestore.subscribeToUsers(handlers.onUsers, user.apartment),
+        firestore.subscribeToRelevantExpenses(handlers.onExpenses, user.apartment),
+        firestore.subscribeToPayments(handlers.onPayments, user.apartment),
+        firestore.subscribeToBalanceSheets(handlers.onBalanceSheets, user.apartment),
+      ]).then(([usersSub, expensesSub, paymentsSub, balanceSheetsSub]) => {
+        unsubscribes.push(
+          () => usersSub.unsubscribe(),
+          () => expensesSub.unsubscribe(),
+          () => paymentsSub.unsubscribe(),
+          () => balanceSheetsSub.unsubscribe()
+        );
+      }).catch(err => {
+        console.error('Error setting up user subscriptions:', err);
+      });
     }
 
     // Initialize apartments data

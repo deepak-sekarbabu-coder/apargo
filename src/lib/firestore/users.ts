@@ -1,58 +1,41 @@
-import {
-  DocumentData,
-  QuerySnapshot,
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getDocs,
-  onSnapshot,
-  query,
-  updateDoc,
-  where,
-} from 'firebase/firestore';
-
-import { db } from '../firebase';
+import { database, type DocumentSnapshot, type QuerySnapshot } from '../database';
 import { removeUndefined } from '../firestore-utils';
 import type { User } from '../types';
 
 export const getUsers = async (apartment?: string): Promise<User[]> => {
-  let usersQuery = query(collection(db, 'users'), where('isApproved', '==', true));
+  const usersCollection = database.collection<User>('users');
+  let queryBuilder = usersCollection.query().where({ field: 'isApproved', operator: '==', value: true });
   if (apartment) {
-    usersQuery = query(usersQuery, where('apartment', '==', apartment)); // Composite index: apartment
+    queryBuilder = queryBuilder.where({ field: 'apartment', operator: '==', value: apartment });
   }
-  // Only fetch needed fields for user list
-  usersQuery = query(usersQuery); // Add .select() if using Firestore Lite
-  const userSnapshot = await getDocs(usersQuery);
+  const userSnapshot = await queryBuilder.get();
   return userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as User);
 };
 
 export const getAllUsers = async (apartment?: string): Promise<User[]> => {
-  let usersQuery = query(collection(db, 'users'));
+  const usersCollection = database.collection<User>('users');
+  let queryBuilder = usersCollection.query();
   if (apartment) {
-    usersQuery = query(usersQuery, where('apartment', '==', apartment)); // Composite index: apartment
+    queryBuilder = queryBuilder.where({ field: 'apartment', operator: '==', value: apartment });
   }
-  // Only fetch needed fields for user list
-  usersQuery = query(usersQuery); // Add .select() if using Firestore Lite
-  const userSnapshot = await getDocs(usersQuery);
+  const userSnapshot = await queryBuilder.get();
   return userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as User);
 };
 
 export const getUser = async (id: string): Promise<User | null> => {
-  const userDoc = doc(db, 'users', id);
-  const userSnapshot = await getDoc(userDoc);
-  if (userSnapshot.exists()) {
+  const userDoc = database.collection<User>('users').doc(id);
+  const userSnapshot = await userDoc.get();
+  if (userSnapshot.exists) {
     return { id: userSnapshot.id, ...userSnapshot.data() } as User;
   }
   return null;
 };
 
 export const getUserByEmail = async (email: string): Promise<User | null> => {
-  const usersCol = collection(db, 'users');
-  const q = query(usersCol, where('email', '==', email)); // Index: email
+  const usersCollection = database.collection<User>('users');
+  const queryBuilder = usersCollection.query().where({ field: 'email', operator: '==', value: email });
   try {
-    const userSnapshot = await getDocs(q);
+    const userSnapshot = await queryBuilder.get();
     if (userSnapshot.empty) {
       return null;
     }
@@ -66,46 +49,46 @@ export const getUserByEmail = async (email: string): Promise<User | null> => {
 };
 
 export const addUser = async (user: Omit<User, 'id'>): Promise<User> => {
-  const usersCol = collection(db, 'users');
+  const usersCollection = database.collection<User>('users');
   const cleanUser = removeUndefined({ ...user, isApproved: false });
-  const docRef = await addDoc(usersCol, cleanUser);
+  const docRef = await usersCollection.add(cleanUser);
   return { id: docRef.id, ...cleanUser } as User;
 };
 
 export const approveUser = async (id: string): Promise<void> => {
-  const userDoc = doc(db, 'users', id);
-  await updateDoc(userDoc, { isApproved: true });
+  const userDoc = database.collection<User>('users').doc(id);
+  await userDoc.update({ isApproved: true });
 };
 
 export const updateUser = async (id: string, user: Partial<User>): Promise<void> => {
-  const userDoc = doc(db, 'users', id);
+  const userDoc = database.collection<User>('users').doc(id);
   const cleanUser = removeUndefined(user) as Partial<User>;
-  await updateDoc(userDoc, cleanUser);
+  await userDoc.update(cleanUser);
 };
 
 export const deleteUser = async (id: string): Promise<void> => {
-  const userDoc = doc(db, 'users', id);
-  await deleteDoc(userDoc);
+  const userDoc = database.collection<User>('users').doc(id);
+  await userDoc.delete();
 };
 
-export const subscribeToUsers = (callback: (users: User[]) => void, apartment?: string) => {
-  let usersQuery = query(collection(db, 'users'), where('isApproved', '==', true));
+export const subscribeToUsers = async (callback: (users: User[]) => void, apartment?: string) => {
+  const filters = [{ field: 'isApproved', operator: '==' as const, value: true }];
   if (apartment) {
-    usersQuery = query(usersQuery, where('apartment', '==', apartment));
+    filters.push({ field: 'apartment', operator: '==' as const, value: apartment });
   }
-  return onSnapshot(usersQuery, (snapshot: QuerySnapshot<DocumentData>) => {
+  return database.subscribeToCollection<User>('users', (snapshot: QuerySnapshot<User>) => {
     const users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as User);
     callback(users);
-  });
+  }, filters);
 };
 
-export const subscribeToAllUsers = (callback: (users: User[]) => void, apartment?: string) => {
-  let usersQuery = query(collection(db, 'users'));
+export const subscribeToAllUsers = async (callback: (users: User[]) => void, apartment?: string) => {
+  const filters: Array<{ field: string; operator: '==' | '!=' | '<' | '<=' | '>' | '>=' | 'array-contains' | 'in' | 'array-contains-any'; value: any }> = [];
   if (apartment) {
-    usersQuery = query(usersQuery, where('apartment', '==', apartment));
+    filters.push({ field: 'apartment', operator: '==', value: apartment });
   }
-  return onSnapshot(usersQuery, (snapshot: QuerySnapshot<DocumentData>) => {
+  return database.subscribeToCollection<User>('users', (snapshot: QuerySnapshot<User>) => {
     const users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as User);
     callback(users);
-  });
+  }, filters);
 };

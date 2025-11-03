@@ -1,19 +1,4 @@
-import {
-  DocumentData,
-  QuerySnapshot,
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getDocs,
-  onSnapshot,
-  query,
-  updateDoc,
-  where,
-} from 'firebase/firestore';
-
-import { db } from '../firebase';
+import { database, type QuerySnapshot } from '../database';
 import { applyDeltasToBalanceSheets } from './expenses';
 import { computeApprovedExpensePaymentDeltas } from '../payments';
 import { getApartments } from './apartments';
@@ -76,24 +61,25 @@ const createApartmentPayment = async (apartment: Apartment, category: Category, 
 };
 
 export const getPayments = async (apartmentId?: string, monthYear?: string): Promise<Payment[]> => {
-  let paymentsQuery = query(collection(db, 'payments'));
+  const paymentsCollection = database.collection<Payment>('payments');
+  let queryBuilder = paymentsCollection.query();
   if (apartmentId) {
-    paymentsQuery = query(paymentsQuery, where('apartmentId', '==', apartmentId));
+    queryBuilder = queryBuilder.where({ field: 'apartmentId', operator: '==', value: apartmentId });
   }
   if (monthYear) {
-    paymentsQuery = query(paymentsQuery, where('monthYear', '==', monthYear));
+    queryBuilder = queryBuilder.where({ field: 'monthYear', operator: '==', value: monthYear });
   }
-  const paymentSnapshot = await getDocs(paymentsQuery);
+  const paymentSnapshot = await queryBuilder.get();
   return paymentSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Payment);
 };
 
 export const addPayment = async (payment: Omit<Payment, 'id' | 'createdAt'>): Promise<Payment> => {
-  const paymentsCol = collection(db, 'payments');
+  const paymentsCollection = database.collection<Payment>('payments');
   const newPayment = {
     ...payment,
     createdAt: new Date().toISOString(),
   };
-  const docRef = await addDoc(paymentsCol, newPayment);
+  const docRef = await paymentsCollection.add(newPayment);
   // If this is already an approved expense, apply deltas to balanceSheets
   try {
     const deltas = computeApprovedExpensePaymentDeltas(undefined, {
@@ -129,13 +115,13 @@ export const addPayment = async (payment: Omit<Payment, 'id' | 'createdAt'>): Pr
 };
 
 export const updatePayment = async (id: string, payment: Partial<Payment>): Promise<void> => {
-  const paymentDoc = doc(db, 'payments', id);
+  const paymentDoc = database.collection<Payment>('payments').doc(id);
   // Read old to compute deltas
-  const oldSnap = await getDoc(paymentDoc);
+  const oldSnap = await paymentDoc.get();
   const oldPayment = oldSnap.exists()
     ? ({ ...(oldSnap.data() as Payment), id } as Payment)
     : undefined;
-  await updateDoc(paymentDoc, payment);
+  await paymentDoc.update(payment);
   try {
     const deltas = computeApprovedExpensePaymentDeltas(oldPayment, { ...oldPayment, ...payment });
     if (deltas.length) {
@@ -165,10 +151,10 @@ export const updatePayment = async (id: string, payment: Partial<Payment>): Prom
 };
 
 export const deletePayment = async (id: string): Promise<void> => {
-  const paymentDoc = doc(db, 'payments', id);
+  const paymentDoc = database.collection<Payment>('payments').doc(id);
   // Read existing payment to possibly subtract its effect
-  const snap = await getDoc(paymentDoc);
-  if (snap.exists()) {
+  const snap = await paymentDoc.get();
+  if (snap.exists) {
     try {
       const p = { ...(snap.data() as Payment), id } as Payment;
       const deltas = computeApprovedExpensePaymentDeltas(p, undefined);
@@ -197,25 +183,26 @@ export const deletePayment = async (id: string): Promise<void> => {
       console.error('Error updating balanceSheets before deletePayment:', e);
     }
   }
-  await deleteDoc(paymentDoc);
+  await paymentDoc.delete();
 };
 
-export const subscribeToPayments = (
+export const subscribeToPayments = async (
   callback: (payments: Payment[]) => void,
   apartmentId?: string,
   monthYear?: string
 ) => {
-  let paymentsQuery = query(collection(db, 'payments'));
+  const paymentsCollection = database.collection<Payment>('payments');
+  const filters: Array<{ field: string; operator: '==' | '!=' | '<' | '<=' | '>' | '>=' | 'array-contains' | 'in' | 'array-contains-any'; value: any }> = [];
   if (apartmentId) {
-    paymentsQuery = query(paymentsQuery, where('apartmentId', '==', apartmentId));
+    filters.push({ field: 'apartmentId', operator: '==', value: apartmentId });
   }
   if (monthYear) {
-    paymentsQuery = query(paymentsQuery, where('monthYear', '==', monthYear));
+    filters.push({ field: 'monthYear', operator: '==', value: monthYear });
   }
-  return onSnapshot(paymentsQuery, (snapshot: QuerySnapshot<DocumentData>) => {
+  return database.subscribeToCollection<Payment>('payments', (snapshot: QuerySnapshot<Payment>) => {
     const payments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Payment);
     callback(payments);
-  });
+  }, filters);
 };
 
 // Generate monthly payment events for configured categories

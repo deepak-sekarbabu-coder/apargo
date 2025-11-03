@@ -1,48 +1,33 @@
-import {
-  DocumentData,
-  QuerySnapshot,
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  onSnapshot,
-  query,
-  updateDoc,
-} from 'firebase/firestore';
-
-import { db } from '../firebase';
+import { database, type QuerySnapshot } from '../database';
 import { removeUndefined } from '../firestore-utils';
 import type { Category } from '../types';
 
 export const getCategories = async (): Promise<Category[]> => {
-  const categoriesCol = collection(db, 'categories');
-  // Only fetch needed fields for category list
-  const categorySnapshot = await getDocs(categoriesCol);
+  const categoriesCollection = database.collection<Category>('categories');
+  const categorySnapshot = await categoriesCollection.query().get();
   return categorySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Category);
 };
 
 export const addCategory = async (category: Omit<Category, 'id'>): Promise<Category> => {
-  const categoriesCol = collection(db, 'categories');
+  const categoriesCollection = database.collection<Category>('categories');
   const cleanCategory = removeUndefined(category);
-  const docRef = await addDoc(categoriesCol, cleanCategory);
+  const docRef = await categoriesCollection.add(cleanCategory);
   return { id: docRef.id, ...cleanCategory } as Category;
 };
 
 export const updateCategory = async (id: string, category: Partial<Category>): Promise<void> => {
-  const categoryDoc = doc(db, 'categories', id);
+  const categoryDoc = database.collection<Category>('categories').doc(id);
   const cleanCategory = removeUndefined(category) as Partial<Category>;
-  await updateDoc(categoryDoc, cleanCategory);
+  await categoryDoc.update(cleanCategory);
 };
 
 export const deleteCategory = async (id: string): Promise<void> => {
-  const categoryDoc = doc(db, 'categories', id);
-  await deleteDoc(categoryDoc);
+  const categoryDoc = database.collection<Category>('categories').doc(id);
+  await categoryDoc.delete();
 };
 
-export const subscribeToCategories = (callback: (categories: Category[]) => void) => {
-  const categoriesQuery = query(collection(db, 'categories'));
-  return onSnapshot(categoriesQuery, (snapshot: QuerySnapshot<DocumentData>) => {
+export const subscribeToCategories = async (callback: (categories: Category[]) => void) => {
+  return database.subscribeToCollection<Category>('categories', (snapshot: QuerySnapshot<Category>) => {
     const categories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Category);
     callback(categories);
   });

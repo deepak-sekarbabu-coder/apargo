@@ -1,20 +1,4 @@
-import {
-  DocumentData,
-  QuerySnapshot,
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  getDoc,
-  getDocs,
-  onSnapshot,
-  query,
-  setDoc,
-  updateDoc,
-  where,
-} from 'firebase/firestore';
-
-import { db } from '../firebase';
+import { database, type DocumentSnapshot, type QuerySnapshot } from '../database';
 import {
   calculateDeltaChanges,
   computeExpenseDeltas,
@@ -34,8 +18,10 @@ const updateBalanceSheets = async (deltas: ReturnType<typeof calculateDeltaChang
 
 // Apply deltas (positive or negative) to balanceSheets documents using updateDoc/addDoc
 
-async function updateExistingBalanceSheet(sheetDoc: any, delta: {totalIncomeDelta: number, totalExpensesDelta: number}, opening: number) {
-  const data = (await getDoc(sheetDoc)).data() as Partial<BalanceSheet>;
+async function updateExistingBalanceSheet(db: any, sheetDocId: string, delta: {totalIncomeDelta: number, totalExpensesDelta: number}, opening: number) {
+  const sheetDoc = db.collection<BalanceSheet>('balanceSheets').doc(sheetDocId);
+  const snapshot = await sheetDoc.get();
+  const data = snapshot.data() as Partial<BalanceSheet>;
   const newTotalIncome = (data?.totalIncome || 0) + (delta.totalIncomeDelta || 0);
   const newTotalExpenses = (data?.totalExpenses || 0) + (delta.totalExpensesDelta || 0);
   const closingBalance = opening + newTotalIncome - newTotalExpenses;
@@ -45,10 +31,10 @@ async function updateExistingBalanceSheet(sheetDoc: any, delta: {totalIncomeDelt
     openingBalance: opening,
     closingBalance,
   };
-  return updateDoc(sheetDoc, removeUndefined(updated));
+  return sheetDoc.update(removeUndefined(updated));
 }
 
-async function createNewBalanceSheet(sheetDoc: any, apartmentId: string, monthYear: string, delta: {totalIncomeDelta: number, totalExpensesDelta: number}) {
+async function createNewBalanceSheet(db: any, sheetDocId: string, apartmentId: string, monthYear: string, delta: {totalIncomeDelta: number, totalExpensesDelta: number}) {
   let openingBalance = 0;
 
   try {
@@ -59,10 +45,10 @@ async function createNewBalanceSheet(sheetDoc: any, apartmentId: string, monthYe
     const prevMonth = String(prevDate.getMonth() + 1).padStart(2, '0');
     const prevMonthYear = `${prevYear}-${prevMonth}`;
     const prevDocId = getBalanceDocId(apartmentId, prevMonthYear);
-    const prevSheetDoc = doc(db, 'balanceSheets', prevDocId);
+    const prevSheetDoc = db.collection<BalanceSheet>('balanceSheets').doc(prevDocId);
 
-    const prevSnap = await getDoc(prevSheetDoc);
-    if (prevSnap.exists()) {
+    const prevSnap = await prevSheetDoc.get();
+    if (prevSnap.exists) {
       const prevData = prevSnap.data() as BalanceSheet;
       openingBalance = prevData.closingBalance;
     }
@@ -78,25 +64,27 @@ async function createNewBalanceSheet(sheetDoc: any, apartmentId: string, monthYe
     totalExpenses: delta.totalExpensesDelta || 0,
     closingBalance: openingBalance + (delta.totalIncomeDelta || 0) - (delta.totalExpensesDelta || 0),
   };
-  return setDoc(sheetDoc, newSheet);
+  const sheetDoc = db.collection<BalanceSheet>('balanceSheets').doc(sheetDocId);
+  return sheetDoc.set(newSheet);
 }
 
 export const applyDeltasToBalanceSheets = async (
   deltas: Record<string, { totalIncomeDelta: number; totalExpensesDelta: number }>,
   monthYear: string
 ) => {
+  const db = await database;
   const ops: Promise<unknown>[] = [];
 
   Object.entries(deltas).forEach(([apartmentId, delta]) => {
     const docId = getBalanceDocId(apartmentId, monthYear);
-    const sheetDoc = doc(db, 'balanceSheets', docId);
+    const sheetDoc = db.collection<BalanceSheet>('balanceSheets').doc(docId);
 
-    const op = getDoc(sheetDoc).then(async snap => {
-      if (snap.exists()) {
+    const op = sheetDoc.get().then(async snap => {
+      if (snap.exists) {
         const opening = (snap.data()?.openingBalance as number) || 0;
-        return updateExistingBalanceSheet(sheetDoc, delta, opening);
+        return updateExistingBalanceSheet(db, docId, delta, opening);
       } else {
-        return createNewBalanceSheet(sheetDoc, apartmentId, monthYear, delta);
+        return createNewBalanceSheet(db, docId, apartmentId, monthYear, delta);
       }
     });
 
@@ -109,25 +97,19 @@ export const applyDeltasToBalanceSheets = async (
 export const getExpenses = async (apartment?: string): Promise<Expense[]> => {
   // If apartment not provided, return recent expenses (existing behavior)
   if (!apartment) {
-    let expensesQuery = query(collection(db, 'expenses'));
-    // Only fetch needed fields for dashboard
-    expensesQuery = query(expensesQuery); // Add .select() if using Firestore Lite
-    // Limit results for dashboard
-    expensesQuery = query(expensesQuery /* e.g. */ /* limit(20) */);
-    const expenseSnapshot = await getDocs(expensesQuery);
+    const expensesCollection = database.collection<Expense>('expenses');
+    const expenseSnapshot = await expensesCollection.query().get();
     return expenseSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Expense);
   }
 
   // When apartment is provided, perform server-side queries for relevance.
   // Firestore doesn't support OR across different fields in a single query (except in newer SDKs with 'in'/'array-contains-any').
   // We'll run two queries in parallel and merge results client-side (this avoids downloading the entire collection).
-  const paidByQuery = query(collection(db, 'expenses'), where('paidByApartment', '==', apartment));
-  const owedByQuery = query(
-    collection(db, 'expenses'),
-    where('owedByApartments', 'array-contains', apartment)
-  );
+  const expensesCollection = database.collection<Expense>('expenses');
+  const paidByQuery = expensesCollection.query().where({ field: 'paidByApartment', operator: '==', value: apartment });
+  const owedByQuery = expensesCollection.query().where({ field: 'owedByApartments', operator: 'array-contains', value: apartment });
 
-  const [paidSnap, owedSnap] = await Promise.all([getDocs(paidByQuery), getDocs(owedByQuery)]);
+  const [paidSnap, owedSnap] = await Promise.all([paidByQuery.get(), owedByQuery.get()]);
   const paid = paidSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Expense);
   const owed = owedSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Expense);
 
@@ -137,19 +119,16 @@ export const getExpenses = async (apartment?: string): Promise<Expense[]> => {
   return Array.from(mergedById.values());
 };
 
-export const subscribeToExpenses = (
+export const subscribeToExpenses = async (
   callback: (expenses: Expense[]) => void,
   apartment?: string
 ) => {
-  let expensesQuery = query(collection(db, 'expenses'));
-  if (apartment) {
-    expensesQuery = query(expensesQuery, where('paidByApartment', '==', apartment));
-  }
+  const filters = apartment ? [{ field: 'paidByApartment', operator: '==' as const, value: apartment }] : [];
   // Only use real-time listener if UI requires live updates
-  return onSnapshot(expensesQuery, (snapshot: QuerySnapshot<DocumentData>) => {
+  return database.subscribeToCollection<Expense>('expenses', (snapshot: QuerySnapshot<Expense>) => {
     const expenses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Expense);
     callback(expenses);
-  });
+  }, filters);
 };
 
 async function updateBalanceSheetsForExpense(expense: Expense) {
@@ -167,23 +146,24 @@ export const addExpense = async (expense: Omit<Expense, 'id' | 'date'>): Promise
     date: new Date().toISOString(),
     paidByApartments: expense.paidByApartments || [],
   };
-  const expensesCol = collection(db, 'expenses');
+  const expensesCollection = database.collection<Expense>('expenses');
   const cleanExpense = removeUndefined(newExpense);
-  const docRef = await addDoc(expensesCol, cleanExpense);
+  const docRef = await expensesCollection.add(cleanExpense);
   const fullExpense = { id: docRef.id, ...cleanExpense } as Expense;
   await updateBalanceSheetsForExpense(fullExpense);
   return fullExpense;
 };
 
 export const updateExpense = async (id: string, expense: Partial<Expense>): Promise<void> => {
-  const expenseDoc = doc(db, 'expenses', id);
+  const db = await database;
+  const expenseDoc = db.collection<Expense>('expenses').doc(id);
   // Fetch existing expense to compute delta
-  const oldSnap = await getDoc(expenseDoc);
-  if (!oldSnap.exists()) throw new Error('Expense not found');
+  const oldSnap = await expenseDoc.get();
+  if (!oldSnap.exists) throw new Error('Expense not found');
   const oldExpense = { id: oldSnap.id, ...(oldSnap.data() as Partial<Expense>) } as Expense;
 
   const cleanExpense = removeUndefined(expense) as Partial<Expense>;
-  await updateDoc(expenseDoc, cleanExpense);
+  await expenseDoc.update(cleanExpense);
 
   try {
     const newExpense = { ...oldExpense, ...cleanExpense } as Expense;
@@ -195,10 +175,11 @@ export const updateExpense = async (id: string, expense: Partial<Expense>): Prom
 };
 
 export const deleteExpense = async (id: string): Promise<void> => {
-  const expenseDoc = doc(db, 'expenses', id);
+  const db = await database;
+  const expenseDoc = db.collection<Expense>('expenses').doc(id);
   // Fetch existing expense to subtract its effect
-  const snap = await getDoc(expenseDoc);
-  if (!snap.exists()) return;
+  const snap = await expenseDoc.get();
+  if (!snap.exists) return;
   const expense = { id: snap.id, ...(snap.data() as Partial<Expense>) } as Expense;
 
   try {
@@ -213,35 +194,38 @@ export const deleteExpense = async (id: string): Promise<void> => {
     console.error('Error updating balanceSheets before deleteExpense:', err);
   }
 
-  await deleteDoc(expenseDoc);
+  await expenseDoc.delete();
 };
 
 export const getBalanceSheets = async (apartmentId?: string, monthYear?: string): Promise<BalanceSheet[]> => {
-  let sheetsQuery = query(collection(db, 'balanceSheets'));
+  const db = await database;
+  const sheetsCollection = db.collection<BalanceSheet>('balanceSheets');
+  let queryBuilder = sheetsCollection.query();
   if (apartmentId) {
-    sheetsQuery = query(sheetsQuery, where('apartmentId', '==', apartmentId));
+    queryBuilder = queryBuilder.where({ field: 'apartmentId', operator: '==', value: apartmentId });
   }
   if (monthYear) {
-    sheetsQuery = query(sheetsQuery, where('monthYear', '==', monthYear));
+    queryBuilder = queryBuilder.where({ field: 'monthYear', operator: '==', value: monthYear });
   }
-  const sheetSnapshot = await getDocs(sheetsQuery);
+  const sheetSnapshot = await queryBuilder.get();
   return sheetSnapshot.docs.map(doc => {
     const data = doc.data();
     return {
       id: doc.id,
-      apartmentId: data.apartmentId,
-      monthYear: data.monthYear,
-      openingBalance: data.openingBalance,
-      totalIncome: data.totalIncome,
-      totalExpenses: data.totalExpenses,
-      closingBalance: data.closingBalance,
+      apartmentId: data?.apartmentId,
+      monthYear: data?.monthYear,
+      openingBalance: data?.openingBalance,
+      totalIncome: data?.totalIncome,
+      totalExpenses: data?.totalExpenses,
+      closingBalance: data?.closingBalance,
     } as BalanceSheet;
   });
 };
 
 export const addBalanceSheet = async (sheet: Omit<BalanceSheet, 'id'>): Promise<BalanceSheet> => {
-  const sheetsCol = collection(db, 'balanceSheets');
-  const docRef = await addDoc(sheetsCol, sheet);
+  const db = await database;
+  const sheetsCollection = db.collection<BalanceSheet>('balanceSheets');
+  const docRef = await sheetsCollection.add(sheet);
   return { id: docRef.id, ...sheet } as BalanceSheet;
 };
 
@@ -249,55 +233,70 @@ export const updateBalanceSheet = async (
   id: string,
   sheet: Partial<BalanceSheet>
 ): Promise<void> => {
-  const sheetDoc = doc(db, 'balanceSheets', id);
-  await updateDoc(sheetDoc, sheet);
+  const db = await database;
+  const sheetDoc = db.collection<BalanceSheet>('balanceSheets').doc(id);
+  await sheetDoc.update(sheet);
 };
 
 export const deleteBalanceSheet = async (id: string): Promise<void> => {
-  const sheetDoc = doc(db, 'balanceSheets', id);
-  await deleteDoc(sheetDoc);
+  const db = await database;
+  const sheetDoc = db.collection<BalanceSheet>('balanceSheets').doc(id);
+  await sheetDoc.delete();
 };
 
-export const subscribeToBalanceSheets = (
+export const subscribeToBalanceSheets = async (
   callback: (sheets: BalanceSheet[]) => void,
   apartmentId?: string,
   monthYear?: string
 ) => {
-  let sheetsQuery = query(collection(db, 'balanceSheets'));
+  const db = await database;
+  const filters: Array<{ field: string; operator: '==' | '!=' | '<' | '<=' | '>' | '>=' | 'array-contains' | 'in' | 'array-contains-any'; value: any }> = [];
   if (apartmentId) {
-    sheetsQuery = query(sheetsQuery, where('apartmentId', '==', apartmentId));
+    filters.push({ field: 'apartmentId', operator: '==', value: apartmentId });
   }
   if (monthYear) {
-    sheetsQuery = query(sheetsQuery, where('monthYear', '==', monthYear));
+    filters.push({ field: 'monthYear', operator: '==', value: monthYear });
   }
-  return onSnapshot(sheetsQuery, (snapshot: QuerySnapshot<DocumentData>) => {
+  return db.subscribeToCollection<BalanceSheet>('balanceSheets', (snapshot: QuerySnapshot<BalanceSheet>) => {
     const sheets = snapshot.docs.map(doc => {
       const data = doc.data();
       return {
         id: doc.id,
-        apartmentId: data.apartmentId,
-        monthYear: data.monthYear,
-        openingBalance: data.openingBalance,
-        totalIncome: data.totalIncome,
-        totalExpenses: data.totalExpenses,
-        closingBalance: data.closingBalance,
+        apartmentId: data?.apartmentId,
+        monthYear: data?.monthYear,
+        openingBalance: data?.openingBalance,
+        totalIncome: data?.totalIncome,
+        totalExpenses: data?.totalExpenses,
+        closingBalance: data?.closingBalance,
       } as BalanceSheet;
     });
     callback(sheets);
-  });
+  }, filters);
 };
 
-export const subscribeToRelevantExpenses = (
+// Helper function to create snapshot handlers for expense subscriptions
+const createExpenseSnapshotHandler = (expenseMap: Map<string, Expense>, emitCallback: () => void) => {
+  return (snapshot: QuerySnapshot<Expense>) => {
+    snapshot.docs.forEach(doc => {
+      const expense = { id: doc.id, ...doc.data() } as Expense;
+      expenseMap.set(doc.id, expense);
+    });
+    // Remove expenses that are no longer in the snapshot
+    const currentIds = new Set(snapshot.docs.map(doc => doc.id));
+    for (const [id] of expenseMap) {
+      if (!currentIds.has(id)) {
+        expenseMap.delete(id);
+      }
+    }
+    emitCallback();
+  };
+};
+
+export const subscribeToRelevantExpenses = async (
   callback: (expenses: Expense[]) => void,
   apartment: string
 ) => {
-  // Subscribe to two server-side queries: expenses paid by apartment, and expenses where apartment is in owedByApartments.
-  // This avoids fetching the entire collection and client-side scanning.
-  const paidByQuery = query(collection(db, 'expenses'), where('paidByApartment', '==', apartment));
-  const owedByQuery = query(
-    collection(db, 'expenses'),
-    where('owedByApartments', 'array-contains', apartment)
-  );
+  const db = await database;
 
   // Track latest documents from each listener and merge on updates.
   const paidMap = new Map<string, Expense>();
@@ -310,12 +309,16 @@ export const subscribeToRelevantExpenses = (
     callback(Array.from(merged.values()));
   };
 
-  const paidUnsub = onSnapshot(paidByQuery, createExpenseSnapshotHandler(paidMap, emitMerged));
-  const owedUnsub = onSnapshot(owedByQuery, createExpenseSnapshotHandler(owedMap, emitMerged));
+  const paidUnsub = await db.subscribeToCollection<Expense>('expenses', createExpenseSnapshotHandler(paidMap, emitMerged), [
+    { field: 'paidByApartment', operator: '==', value: apartment }
+  ]);
+  const owedUnsub = await db.subscribeToCollection<Expense>('expenses', createExpenseSnapshotHandler(owedMap, emitMerged), [
+    { field: 'owedByApartments', operator: 'array-contains', value: apartment }
+  ]);
 
   // Return a combined unsubscribe
   return () => {
-    paidUnsub();
-    owedUnsub();
+    paidUnsub.unsubscribe();
+    owedUnsub.unsubscribe();
   };
 };
