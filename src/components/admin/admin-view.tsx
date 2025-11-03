@@ -1,8 +1,9 @@
 import { Calendar, CreditCard, FileText, Megaphone, Users } from 'lucide-react';
 
-import { useCallback, useEffect, useState } from 'react';
-
 import type { Category, Payment, PollOption, User } from '@/lib/types';
+
+import { useAdminTabState } from '@/hooks/use-admin-tab-state';
+import { createStandardAdminConfig } from '@/lib/user-actions-config.tsx';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -14,69 +15,87 @@ import { AdminUsersTab } from './admin-users-tab';
 
 // import { AdminFileManager } from './admin-file-manager'; // Removed to resolve unused import lint error; restore when Files tab is re-enabled.
 
-interface AdminViewProps {
+// Legacy props for backward compatibility
+interface AdminViewLegacyProps {
   users: User[];
   categories: Category[];
 
+  // User management handlers
   onAddUser: (userData: Omit<User, 'id'>) => void;
   onUpdateUser: (user: User) => void;
   onDeleteUser: (userId: string) => void;
   onRejectUser: (userId: string) => void;
+
+  // Category management
   onAddCategory: (categoryData: Omit<Category, 'id'>) => void;
   onUpdateCategory: (category: Category) => void;
   onDeleteCategory: (categoryId: string) => void;
 
+  // Poll management
   onAddPoll: (data: { question: string; options: PollOption[]; expiresAt?: string }) => void;
   getUserById: (id: string) => User | undefined;
 
+  // Payment management
   payments?: Payment[];
   onApprovePayment?: (paymentId: string) => void;
   onRejectPayment?: (paymentId: string) => void;
 }
 
-export function AdminView({
-  users,
-  categories,
+// New configuration-based props
+interface AdminViewConfigProps {
+  users: User[];
+  categories: Category[];
+  config: AdminUsersTabConfig;
 
-  onAddUser,
-  onUpdateUser,
-  onDeleteUser,
-  onRejectUser,
-  onAddCategory,
-  onUpdateCategory,
-  onDeleteCategory,
+  // Category management (still needed for other tabs)
+  onAddCategory: (categoryData: Omit<Category, 'id'>) => void;
+  onUpdateCategory: (category: Category) => void;
+  onDeleteCategory: (categoryId: string) => void;
 
-  onAddPoll,
-  payments = [],
-  onApprovePayment,
-  onRejectPayment,
-  getUserById,
-}: AdminViewProps) {
-  const [activeAdminTab, setActiveAdminTab] = useState<string>('users');
+  // Poll management
+  onAddPoll: (data: { question: string; options: PollOption[]; expiresAt?: string }) => void;
+  getUserById: (id: string) => User | undefined;
 
-  // Restore persisted tab on mount
-  useEffect(() => {
-    try {
-      const saved = sessionStorage.getItem('admin.activeTab');
-      if (saved) setActiveAdminTab(saved);
-    } catch {
-      /* ignore */
-    }
-  }, []);
+  // Payment management
+  payments?: Payment[];
+  onApprovePayment?: (paymentId: string) => void;
+  onRejectPayment?: (paymentId: string) => void;
+}
 
-  const updateActiveAdminTab = useCallback((val: string) => {
-    setActiveAdminTab(val);
-    try {
-      sessionStorage.setItem('admin.activeTab', val);
-    } catch {
-      /* ignore */
-    }
-  }, []);
+type AdminViewProps = AdminViewLegacyProps | AdminViewConfigProps;
+
+export function AdminView(props: AdminViewProps) {
+  const { activeTab, updateTab } = useAdminTabState('users');
+
+  // Extract common props
+  const {
+    users,
+    categories,
+    onAddCategory,
+    onUpdateCategory,
+    onDeleteCategory,
+    onAddPoll,
+    payments = [],
+    onApprovePayment,
+    onRejectPayment,
+    getUserById,
+  } = props;
+
+  // Determine if using legacy props or new config
+  const isLegacyProps = 'onAddUser' in props && 'onUpdateUser' in props;
+  const userConfig = isLegacyProps
+    ? createStandardAdminConfig({
+        onAddUser: (props as AdminViewLegacyProps).onAddUser,
+        onUpdateUser: (props as AdminViewLegacyProps).onUpdateUser,
+        onDeleteUser: (props as AdminViewLegacyProps).onDeleteUser,
+        onRejectUser: (props as AdminViewLegacyProps).onRejectUser,
+      })
+    : (props as AdminViewConfigProps).config;
 
   return (
     <div className="space-y-4 md:space-y-6 px-2 md:px-0">
       {/* Admin Navigation Tabs */}
-      <Tabs value={activeAdminTab} onValueChange={updateActiveAdminTab} className="w-full">
+      <Tabs value={activeTab} onValueChange={updateTab} className="w-full">
         <TabsList className="grid w-full grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 h-auto">
           <TabsTrigger value="users" className="admin-mobile-tab">
             <Users className="w-4 h-4 md:mr-2" />
@@ -113,10 +132,7 @@ export function AdminView({
         <TabsContent value="users" className="space-y-4">
           <AdminUsersTab
             users={users}
-            onAddUser={onAddUser}
-            onUpdateUser={onUpdateUser}
-            onDeleteUser={onDeleteUser}
-            onRejectUser={onRejectUser}
+            config={userConfig}
           />
         </TabsContent>
 

@@ -1,9 +1,10 @@
-import { Pencil, PlusCircle, Search, Trash2, Users, X } from 'lucide-react';
+import { PlusCircle, Search, Users, X } from 'lucide-react';
 
 import React, { useState } from 'react';
 
 import type { User } from '@/lib/types';
 import { DEBOUNCE_CONFIG, DEBOUNCE_OPTIONS } from '@/lib/utils';
+import type { AdminUsersTabConfig, UserAction } from '@/lib/user-actions-config.tsx';
 
 import { AddUserDialog } from '@/components/dialogs/add-user-dialog';
 import { EditUserDialog } from '@/components/dialogs/edit-user-dialog';
@@ -36,21 +37,166 @@ import {
 import { useDebounce } from '@/hooks/use-debounce';
 import { useUserFilter } from '@/hooks/use-user-filter';
 
+// Component for rendering individual user actions
+interface UserActionButtonProps {
+  action: UserAction;
+  user: User;
+  isMobile: boolean;
+}
+
+const UserActionButton: React.FC<UserActionButtonProps> = ({ action, user, isMobile }) => {
+  const handleClick = () => {
+    if (action.confirm) {
+      // For actions that need confirmation, we'll handle this in the parent
+      // For now, just call the handler directly
+      action.handler(user);
+    } else {
+      action.handler(user);
+    }
+  };
+
+  const buttonSize = isMobile ? 'sm' : 'sm';
+  const buttonClass = isMobile ? 'flex-1 h-9 text-xs' : '';
+
+  if (action.confirm) {
+    return (
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button
+            variant={action.variant || 'outline'}
+            size={buttonSize}
+            className={`${buttonClass} ${
+              action.variant === 'destructive'
+                ? 'text-destructive border-destructive/30 hover:bg-destructive/10'
+                : ''
+            }`}
+          >
+            {action.icon && <action.icon className={isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4'} />}
+            {action.label}
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{action.confirm.title}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {typeof action.confirm.description === 'function'
+                ? action.confirm.description(user)
+                : action.confirm.description}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleClick}
+              className={
+                action.confirm.actionVariant === 'destructive'
+                  ? 'bg-destructive hover:bg-destructive/90'
+                  : ''
+              }
+            >
+              {action.confirm.actionLabel}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    );
+  }
+
+  // Special handling for edit action (opens dialog)
+  if (action.id === 'edit') {
+    return (
+      <EditUserDialog user={user} onUpdateUser={action.handler}>
+        <Button
+          variant={action.variant || 'outline'}
+          size={buttonSize}
+          className={buttonClass}
+        >
+          {action.icon && <action.icon className={isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4'} />}
+          {isMobile ? action.label : null}
+        </Button>
+      </EditUserDialog>
+    );
+  }
+
+  return (
+    <Button
+      variant={action.variant || 'outline'}
+      size={buttonSize}
+      className={buttonClass}
+      onClick={handleClick}
+    >
+      {action.icon && <action.icon className={isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4'} />}
+      {isMobile ? action.label : null}
+    </Button>
+  );
+};
+
 interface AdminUsersTabProps {
   users: User[];
-  onAddUser: (userData: Omit<User, 'id'>) => void;
-  onUpdateUser: (user: User) => void;
-  onDeleteUser: (userId: string) => void;
-  onRejectUser: (userId: string) => void;
+  config: AdminUsersTabConfig;
 }
 
 export function AdminUsersTab({
   users,
-  onAddUser,
-  onUpdateUser,
-  onDeleteUser,
-  onRejectUser,
+  config,
 }: AdminUsersTabProps) {
+  // Helper function to render user actions based on configuration
+  const renderUserActions = (user: User, isMobile = false) => {
+    const availableActions = config.actions.filter(action =>
+      !action.condition || action.condition(user)
+    );
+
+    if (isMobile) {
+      // Mobile layout: stack actions vertically
+      return (
+        <div className="space-y-2">
+          {availableActions.map(action => (
+            <UserActionButton
+              key={action.id}
+              action={action}
+              user={user}
+              isMobile={true}
+            />
+          ))}
+        </div>
+      );
+    }
+
+    // Desktop layout: show primary actions inline, others in dropdown or similar
+    const primaryActions = availableActions.filter(a => a.group === 'primary');
+    const secondaryActions = availableActions.filter(a => a.group === 'secondary');
+    const dangerActions = availableActions.filter(a => a.group === 'danger');
+
+    return (
+      <div className="flex gap-2 justify-end">
+        {primaryActions.map(action => (
+          <UserActionButton
+            key={action.id}
+            action={action}
+            user={user}
+            isMobile={false}
+          />
+        ))}
+        {secondaryActions.map(action => (
+          <UserActionButton
+            key={action.id}
+            action={action}
+            user={user}
+            isMobile={false}
+          />
+        ))}
+        {dangerActions.map(action => (
+          <UserActionButton
+            key={action.id}
+            action={action}
+            user={user}
+            isMobile={false}
+          />
+        ))}
+      </div>
+    );
+  };
+
   // Local search state - simplified like vendor filtering
   const [localUserSearch, setLocalUserSearch] = useState('');
   const debouncedLocalSearch = useDebounce(
@@ -97,11 +243,13 @@ export function AdminUsersTab({
                 </Button>
               )}
             </div>
-            <AddUserDialog onAddUser={onAddUser}>
-              <Button className="w-full sm:w-auto admin-mobile-action-button">
+            {config.canAddUsers && config.onAddUser && (
+              <AddUserDialog onAddUser={config.onAddUser}>
+                <Button className="w-full sm:w-auto admin-mobile-action-button">
                 <PlusCircle className="mr-2 h-4 w-4" /> Add User
-              </Button>
+            </Button>
             </AddUserDialog>
+            )}
           </div>
         </div>
       </CardHeader>
@@ -172,106 +320,8 @@ export function AdminUsersTab({
                     </div>
                   </div>
 
-                  {/* Actions - Streamlined for Mobile */}
-                  <div className="space-y-2">
-                    {u.isApproved ? (
-                      /* Approved User Actions */
-                      <div className="flex gap-2">
-                        <EditUserDialog user={u} onUpdateUser={onUpdateUser}>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="flex-1 h-9 text-xs"
-                          >
-                            <Pencil className="h-3 w-3 mr-1" />
-                            Edit
-                          </Button>
-                        </EditUserDialog>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="flex-1 h-9 text-xs text-destructive border-destructive/30 hover:bg-destructive/10"
-                            >
-                              <Trash2 className="h-3 w-3 mr-1" />
-                              Delete
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Delete User?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This will permanently delete{' '}
-                                <strong>{u.name || 'this user'}</strong>'s account.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => onDeleteUser(u.id)}
-                                className="bg-destructive hover:bg-destructive/90"
-                              >
-                                Delete User
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    ) : (
-                      /* Pending User Actions */
-                      <div className="space-y-2">
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            className="flex-1 h-9 text-xs bg-green-600 hover:bg-green-700"
-                            onClick={() => onUpdateUser({ ...u, isApproved: true })}
-                          >
-                            ✓ Approve
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="flex-1 h-9 text-xs text-destructive border-destructive/30"
-                              >
-                                ✗ Reject
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Reject Application?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This will permanently reject{' '}
-                                  <strong>{u.name || 'this user'}</strong>'s application.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => onRejectUser(u.id)}
-                                  className="bg-destructive hover:bg-destructive/90"
-                                >
-                                  Reject Application
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
-                        <EditUserDialog user={u} onUpdateUser={onUpdateUser}>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            className="w-full h-8 text-xs"
-                          >
-                            <Pencil className="h-3 w-3 mr-1" />
-                            Edit Before Approving
-                          </Button>
-                        </EditUserDialog>
-                      </div>
-                    )}
-                  </div>
+                  {/* Actions - Configurable */}
+                  {renderUserActions(u, true)}
                 </div>
               </Card>
             ))
@@ -345,82 +395,13 @@ export function AdminUsersTab({
                       {u.isApproved ? (
                         <Badge variant="default">Approved</Badge>
                       ) : (
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="text-green-600 hover:text-green-700 hover:bg-green-50"
-                            onClick={() => onUpdateUser({ ...u, isApproved: true })}
-                          >
-                            Approve
-                          </Button>
-                          <AlertDialog>
-                            <AlertDialogTrigger asChild>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                              >
-                                Reject
-                              </Button>
-                            </AlertDialogTrigger>
-                            <AlertDialogContent>
-                              <AlertDialogHeader>
-                                <AlertDialogTitle>Reject User Application?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                  This action cannot be undone. This will permanently reject and remove{' '}
-                                  <strong>{u.name || 'this user'}</strong>'s application.
-                                </AlertDialogDescription>
-                              </AlertDialogHeader>
-                              <AlertDialogFooter>
-                                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                <AlertDialogAction
-                                  onClick={() => onRejectUser(u.id)}
-                                  className="bg-destructive hover:bg-destructive/90"
-                                >
-                                  Reject Application
-                                </AlertDialogAction>
-                              </AlertDialogFooter>
-                            </AlertDialogContent>
-                          </AlertDialog>
-                        </div>
+                        <Badge variant="outline" className="text-amber-600">
+                          Pending
+                        </Badge>
                       )}
                     </TableCell>
                     <TableCell className="text-right">
-                      <EditUserDialog user={u} onUpdateUser={onUpdateUser}>
-                        <Button variant="ghost" size="sm">
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                      </EditUserDialog>
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="text-destructive hover:text-destructive"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              This action cannot be undone. This will permanently delete{' '}
-                              <strong>{u.name || 'this user'}</strong>'s account.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Cancel</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => onDeleteUser(u.id)}
-                              className="bg-destructive hover:bg-destructive/90"
-                            >
-                              Delete User
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                      {renderUserActions(u, false)}
                     </TableCell>
                   </TableRow>
                 ))

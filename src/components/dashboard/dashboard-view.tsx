@@ -7,6 +7,9 @@ import * as React from 'react';
 import type { Expense, Payment, User } from '@/lib/types';
 import { Category } from '@/lib/types';
 
+import { useApartmentBalances } from '@/hooks/use-apartment-balances';
+import { useAccountSummary } from '@/hooks/use-account-summary';
+
 import { FeatureGrid } from '@/components/dashboard/feature-grid';
 import { MaintenancePaymentStatus } from '@/components/dashboard/maintenance-payment-status';
 import type { ExpensesListProps } from '@/components/expenses/expenses-list';
@@ -73,11 +76,19 @@ export function DashboardView({
   onNavigateToExpenses,
   isLoadingApartments = false,
 }: DashboardViewProps) {
+  // Extract business logic to hooks
+  const { owedItems, owesItems, netBalance, hasBalances } = useApartmentBalances(
+    apartmentBalances,
+    currentUserApartment
+  );
+
   const currentApartmentBalance = currentUserApartment
     ? apartmentBalances[currentUserApartment]
     : null;
 
   const loggedInUserBalance = currentApartmentBalance ? currentApartmentBalance.balance : 0;
+  const { balanceDisplay, showReminder } = useAccountSummary(loggedInUserBalance);
+
   const [showMobileActions, setShowMobileActions] = React.useState(false);
 
   return (
@@ -124,100 +135,83 @@ export function DashboardView({
       />
 
       {/* Apartment Balances */}
-      {currentApartmentBalance && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Apartment Balances</CardTitle>
-            <CardDescription>Summary of amounts owed between apartments</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {/* What you are owed */}
-            {Object.entries(currentApartmentBalance.isOwed).map(
-              ([apartmentId, amount]) =>
-                amount > 0 && (
-                  <div
-                    key={`owed-${apartmentId}`}
-                    className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-full bg-green-100 dark:bg-green-800/30">
-                        <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
-                      </div>
-                      <div>
-                        <p className="font-medium">
-                          {apartmentBalances[apartmentId]?.name || 'Unknown Apartment'}
-                        </p>
-                        <p className="text-sm text-muted-foreground dark:text-green-200">
-                          owes your apartment
-                        </p>
-                      </div>
-                    </div>
-                    <span className="text-lg font-semibold text-green-700 dark:text-green-400">
-                      ₹{amount.toFixed(2)}
-                    </span>
-                  </div>
-                )
-            )}
+      {hasBalances && (
+      <Card>
+      <CardHeader>
+      <CardTitle>Apartment Balances</CardTitle>
+      <CardDescription>Summary of amounts owed between apartments</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+      {/* What you are owed */}
+      {owedItems.map(({ apartmentId, apartmentName, formattedAmount }) => (
+      <div
+      key={`owed-${apartmentId}`}
+      className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"
+      >
+      <div className="flex items-center gap-3">
+      <div className="p-2 rounded-full bg-green-100 dark:bg-green-800/30">
+      <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
+      </div>
+      <div>
+      <p className="font-medium">{apartmentName}</p>
+      <p className="text-sm text-muted-foreground dark:text-green-200">
+      owes your apartment
+      </p>
+      </div>
+      </div>
+      <span className="text-lg font-semibold text-green-700 dark:text-green-400">
+      {formattedAmount}
+      </span>
+      </div>
+      ))}
 
-            {/* What you owe */}
-            {Object.entries(currentApartmentBalance.owes).map(
-              ([apartmentId, amount]) =>
-                amount > 0 && (
-                  <div
-                    key={`owes-${apartmentId}`}
-                    className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-full bg-red-100 dark:bg-red-800/30">
-                        <TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
-                      </div>
-                      <div>
-                        <p className="font-medium">
-                          You owe {apartmentBalances[apartmentId]?.name || 'Unknown Apartment'}
-                        </p>
-                        <p className="text-sm text-muted-foreground dark:text-red-200">
-                          for shared expenses
-                        </p>
-                      </div>
-                    </div>
-                    <span className="text-lg font-semibold text-red-700 dark:text-red-400">
-                      ₹{amount.toFixed(2)}
-                    </span>
-                  </div>
-                )
-            )}
+      {/* What you owe */}
+      {owesItems.map(({ apartmentId, apartmentName, formattedAmount }) => (
+      <div
+          key={`owes-${apartmentId}`}
+                className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
+        >
+          <div className="flex items-center gap-3">
+          <div className="p-2 rounded-full bg-red-100 dark:bg-red-800/30">
+          <TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
+      </div>
+      <div>
+      <p className="font-medium">You owe {apartmentName}</p>
+        <p className="text-sm text-muted-foreground dark:text-red-200">
+        for shared expenses
+      </p>
+      </div>
+      </div>
+      <span className="text-lg font-semibold text-red-700 dark:text-red-400">
+      {formattedAmount}
+      </span>
+      </div>
+      ))}
 
-            {/* Net balance */}
-            {currentApartmentBalance.balance !== 0 && (
-              <div
-                className={`mt-4 p-4 rounded-lg ${currentApartmentBalance.balance > 0 ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20'}`}
+      {/* Net balance */}
+      {netBalance.amount > 0 && (
+      <div
+      className={`mt-4 p-4 rounded-lg ${netBalance.isPositive ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20'}`}
+      >
+      <div className="flex items-center justify-between">
+      <div>
+          <p className="font-medium">{netBalance.displayText}</p>
+              <p
+                      className={`text-sm ${netBalance.isPositive ? 'text-muted-foreground dark:text-green-200' : 'text-muted-foreground dark:text-red-200'}`}
               >
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium">
-                      {currentApartmentBalance.balance > 0
-                        ? 'Your apartment is owed'
-                        : 'Your apartment owes'}
-                    </p>
-                    <p
-                      className={`text-sm ${currentApartmentBalance.balance > 0 ? 'text-muted-foreground dark:text-green-200' : 'text-muted-foreground dark:text-red-200'}`}
-                    >
-                      {currentApartmentBalance.balance > 0
-                        ? 'in total across all apartments'
-                        : 'in total to other apartments'}
-                    </p>
-                  </div>
-                  <span
-                    className={`text-xl font-bold ${currentApartmentBalance.balance > 0 ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}
-                  >
-                    {currentApartmentBalance.balance > 0 ? '+' : ''}₹
-                    {Math.abs(currentApartmentBalance.balance).toFixed(2)}
-                  </span>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                {netBalance.description}
+            </p>
+        </div>
+          <span
+          className={`text-xl font-bold ${netBalance.isPositive ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}
+      >
+      {netBalance.formattedAmount}
+      </span>
+      </div>
+      </div>
+      )}
+      </CardContent>
+      </Card>
       )}
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -267,40 +261,31 @@ export function DashboardView({
             </div>
             <Separator />
             <div className="flex items-center gap-4">
-              <Wallet
-                className={`h-6 w-6 ${Math.abs(loggedInUserBalance) < 0.01 ? 'text-green-600 dark:text-green-400' : loggedInUserBalance >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
-              />
-              <div className="grid gap-1">
-                <p className="text-sm font-medium">
-                  Your balance is{' '}
-                  {Math.abs(loggedInUserBalance) < 0.01
-                    ? '₹0.00'
-                    : loggedInUserBalance >= 0
-                      ? `-₹${loggedInUserBalance.toFixed(2)}`
-                      : `+₹${Math.abs(loggedInUserBalance).toFixed(2)}`}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  {Math.abs(loggedInUserBalance) < 0.01
-                    ? 'You are all settled up.'
-                    : loggedInUserBalance > 0
-                      ? 'Others owe you money.'
-                      : 'You have outstanding balances.'}
-                </p>
-              </div>
+            <Wallet
+            className={`h-6 w-6 ${balanceDisplay.isSettled ? 'text-green-600 dark:text-green-400' : balanceDisplay.isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+            />
+            <div className="grid gap-1">
+            <p className="text-sm font-medium">
+            Your balance is {balanceDisplay.formattedAmount}
+            </p>
+            <p className="text-sm text-muted-foreground">
+            {balanceDisplay.statusText}
+            </p>
             </div>
-            {loggedInUserBalance < -0.01 && (
-              <>
-                <Separator />
-                <div className="flex items-center gap-4">
-                  <TrendingUp className="h-6 w-6 text-blue-500" />
-                  <div className="grid gap-1">
-                    <p className="text-sm font-medium">Settle Up Reminder</p>
-                    <p className="text-sm text-muted-foreground">
+            </div>
+            {showReminder && (
+            <>
+            <Separator />
+            <div className="flex items-center gap-4">
+            <TrendingUp className="h-6 w-6 text-blue-500" />
+            <div className="grid gap-1">
+                <p className="text-sm font-medium">Settle Up Reminder</p>
+                  <p className="text-sm text-muted-foreground">
                       Please pay your outstanding balance to keep the records updated.
                     </p>
-                  </div>
                 </div>
-              </>
+            </div>
+            </>
             )}
           </CardContent>
         </Card>
