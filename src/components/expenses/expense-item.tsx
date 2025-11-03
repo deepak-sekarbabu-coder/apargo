@@ -3,7 +3,7 @@
 import { format } from 'date-fns';
 import { Check, Receipt, Trash2, Users, X } from 'lucide-react';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Image from 'next/image';
 
@@ -52,8 +52,19 @@ export function ExpenseItem({
   const { toast } = useToast();
   const [loadingMap, setLoadingMap] = useState<{ [apartmentId: string]: boolean }>({});
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [optimisticPaidByApartments, setOptimisticPaidByApartments] = useState<string[] | null>(null);
 
-  const calculation = calculateExpenseAmounts(expense);
+  // Reset optimistic state when expense prop changes
+  useEffect(() => {
+    setOptimisticPaidByApartments(null);
+  }, [expense.id, expense.paidByApartments]);
+
+  // Use optimistic state if available, otherwise use the expense prop
+  const effectiveExpense = optimisticPaidByApartments !== null
+    ? { ...expense, paidByApartments: optimisticPaidByApartments }
+    : expense;
+
+  const calculation = calculateExpenseAmounts(effectiveExpense);
 
   // Check if this is a no-split expense
   const category = categories?.find(c => c.id === expense.categoryId);
@@ -90,27 +101,30 @@ export function ExpenseItem({
 
     setLoadingMap(prev => ({ ...prev, [apartmentId]: true }));
 
-    // Optimistic update: immediately update UI before database call
-    const optimisticExpense = markApartmentAsPaid(expense, apartmentId);
-    onExpenseUpdate?.(optimisticExpense);
+    // Optimistic update: immediately update local UI state
+    const optimisticPaidApartments = markApartmentAsPaid(expense, apartmentId).paidByApartments;
+    setOptimisticPaidByApartments(optimisticPaidApartments);
+
+    const isUserMarkingOwnPayment = isCurrentUserPayment && !isPayer;
+
+    // Show immediate feedback toast
+    toast({
+      title: 'Payment Marked',
+      description: isUserMarkingOwnPayment
+        ? 'Your payment has been marked as paid'
+        : `${apartmentId} marked as paid`,
+    });
 
     try {
       const updatedExpense = markApartmentAsPaid(expense, apartmentId);
       await updateExpense(expense.id, { paidByApartments: updatedExpense.paidByApartments });
 
-      // Update again with the confirmed data from database
+      // Clear optimistic state and update with confirmed data
+      setOptimisticPaidByApartments(null);
       onExpenseUpdate?.(updatedExpense);
-
-      const isUserMarkingOwnPayment = isCurrentUserPayment && !isPayer;
-
-      toast({
-        title: 'Payment Marked',
-        description: isUserMarkingOwnPayment
-          ? 'Your payment has been marked as paid'
-          : `${apartmentId} marked as paid`,
-      });
     } catch (error) {
       // Revert optimistic update on error
+      setOptimisticPaidByApartments(null);
       onExpenseUpdate?.(expense);
 
       console.error('Failed to update payment status:', error);
@@ -137,27 +151,30 @@ export function ExpenseItem({
 
     setLoadingMap(prev => ({ ...prev, [apartmentId]: true }));
 
-    // Optimistic update: immediately update UI before database call
-    const optimisticExpense = markApartmentAsUnpaid(expense, apartmentId);
-    onExpenseUpdate?.(optimisticExpense);
+    // Optimistic update: immediately update local UI state
+    const optimisticPaidApartments = markApartmentAsUnpaid(expense, apartmentId).paidByApartments;
+    setOptimisticPaidByApartments(optimisticPaidApartments);
+
+    const isUserMarkingOwnPayment = isCurrentUserPayment && !isPayer;
+
+    // Show immediate feedback toast
+    toast({
+      title: 'Payment Unmarked',
+      description: isUserMarkingOwnPayment
+        ? 'Your payment has been marked as unpaid'
+        : `${apartmentId} marked as unpaid`,
+    });
 
     try {
       const updatedExpense = markApartmentAsUnpaid(expense, apartmentId);
       await updateExpense(expense.id, { paidByApartments: updatedExpense.paidByApartments });
 
-      // Update again with the confirmed data from database
+      // Clear optimistic state and update with confirmed data
+      setOptimisticPaidByApartments(null);
       onExpenseUpdate?.(updatedExpense);
-
-      const isUserMarkingOwnPayment = isCurrentUserPayment && !isPayer;
-
-      toast({
-        title: 'Payment Unmarked',
-        description: isUserMarkingOwnPayment
-          ? 'Your payment has been marked as unpaid'
-          : `${apartmentId} marked as unpaid`,
-      });
     } catch (error) {
       // Revert optimistic update on error
+      setOptimisticPaidByApartments(null);
       onExpenseUpdate?.(expense);
 
       console.error('Failed to update payment status:', error);
@@ -378,17 +395,17 @@ export function ExpenseItem({
 
                 return (
                   <div
-                    key={apartmentId}
-                    className={`flex flex-col gap-2 p-3 rounded-lg border ${
-                      isPaid
-                        ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
-                        : 'bg-red-50 dark:bg-red-900/20 border-red-200 dark:border-red-800'
-                    }`}
+                  key={apartmentId}
+                  className={`flex flex-col gap-2 p-3 rounded-lg border transition-all duration-300 ease-in-out ${
+                  isPaid
+                  ? 'bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-700'
+                  : 'bg-red-100 dark:bg-red-900/30 border-red-300 dark:border-red-700'
+                  }`}
                   >
                     {/* Apartment info row */}
                     <div className="flex items-center gap-2 min-w-0">
                       <div
-                        className={`h-2 w-2 rounded-full flex-shrink-0 ${isPaid ? 'bg-green-500 dark:bg-green-400' : 'bg-red-500 dark:bg-red-400'}`}
+                        className={`h-2 w-2 rounded-full flex-shrink-0 transition-colors duration-300 ease-in-out ${isPaid ? 'bg-green-600 dark:bg-green-500' : 'bg-red-600 dark:bg-red-500'}`}
                       />
                       <span className="text-sm font-medium break-words flex-1">
                         {formatApartmentWithUsers(apartmentId, isCurrentUser)}

@@ -1,7 +1,5 @@
 import { useAuth } from '@/context/auth-context';
 import { format } from 'date-fns';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { BarChart3, CreditCard, Download } from 'lucide-react';
 
 import * as React from 'react';
@@ -35,7 +33,7 @@ import { usePaymentFilters } from '@/hooks/use-payment-filters';
 
 import { PaymentsTable } from './payments-table';
 
-// Extend jsPDF type to include autoTable
+// Type declarations for jsPDF and autoTable (used with dynamic imports)
 interface AutoTableOptions {
   head: string[][];
   body: string[][];
@@ -54,12 +52,6 @@ interface AutoTableOptions {
     fillColor?: number[];
   };
   margin?: { top?: number };
-}
-
-declare module 'jspdf' {
-  interface jsPDF {
-    autoTable: (options: AutoTableOptions) => jsPDF;
-  }
 }
 
 interface LedgerViewProps {
@@ -116,75 +108,89 @@ export function LedgerView({ payments, users }: LedgerViewProps) {
   }, []);
 
   // PDF export for balance sheets
-  const handleExportBalanceSheetsPDF = React.useCallback(() => {
-    const doc = new jsPDF();
+  const handleExportBalanceSheetsPDF = React.useCallback(async () => {
+    try {
+      // Dynamically import jsPDF and autoTable to reduce bundle size
+      const [{ default: jsPDF }, { default: autoTable }] = await Promise.all([
+        import('jspdf'),
+        import('jspdf-autotable')
+      ]);
 
-    // Add title
-    doc.setFontSize(18);
-    doc.text('Monthly Balance Sheets', 14, 22);
+      const doc = new jsPDF();
 
-    // Add date
-    doc.setFontSize(11);
-    doc.text(`Generated on: ${format(new Date(), 'yyyy-MM-dd HH:mm')}`, 14, 32);
+      // Extend jsPDF with autoTable for this instance
+      autoTable(doc);
 
-    // Calculate income and expenses from approved payments only (consistent with UI display)
-    const incomeMap = new Map<string, number>();
-    const expensesMap = new Map<string, number>();
+      // Add title
+      doc.setFontSize(18);
+      doc.text('Monthly Balance Sheets', 14, 22);
 
-    payments
-      // Include both explicitly approved and paid payments in balance calculations
-      .filter(p => p.status === 'approved' || p.status === 'paid')
-      .forEach(p => {
-        const category = p.category || (p.expenseId ? 'expense' : 'income');
-        const amt = p.amount || 0;
+      // Add date
+      doc.setFontSize(11);
+      doc.text(`Generated on: ${format(new Date(), 'yyyy-MM-dd HH:mm')}`, 14, 32);
 
-        if (category === 'expense') {
-          const current = expensesMap.get(p.monthYear) || 0;
-          expensesMap.set(p.monthYear, current + amt);
-        } else {
-          const current = incomeMap.get(p.monthYear) || 0;
-          incomeMap.set(p.monthYear, current + amt);
-        }
+      // Calculate income and expenses from approved payments only (consistent with UI display)
+      const incomeMap = new Map<string, number>();
+      const expensesMap = new Map<string, number>();
+
+      payments
+        // Include both explicitly approved and paid payments in balance calculations
+        .filter(p => p.status === 'approved' || p.status === 'paid')
+        .forEach(p => {
+          const category = p.category || (p.expenseId ? 'expense' : 'income');
+          const amt = p.amount || 0;
+
+          if (category === 'expense') {
+            const current = expensesMap.get(p.monthYear) || 0;
+            expensesMap.set(p.monthYear, current + amt);
+          } else {
+            const current = incomeMap.get(p.monthYear) || 0;
+            incomeMap.set(p.monthYear, current + amt);
+          }
+        });
+
+      // Get all months that have either income or expenses
+      const months = new Set<string>([...incomeMap.keys(), ...expensesMap.keys()]);
+
+      // Prepare table data
+      const headers = [['Month', 'Opening', 'Income', 'Expenses', 'Closing']];
+      const data: string[][] = Array.from(months)
+        .sort()
+        .map(monthYear => {
+          const opening = 0;
+          const income = incomeMap.get(monthYear) || 0;
+          const expenses = expensesMap.get(monthYear) || 0;
+          const closing = opening + income - expenses;
+          return [monthYear, `Rs. ${opening}`, `Rs. ${income}`, `Rs. ${expenses}`, `Rs. ${closing}`];
+        });
+
+      // Generate table
+      doc.autoTable({
+        head: headers,
+        body: data,
+        startY: 40,
+        styles: {
+          fontSize: 8,
+          cellPadding: 2,
+        },
+        headStyles: {
+          fillColor: [41, 128, 185],
+          textColor: 255,
+          fontSize: 9,
+          fontStyle: 'bold',
+        },
+        alternateRowStyles: {
+          fillColor: [245, 245, 245],
+        },
+        margin: { top: 40 },
       });
 
-    // Get all months that have either income or expenses
-    const months = new Set<string>([...incomeMap.keys(), ...expensesMap.keys()]);
-
-    // Prepare table data
-    const headers = [['Month', 'Opening', 'Income', 'Expenses', 'Closing']];
-    const data: string[][] = Array.from(months)
-      .sort()
-      .map(monthYear => {
-        const opening = 0;
-        const income = incomeMap.get(monthYear) || 0;
-        const expenses = expensesMap.get(monthYear) || 0;
-        const closing = opening + income - expenses;
-        return [monthYear, `Rs. ${opening}`, `Rs. ${income}`, `Rs. ${expenses}`, `Rs. ${closing}`];
-      });
-
-    // Generate table
-    autoTable(doc, {
-      head: headers,
-      body: data,
-      startY: 40,
-      styles: {
-        fontSize: 8,
-        cellPadding: 2,
-      },
-      headStyles: {
-        fillColor: [41, 128, 185],
-        textColor: 255,
-        fontSize: 9,
-        fontStyle: 'bold',
-      },
-      alternateRowStyles: {
-        fillColor: [245, 245, 245],
-      },
-      margin: { top: 40 },
-    });
-
-    // Save the PDF
-    doc.save(`balance-sheets-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+      // Save the PDF
+      doc.save(`balance-sheets-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+    } catch (error) {
+      console.error('Failed to generate PDF:', error);
+      // Could show a toast notification here if needed
+    }
   }, [payments]);
 
   // aggregated view of balance sheets by month (used for UI)

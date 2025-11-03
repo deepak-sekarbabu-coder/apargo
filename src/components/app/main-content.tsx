@@ -27,8 +27,18 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useExpenseFilters } from '@/hooks/use-expense-filters';
 
 const LedgerView = dynamic(
-  () => import('@/components/ledger/ledger-view').then(mod => mod.default),
-  { ssr: false }
+  () => import('@/components/ledger/ledger-view'),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading ledger view...</p>
+        </div>
+      </div>
+    )
+  }
 );
 
 const AdminView = dynamic(() => import('@/components/admin/admin-view').then(mod => mod.default), {
