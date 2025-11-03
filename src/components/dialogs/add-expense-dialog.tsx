@@ -92,7 +92,14 @@ export function AddExpenseDialog({
       categoryId: '',
       paid: false,
     },
+    mode: 'onChange',
   });
+
+  // Watch form values to enable/disable button similar to Add Payment dialog
+  const watchedValues = form.watch();
+  const isFormValid = watchedValues.description.trim() !== '' &&
+                     watchedValues.amount > 0 &&
+                     watchedValues.categoryId !== '';
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -327,7 +334,7 @@ export function AddExpenseDialog({
             <DialogFooter className="flex flex-col-reverse gap-3 sm:flex-row sm:gap-2 pt-4">
               <Button
                 type="submit"
-                disabled={loading || isLoadingApartments}
+                disabled={!isFormValid || loading || isLoadingApartments}
                 className="w-full h-12 text-base font-medium touch-manipulation"
               >
                 {loading ? (
