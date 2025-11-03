@@ -2,7 +2,7 @@ import { collection, getDocs, query, where } from 'firebase/firestore';
 
 import { db } from './firebase';
 import { listenToPolls } from './firestore';
-import { Poll, User } from './types';
+import { Poll, PollNotification, User } from './types';
 
 /**
  * Checks if a user has any active polls they haven't participated in yet
@@ -61,16 +61,16 @@ export const listenToUnvotedPolls = (
  * @param apartmentId The user's apartment ID
  * @returns A notification object
  */
-export const createPollNotification = (poll: Poll, apartmentId: string) => {
+export const createPollNotification = (poll: Poll, apartmentId: string): PollNotification => {
   return {
     id: `poll-${poll.id}`,
     type: 'poll',
     title: 'New Community Poll',
     message: poll.question,
     toApartmentId: apartmentId,
-    isRead: false,
     createdAt: poll.createdAt,
-    relatedPollId: poll.id,
-    poll: poll,
+    // Poll-specific fields can be added here if needed
+    relatedExpenseId: undefined,
+    fromApartmentId: undefined,
   };
 };

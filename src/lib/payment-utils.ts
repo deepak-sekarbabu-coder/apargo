@@ -1,7 +1,7 @@
 import { addDoc, collection } from 'firebase/firestore';
 
 import { db } from './firebase';
-import type { Apartment, Category, Notification } from './types';
+import type { Apartment, Category, PaymentNotification } from './types';
 
 export interface PaymentDistribution {
   totalAmount: number; // Amount owed by other apartments (excluding paying apartment's share)
@@ -70,21 +70,21 @@ function createPaymentRequestNotification(
   apartment: { apartment: Apartment; share: number },
   dueDate: string,
   userId?: string
-): Omit<Notification, 'id'> {
+): Omit<PaymentNotification, 'id'> {
   return {
     type: 'payment_request',
     title: `Payment Request from ${payment.payingApartment.name}`,
     message: `${payment.description || 'Shared expense'}. Your share: ₹${apartment.share.toFixed(2)}`,
     amount: apartment.share,
-    currency: '₹',
     fromApartmentId: payment.payingApartment.id,
     toApartmentId: apartment.apartment.id,
-    isRead: false,
-    createdAt: new Date().toISOString(),
-    dueDate,
     status: 'pending',
     category: typeof payment.category === 'object' ? payment.category.name : payment.category,
     requestedBy: userId,
+    paidAt: undefined,
+    paymentMethod: undefined,
+    transactionId: undefined,
+    createdAt: new Date().toISOString(),
   };
 }
 

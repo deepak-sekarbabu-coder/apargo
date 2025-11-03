@@ -61,32 +61,69 @@ export type PaymentMethodType =
 
 export type PaymentStatus = 'pending' | 'approved' | 'rejected' | 'paid' | 'failed' | 'cancelled';
 
-export type Notification = {
+// Base notification interface with common fields
+interface BaseNotification {
   id: string;
   type: NotificationType;
   title: string;
   message: string;
-  amount?: number;
-  currency?: string;
-  fromApartmentId?: string;
-  toApartmentId?: string | string[]; // Can be single apartment or array for announcements
-  relatedExpenseId?: string;
-  // Announcement-specific fields (when type === 'announcement')
-  createdBy?: string; // Admin user ID who created the announcement
-  isActive?: boolean; // Whether the announcement is still active
-  priority?: 'low' | 'medium' | 'high';
-  expiresAt?: string; // ISO date string
-  isRead: boolean | { [apartmentId: string]: boolean }; // Can be boolean or object for announcements
-  isDismissed?: boolean;
   createdAt: string; // ISO date string
-  dueDate?: string; // ISO date string
-  status?: PaymentStatus;
+}
+
+// Discriminated union for different notification types
+export type Notification =
+  | PaymentNotification
+  | AnnouncementNotification
+  | PollNotification
+  | ReminderNotification;
+
+// Payment-related notifications
+export interface PaymentNotification extends BaseNotification {
+  type: 'payment_request' | 'payment_received' | 'payment_confirmed';
+  amount: number;
+  currency?: string;
+  fromApartmentId: string;
+  toApartmentId: string | string[];
+  relatedExpenseId?: string;
+  status: PaymentStatus;
   paymentMethod?: PaymentMethodType;
   transactionId?: string;
   category?: string;
   requestedBy?: string; // User ID who requested the payment
   paidAt?: string; // ISO date string when payment was completed
-};
+}
+
+// Announcement notifications
+export interface AnnouncementNotification extends BaseNotification {
+  type: 'announcement';
+  createdBy: string; // Admin user ID who created the announcement (required for announcements)
+  isActive: boolean; // Whether the announcement is still active (required for announcements)
+  priority: 'low' | 'medium' | 'high';
+  expiresAt?: string; // ISO date string
+  isRead: { [apartmentId: string]: boolean }; // Object mapping for announcements (required)
+  isDismissed?: boolean;
+  dueDate?: string;
+}
+
+// Poll notifications
+export interface PollNotification extends BaseNotification {
+  type: 'poll';
+  // Poll-specific fields can be added here if needed
+  relatedExpenseId?: string;
+  fromApartmentId?: string;
+  toApartmentId?: string | string[];
+}
+
+// Reminder notifications
+export interface ReminderNotification extends BaseNotification {
+  type: 'reminder';
+  dueDate?: string;
+  relatedExpenseId?: string;
+  fromApartmentId?: string;
+  toApartmentId?: string | string[];
+  amount?: number;
+  currency?: string;
+}
 
 // --- Polling Feature ---
 export type PollOption = {

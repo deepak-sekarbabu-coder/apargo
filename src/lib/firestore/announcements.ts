@@ -12,9 +12,9 @@ import {
 } from 'firebase/firestore';
 
 import { db } from '../firebase';
-import type { Notification } from '../types';
+import type { AnnouncementNotification } from '../types';
 
-export const getActiveAnnouncements = async (): Promise<Notification[]> => {
+export const getActiveAnnouncements = async (): Promise<AnnouncementNotification[]> => {
   const notificationsCol = collection(db, 'notifications');
   const q = query(
     notificationsCol,
@@ -23,10 +23,10 @@ export const getActiveAnnouncements = async (): Promise<Notification[]> => {
     orderBy('createdAt', 'desc')
   );
   const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Notification);
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as AnnouncementNotification);
 };
 
-export const listenToActiveAnnouncements = (callback: (announcements: Notification[]) => void) => {
+export const listenToActiveAnnouncements = (callback: (announcements: AnnouncementNotification[]) => void) => {
   const notificationsCol = collection(db, 'notifications');
   const q = query(
     notificationsCol,
@@ -35,7 +35,7 @@ export const listenToActiveAnnouncements = (callback: (announcements: Notificati
     orderBy('createdAt', 'desc')
   );
   return onSnapshot(q, snapshot => {
-    const announcements = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Notification);
+    const announcements = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as AnnouncementNotification);
     callback(announcements);
   });
 };

@@ -164,7 +164,7 @@ userActionRegistry.register({
 userActionRegistry.register({
   id: 'delete',
   label: 'Delete',
-  variant: 'destructive',
+  variant: 'ghost',
   icon: Trash2,
   handler: (user) => {
     console.warn('Delete handler not implemented');

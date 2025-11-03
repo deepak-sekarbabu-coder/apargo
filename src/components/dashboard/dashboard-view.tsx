@@ -20,26 +20,29 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 
-interface DashboardViewProps {
+// Base dashboard props that are always required
+interface BaseDashboardProps {
   user: User | null;
   expenses: Expense[];
   users: User[];
   categories: Category[];
   currentUserApartment: string | undefined;
   currentUserRole: string;
-  payments?: Payment[]; // full payment list for status widget
-  apartmentBalances: Record<
-    string,
-    {
-      name: string;
-      balance: number;
-      owes: Record<string, number>;
-      isOwed: Record<string, number>;
-    }
-  >;
+}
+
+// Expense management props (optional - some dashboards might not allow expense management)
+interface ExpenseManagementProps {
   onExpenseUpdate: (expense: Expense) => void;
   onExpenseDelete?: (expenseId: string) => void;
   onAddExpense: (expenseData: Omit<Expense, 'id' | 'date'>) => Promise<void>;
+  ExpensesList: React.ComponentType<ExpensesListProps>;
+  onNavigateToExpenses?: () => void;
+  isLoadingApartments?: boolean;
+}
+
+// Payment management props (optional - some dashboards might not show payments)
+interface PaymentManagementProps {
+  payments?: Payment[];
   onAddPayment: (data: {
     payeeId: string;
     amount: number;
@@ -49,12 +52,35 @@ interface DashboardViewProps {
     category?: 'income' | 'expense';
     reason?: string;
   }) => Promise<void>;
-  ExpensesList: React.ComponentType<ExpensesListProps>;
+}
+
+// Balance display props (optional - some dashboards might not show balances)
+interface BalanceDisplayProps {
+  apartmentBalances: Record<
+    string,
+    {
+      name: string;
+      balance: number;
+      owes: Record<string, number>;
+      isOwed: Record<string, number>;
+    }
+  >;
+}
+
+// Summary statistics props (optional - some dashboards might not show stats)
+interface SummaryStatsProps {
   apartmentsCount?: number;
   unpaidBillsCount?: number;
-  onNavigateToExpenses?: () => void;
-  isLoadingApartments?: boolean;
-  // Payment status widget removed
+}
+
+// Composable dashboard props interface
+// Allows for partial implementations while maintaining type safety
+export interface DashboardViewProps extends BaseDashboardProps {
+  // Optional feature sets that can be mixed and matched
+  expenseManagement?: ExpenseManagementProps;
+  paymentManagement?: PaymentManagementProps;
+  balanceDisplay?: BalanceDisplayProps;
+  summaryStats?: SummaryStatsProps;
 }
 
 export function DashboardView({
@@ -64,30 +90,48 @@ export function DashboardView({
   categories,
   currentUserApartment,
   currentUserRole,
-  payments = [],
-  apartmentBalances,
-  onExpenseUpdate,
-  onExpenseDelete,
-  onAddExpense,
-  onAddPayment,
-  ExpensesList,
-  apartmentsCount = 0,
-  unpaidBillsCount = 0,
-  onNavigateToExpenses,
-  isLoadingApartments = false,
+  expenseManagement,
+  paymentManagement,
+  balanceDisplay,
+  summaryStats,
 }: DashboardViewProps) {
+  // Extract nested props with defaults
+  const {
+    onExpenseUpdate,
+    onExpenseDelete,
+    onAddExpense,
+    ExpensesList,
+    onNavigateToExpenses,
+    isLoadingApartments = false,
+  } = expenseManagement || {};
+
+  const {
+    payments = [],
+    onAddPayment,
+  } = paymentManagement || {};
+
+  const {
+    apartmentBalances,
+  } = balanceDisplay || {};
+
+  const {
+    apartmentsCount = 0,
+    unpaidBillsCount = 0,
+  } = summaryStats || {};
+
+  const currentApartmentBalance = balanceDisplay?.apartmentBalances
+    ? balanceDisplay.apartmentBalances[currentUserApartment || '']
+    : null;
+
+  // Account summary hook
+  const loggedInUserBalance = currentApartmentBalance ? currentApartmentBalance.balance : 0;
+  const { balanceDisplay: accountSummary, showReminder } = useAccountSummary(loggedInUserBalance);
+
   // Extract business logic to hooks
   const { owedItems, owesItems, netBalance, hasBalances } = useApartmentBalances(
     apartmentBalances,
     currentUserApartment
   );
-
-  const currentApartmentBalance = currentUserApartment
-    ? apartmentBalances[currentUserApartment]
-    : null;
-
-  const loggedInUserBalance = currentApartmentBalance ? currentApartmentBalance.balance : 0;
-  const { balanceDisplay, showReminder } = useAccountSummary(loggedInUserBalance);
 
   const [showMobileActions, setShowMobileActions] = React.useState(false);
 
@@ -104,25 +148,27 @@ export function DashboardView({
         isAdmin={currentUserRole === 'admin'}
       />
 
-      {/* Top summary cards */}
-      <div className="grid grid-cols-2 gap-4">
-        <Card className="border-blue-100 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
-          <CardContent className="p-4">
-            <p className="text-sm text-muted-foreground">Total Apartments</p>
-            <div className="text-2xl font-bold text-blue-700 dark:text-blue-400">
-              {apartmentsCount}
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-yellow-100 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20">
-          <CardContent className="p-4">
-            <p className="text-sm text-muted-foreground">Unpaid Bills</p>
-            <div className="text-2xl font-bold text-amber-700 dark:text-amber-400">
-              {unpaidBillsCount}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      {/* Top summary cards - only show if summary stats are provided */}
+      {summaryStats && (
+        <div className="grid grid-cols-2 gap-4">
+          <Card className="border-blue-100 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
+            <CardContent className="p-4">
+              <p className="text-sm text-muted-foreground">Total Apartments</p>
+              <div className="text-2xl font-bold text-blue-700 dark:text-blue-400">
+                {apartmentsCount}
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-yellow-100 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20">
+            <CardContent className="p-4">
+              <p className="text-sm text-muted-foreground">Unpaid Bills</p>
+              <div className="text-2xl font-bold text-amber-700 dark:text-amber-400">
+                {unpaidBillsCount}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* Outstanding Balance Alert */}
       <OutstandingBalance expenses={expenses} currentUserApartment={currentUserApartment} />
@@ -134,8 +180,8 @@ export function DashboardView({
         defaultMonthlyAmount={categories.find(cat => cat.name === 'Maintenance')?.monthlyAmount || 0} 
       />
 
-      {/* Apartment Balances */}
-      {hasBalances && (
+      {/* Apartment Balances - only show if balance display is enabled */}
+      {balanceDisplay && hasBalances && (
       <Card>
       <CardHeader>
       <CardTitle>Apartment Balances</CardTitle>
@@ -214,116 +260,123 @@ export function DashboardView({
       </Card>
       )}
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <div>
-              <CardTitle>Recent Expenses</CardTitle>
-              <CardDescription>The last 2 expenses added to your apartment.</CardDescription>
-            </div>
-            {onNavigateToExpenses && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onNavigateToExpenses}
-                className="text-xs"
-              >
-                View All
-              </Button>
-            )}
-          </CardHeader>
-          <CardContent>
-            <ExpensesList
-              expenses={expenses}
-              limit={2}
-              users={users}
-              categories={categories}
-              currentUserApartment={currentUserApartment}
-              currentUserRole={currentUserRole}
-              onExpenseUpdate={onExpenseUpdate}
-              onExpenseDelete={onExpenseDelete}
-            />
-          </CardContent>
-        </Card>
+      {/* Expense Management Section - only show if expense management is enabled */}
+      {expenseManagement && (
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <div>
+                <CardTitle>Recent Expenses</CardTitle>
+                <CardDescription>The last 2 expenses added to your apartment.</CardDescription>
+              </div>
+              {onNavigateToExpenses && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onNavigateToExpenses}
+                  className="text-xs"
+                >
+                  View All
+                </Button>
+              )}
+            </CardHeader>
+            <CardContent>
+              <ExpensesList
+                expenses={expenses}
+                limit={2}
+                users={users}
+                categories={categories}
+                currentUserApartment={currentUserApartment}
+                currentUserRole={currentUserRole}
+                onExpenseUpdate={onExpenseUpdate}
+                onExpenseDelete={onExpenseDelete}
+              />
+            </CardContent>
+          </Card>
 
         <Card>
           <CardHeader>
-            <CardTitle>Account Summary</CardTitle>
-            <CardDescription>Your personal balance status and account overview.</CardDescription>
+          <CardTitle>Account Summary</CardTitle>
+          <CardDescription>Your personal balance status and account overview.</CardDescription>
           </CardHeader>
           <CardContent className="grid gap-4">
-            <div className="flex items-center gap-4">
-              <Bell className="h-6 w-6 text-accent" />
-              <div className="grid gap-1">
-                <p className="text-sm font-medium">Welcome to Apargo, {user?.name}!</p>
-                <p className="text-sm text-muted-foreground">Here is a summary of your account.</p>
-              </div>
-            </div>
-            <Separator />
-            <div className="flex items-center gap-4">
-            <Wallet
-            className={`h-6 w-6 ${balanceDisplay.isSettled ? 'text-green-600 dark:text-green-400' : balanceDisplay.isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
-            />
-            <div className="grid gap-1">
-            <p className="text-sm font-medium">
-            Your balance is {balanceDisplay.formattedAmount}
-            </p>
-            <p className="text-sm text-muted-foreground">
-            {balanceDisplay.statusText}
-            </p>
-            </div>
-            </div>
-            {showReminder && (
-            <>
-            <Separator />
-            <div className="flex items-center gap-4">
-            <TrendingUp className="h-6 w-6 text-blue-500" />
-            <div className="grid gap-1">
-                <p className="text-sm font-medium">Settle Up Reminder</p>
-                  <p className="text-sm text-muted-foreground">
-                      Please pay your outstanding balance to keep the records updated.
-                    </p>
-                </div>
-            </div>
-            </>
-            )}
+          <div className="flex items-center gap-4">
+          <Bell className="h-6 w-6 text-accent" />
+          <div className="grid gap-1">
+          <p className="text-sm font-medium">Welcome to Apargo, {user?.name}!</p>
+          <p className="text-sm text-muted-foreground">Here is a summary of your account.</p>
+          </div>
+          </div>
+          <Separator />
+          <div className="flex items-center gap-4">
+          <Wallet
+          className={`h-6 w-6 ${accountSummary.isSettled ? 'text-green-600 dark:text-green-400' : accountSummary.isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+          />
+          <div className="grid gap-1">
+          <p className="text-sm font-medium">
+          Your balance is {accountSummary.formattedAmount}
+          </p>
+          <p className="text-sm text-muted-foreground">
+          {accountSummary.statusText}
+          </p>
+          </div>
+          </div>
+          {showReminder && (
+          <>
+          <Separator />
+          <div className="flex items-center gap-4">
+          <TrendingUp className="h-6 w-6 text-blue-500" />
+          <div className="grid gap-1">
+          <p className="text-sm font-medium">Settle Up Reminder</p>
+          <p className="text-sm text-muted-foreground">
+          Please pay your outstanding balance to keep the records updated.
+          </p>
+          </div>
+          </div>
+          </>
+          )}
           </CardContent>
-        </Card>
-      </div>
+          </Card>
+          </div>
+      )}
 
-      {/* Mobile Floating Action Buttons */}
-      {user && (
+      {/* Mobile Floating Action Buttons - only show if management features are enabled */}
+      {user && (expenseManagement || paymentManagement) && (
         <div className="fixed bottom-4 right-4 z-50 sm:hidden">
           <div className="flex flex-col gap-3">
-            {/* Quick Add Expense Button */}
-            <AddExpenseDialog
-              categories={categories}
-              onAddExpense={onAddExpense}
-              currentUser={user}
-              isLoadingApartments={isLoadingApartments}
-            >
-              <Button
-                className="w-14 h-14 rounded-full bg-accent hover:bg-accent/90 shadow-lg active:shadow-md transition-all duration-200 active:scale-95"
-                disabled={isLoadingApartments}
-                aria-label="Quick Add Expense"
+            {/* Quick Add Expense Button - only if expense management enabled */}
+            {expenseManagement && onAddExpense && (
+              <AddExpenseDialog
+                categories={categories}
+                onAddExpense={onAddExpense}
+                currentUser={user}
+                isLoadingApartments={isLoadingApartments}
               >
-                <Plus className="h-6 w-6" />
-              </Button>
-            </AddExpenseDialog>
+                <Button
+                  className="w-14 h-14 rounded-full bg-accent hover:bg-accent/90 shadow-lg active:shadow-md transition-all duration-200 active:scale-95"
+                  disabled={isLoadingApartments}
+                  aria-label="Quick Add Expense"
+                >
+                  <Plus className="h-6 w-6" />
+                </Button>
+              </AddExpenseDialog>
+            )}
 
-            {/* Quick Add Payment Button */}
-            <AddPaymentDialog
-              users={users}
-              onAddPayment={onAddPayment}
-            >
-              <Button
-                className="w-14 h-14 rounded-full bg-primary hover:bg-primary/90 shadow-lg active:shadow-md transition-all duration-200 active:scale-95"
-                disabled={isLoadingApartments}
-                aria-label="Quick Add Payment"
+            {/* Quick Add Payment Button - only if payment management enabled */}
+            {paymentManagement && onAddPayment && (
+              <AddPaymentDialog
+                users={users}
+                onAddPayment={onAddPayment}
               >
-                <CreditCard className="h-6 w-6" />
-              </Button>
-            </AddPaymentDialog>
+                <Button
+                  className="w-14 h-14 rounded-full bg-primary hover:bg-primary/90 shadow-lg active:shadow-md transition-all duration-200 active:scale-95"
+                  disabled={isLoadingApartments}
+                  aria-label="Quick Add Payment"
+                >
+                  <CreditCard className="h-6 w-6" />
+                </Button>
+              </AddPaymentDialog>
+            )}
           </div>
         </div>
       )}

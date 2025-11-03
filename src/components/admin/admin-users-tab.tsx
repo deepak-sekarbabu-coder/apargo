@@ -63,16 +63,18 @@ const UserActionButton: React.FC<UserActionButtonProps> = ({ action, user, isMob
       <AlertDialog>
         <AlertDialogTrigger asChild>
           <Button
-            variant={action.variant || 'outline'}
-            size={buttonSize}
-            className={`${buttonClass} ${
-              action.variant === 'destructive'
-                ? 'text-destructive border-destructive/30 hover:bg-destructive/10'
-                : ''
-            }`}
+          variant={action.variant || 'outline'}
+          size={buttonSize}
+          className={`${buttonClass} ${
+          action.variant === 'destructive'
+          ? 'text-destructive border-destructive/30 hover:bg-destructive/10'
+          : action.variant === 'ghost' && action.id === 'delete'
+          ? 'text-destructive hover:text-destructive'
+          : ''
+          }`}
           >
-            {action.icon && <action.icon className={isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4'} />}
-            {action.label}
+          {action.icon && React.createElement(action.icon, { className: isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4' })}
+          {isMobile ? action.label : null}
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
@@ -107,27 +109,27 @@ const UserActionButton: React.FC<UserActionButtonProps> = ({ action, user, isMob
     return (
       <EditUserDialog user={user} onUpdateUser={action.handler}>
         <Button
-          variant={action.variant || 'outline'}
-          size={buttonSize}
-          className={buttonClass}
+        variant={action.variant || 'outline'}
+        size={buttonSize}
+        className={buttonClass}
         >
-          {action.icon && <action.icon className={isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4'} />}
-          {isMobile ? action.label : null}
+        {action.icon && React.createElement(action.icon, { className: isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4' })}
+        {isMobile ? action.label : null}
         </Button>
       </EditUserDialog>
     );
   }
 
   return (
-    <Button
-      variant={action.variant || 'outline'}
-      size={buttonSize}
-      className={buttonClass}
-      onClick={handleClick}
-    >
-      {action.icon && <action.icon className={isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4'} />}
-      {isMobile ? action.label : null}
-    </Button>
+  <Button
+  variant={action.variant || 'outline'}
+  size={buttonSize}
+  className={buttonClass}
+  onClick={handleClick}
+  >
+  {action.icon && React.createElement(action.icon, { className: isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4' })}
+  {isMobile ? action.label : null}
+  </Button>
   );
 };
 

@@ -13,10 +13,26 @@ export const useApartmentBalances = (
       owes: Record<string, number>;
       isOwed: Record<string, number>;
     }
-  >,
+  > | undefined,
   currentUserApartment?: string
 ) => {
   return useMemo(() => {
+    // Handle case where apartmentBalances is undefined
+    if (!apartmentBalances) {
+      return {
+        currentBalance: null,
+        owedItems: [],
+        owesItems: [],
+        netBalance: {
+          amount: 0,
+          isPositive: true,
+          displayText: 'Your apartment is owed',
+          description: 'in total across all apartments',
+        },
+        hasBalances: false,
+      };
+    }
+
     const currentApartmentBalance = currentUserApartment
       ? apartmentBalances[currentUserApartment]
       : null;
@@ -32,6 +48,7 @@ export const useApartmentBalances = (
           displayText: 'Your apartment is owed',
           description: 'in total across all apartments',
         },
+        hasBalances: false,
       };
     }
 
