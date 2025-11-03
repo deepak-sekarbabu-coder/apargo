@@ -4,6 +4,7 @@ import type { Category, Payment, PollOption, User } from '@/lib/types';
 
 import { useAdminTabState } from '@/hooks/use-admin-tab-state';
 import { createStandardAdminConfig } from '@/lib/user-actions-config.tsx';
+import type { AdminUsersTabConfig } from '@/lib/user-actions-config.tsx';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -15,7 +16,45 @@ import { AdminUsersTab } from './admin-users-tab';
 
 // import { AdminFileManager } from './admin-file-manager'; // Removed to resolve unused import lint error; restore when Files tab is re-enabled.
 
-// Legacy props for backward compatibility
+// Segregated interfaces following Interface Segregation Principle
+interface AdminUsersTabProps {
+  users: User[];
+  config: AdminUsersTabConfig;
+}
+
+interface AdminCategoriesTabProps {
+  categories: Category[];
+  onAddCategory: (categoryData: Omit<Category, 'id'>) => void;
+  onUpdateCategory: (category: Category) => void;
+  onDeleteCategory: (categoryId: string) => void;
+}
+
+interface AdminPaymentsTabProps {
+  payments: Payment[];
+  getUserById: (id: string) => User | undefined;
+  onApprovePayment?: (paymentId: string) => void;
+  onRejectPayment?: (paymentId: string) => void;
+}
+
+interface AdminPaymentEventsTabProps {
+  payments: Payment[];
+  users: User[];
+  categories: Category[];
+}
+
+interface AdminCommunityTabProps {
+  onAddPoll: (data: { question: string; options: PollOption[]; expiresAt?: string }) => void;
+}
+
+interface AdminViewProps {
+  usersTab?: AdminUsersTabProps;
+  categoriesTab?: AdminCategoriesTabProps;
+  paymentsTab?: AdminPaymentsTabProps;
+  paymentEventsTab?: AdminPaymentEventsTabProps;
+  communityTab?: AdminCommunityTabProps;
+}
+
+// Legacy props for backward compatibility (deprecated)
 interface AdminViewLegacyProps {
   users: User[];
   categories: Category[];
@@ -41,7 +80,7 @@ interface AdminViewLegacyProps {
   onRejectPayment?: (paymentId: string) => void;
 }
 
-// New configuration-based props
+// New configuration-based props (deprecated - use segregated interfaces)
 interface AdminViewConfigProps {
   users: User[];
   categories: Category[];
@@ -62,35 +101,85 @@ interface AdminViewConfigProps {
   onRejectPayment?: (paymentId: string) => void;
 }
 
-type AdminViewProps = AdminViewLegacyProps | AdminViewConfigProps;
-
-export function AdminView(props: AdminViewProps) {
+export function AdminView(props: AdminViewProps | AdminViewLegacyProps | AdminViewConfigProps) {
   const { activeTab, updateTab } = useAdminTabState('users');
 
-  // Extract common props
-  const {
-    users,
-    categories,
-    onAddCategory,
-    onUpdateCategory,
-    onDeleteCategory,
-    onAddPoll,
-    payments = [],
-    onApprovePayment,
-    onRejectPayment,
-    getUserById,
-  } = props;
-
-  // Determine if using legacy props or new config
+  // Handle legacy props for backward compatibility
   const isLegacyProps = 'onAddUser' in props && 'onUpdateUser' in props;
-  const userConfig = isLegacyProps
-    ? createStandardAdminConfig({
-        onAddUser: (props as AdminViewLegacyProps).onAddUser,
-        onUpdateUser: (props as AdminViewLegacyProps).onUpdateUser,
-        onDeleteUser: (props as AdminViewLegacyProps).onDeleteUser,
-        onRejectUser: (props as AdminViewLegacyProps).onRejectUser,
-      })
-    : (props as AdminViewConfigProps).config;
+  const isConfigProps = 'config' in props && !isLegacyProps;
+
+  if (isLegacyProps) {
+    const legacyProps = props as AdminViewLegacyProps;
+    const userConfig = createStandardAdminConfig({
+      onAddUser: legacyProps.onAddUser,
+      onUpdateUser: legacyProps.onUpdateUser,
+      onDeleteUser: legacyProps.onDeleteUser,
+      onRejectUser: legacyProps.onRejectUser,
+    });
+
+    // Convert legacy props to segregated format
+    const segregatedProps: AdminViewProps = {
+      usersTab: { users: legacyProps.users, config: userConfig },
+      categoriesTab: {
+        categories: legacyProps.categories,
+        onAddCategory: legacyProps.onAddCategory,
+        onUpdateCategory: legacyProps.onUpdateCategory,
+        onDeleteCategory: legacyProps.onDeleteCategory,
+      },
+      paymentsTab: {
+        payments: legacyProps.payments || [],
+        getUserById: legacyProps.getUserById,
+        onApprovePayment: legacyProps.onApprovePayment,
+        onRejectPayment: legacyProps.onRejectPayment,
+      },
+      paymentEventsTab: {
+        payments: legacyProps.payments || [],
+        users: legacyProps.users,
+        categories: legacyProps.categories,
+      },
+      communityTab: { onAddPoll: legacyProps.onAddPoll },
+    };
+
+    return <AdminView {...segregatedProps} />;
+  }
+
+  if (isConfigProps) {
+    const configProps = props as AdminViewConfigProps;
+    // Convert config props to segregated format
+    const segregatedProps: AdminViewProps = {
+      usersTab: { users: configProps.users, config: configProps.config },
+      categoriesTab: {
+        categories: configProps.categories,
+        onAddCategory: configProps.onAddCategory,
+        onUpdateCategory: configProps.onUpdateCategory,
+        onDeleteCategory: configProps.onDeleteCategory,
+      },
+      paymentsTab: {
+        payments: configProps.payments || [],
+        getUserById: configProps.getUserById,
+        onApprovePayment: configProps.onApprovePayment,
+        onRejectPayment: configProps.onRejectPayment,
+      },
+      paymentEventsTab: {
+        payments: configProps.payments || [],
+        users: configProps.users,
+        categories: configProps.categories,
+      },
+      communityTab: { onAddPoll: configProps.onAddPoll },
+    };
+
+    return <AdminView {...segregatedProps} />;
+  }
+
+  // Use segregated props
+  const segregatedProps = props as AdminViewProps;
+
+  // Extract props for each tab (only what they need)
+  const usersTabProps = segregatedProps.usersTab;
+  const categoriesTabProps = segregatedProps.categoriesTab;
+  const paymentsTabProps = segregatedProps.paymentsTab;
+  const paymentEventsTabProps = segregatedProps.paymentEventsTab;
+  const communityTabProps = segregatedProps.communityTab;
 
   return (
     <div className="space-y-4 md:space-y-6 px-2 md:px-0">
@@ -130,40 +219,57 @@ export function AdminView(props: AdminViewProps) {
 
         {/* Users Management Tab */}
         <TabsContent value="users" className="space-y-4">
-          <AdminUsersTab
-            users={users}
-            config={userConfig}
-          />
+          {usersTabProps ? (
+            <AdminUsersTab {...usersTabProps} />
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              Users tab configuration not provided
+            </div>
+          )}
         </TabsContent>
 
         {/* Categories Management Tab */}
         <TabsContent value="categories" className="space-y-4">
-          <AdminCategoriesTab
-            categories={categories}
-            onAddCategory={onAddCategory}
-            onUpdateCategory={onUpdateCategory}
-            onDeleteCategory={onDeleteCategory}
-          />
+          {categoriesTabProps ? (
+            <AdminCategoriesTab {...categoriesTabProps} />
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              Categories tab configuration not provided
+            </div>
+          )}
         </TabsContent>
 
         {/* Payments Tab */}
         <TabsContent value="payments" className="space-y-4">
-          <AdminPaymentsTab
-            payments={payments}
-            getUserById={getUserById}
-            onApprovePayment={onApprovePayment}
-            onRejectPayment={onRejectPayment}
-          />
+          {paymentsTabProps ? (
+            <AdminPaymentsTab {...paymentsTabProps} />
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              Payments tab configuration not provided
+            </div>
+          )}
         </TabsContent>
 
         {/* Payment Events Tab */}
         <TabsContent value="payment-events" className="space-y-4">
-          <AdminPaymentEventsTab payments={payments} users={users} categories={categories} />
+          {paymentEventsTabProps ? (
+            <AdminPaymentEventsTab {...paymentEventsTabProps} />
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              Payment Events tab configuration not provided
+            </div>
+          )}
         </TabsContent>
 
         {/* Community Tab */}
         <TabsContent value="community" className="space-y-4">
-          <AdminCommunityTab onAddPoll={onAddPoll} />
+          {communityTabProps ? (
+            <AdminCommunityTab {...communityTabProps} />
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              Community tab configuration not provided
+            </div>
+          )}
         </TabsContent>
 
         {/* Files Tab hidden */}

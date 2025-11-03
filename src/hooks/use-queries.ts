@@ -1,11 +1,21 @@
 import { useQuery } from '@tanstack/react-query';
 
-import * as firestore from '@/lib/firestore';
+// ISP-compliant: Import only what you need from specific modules
+import { getApartments, subscribeToApartments } from '@/lib/firestore/apartments';
+import { getUsers, getAllUsers, getUser, subscribeToUsers } from '@/lib/firestore/users';
+import { getCategories, subscribeToCategories } from '@/lib/firestore/categories';
+import { getExpenses, subscribeToExpenses, subscribeToRelevantExpenses, getBalanceSheets } from '@/lib/firestore/expenses';
+import { getPayments, subscribeToPayments } from '@/lib/firestore/payments';
+import { getVendors, subscribeToVendors } from '@/lib/firestore/vendors';
+import { getMaintenanceTasks, subscribeToMaintenanceTasks } from '@/lib/firestore/maintenance-tasks';
+import { getPolls, listenToPolls } from '@/lib/firestore/polls';
+import { getActiveAnnouncements, listenToActiveAnnouncements } from '@/lib/firestore/announcements';
+import { getFaults } from '@/lib/firestore/faults';
 
 export function useUsers(apartment?: string, includeAll?: boolean) {
   return useQuery({
     queryKey: ['users', apartment, includeAll],
-    queryFn: () => includeAll ? firestore.getAllUsers(apartment) : firestore.getUsers(apartment),
+    queryFn: () => includeAll ? getAllUsers(apartment) : getUsers(apartment),
     staleTime: 1000 * 60 * 2,
   });
 }
@@ -13,7 +23,7 @@ export function useUsers(apartment?: string, includeAll?: boolean) {
 export function useCategories() {
   return useQuery({
     queryKey: ['categories'],
-    queryFn: () => firestore.getCategories(),
+    queryFn: () => getCategories(),
     staleTime: 1000 * 60 * 60,
   });
 }
@@ -21,7 +31,7 @@ export function useCategories() {
 export function useExpenses(apartment?: string) {
   return useQuery({
     queryKey: ['expenses', apartment],
-    queryFn: () => firestore.getExpenses(apartment),
+    queryFn: () => getExpenses(apartment),
     staleTime: 1000 * 30,
   });
 }
@@ -29,7 +39,7 @@ export function useExpenses(apartment?: string) {
 export function useApartments() {
   return useQuery({
     queryKey: ['apartments'],
-    queryFn: () => firestore.getApartments(),
+    queryFn: () => getApartments(),
     staleTime: 1000 * 60 * 60,
   });
 }
@@ -38,7 +48,7 @@ export function useApartments() {
 export function usePayments(apartment?: string) {
   return useQuery({
     queryKey: ['payments', apartment],
-    queryFn: () => firestore.getPayments(apartment),
+    queryFn: () => getPayments(apartment),
     staleTime: 1000 * 60 * 2,
   });
 }
@@ -46,7 +56,7 @@ export function usePayments(apartment?: string) {
 export function useBalanceSheets(apartment?: string) {
   return useQuery({
     queryKey: ['balanceSheets', apartment],
-    queryFn: () => firestore.getBalanceSheets(apartment),
+    queryFn: () => getBalanceSheets(apartment),
     staleTime: 1000 * 60 * 5,
   });
 }

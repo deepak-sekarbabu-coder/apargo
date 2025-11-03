@@ -1,7 +1,20 @@
-// Apartments
+/**
+ * FIRESTORE MODULE INDEX
+ *
+ * ⚠️  Interface Segregation Principle (ISP) Violation:
+ * This index file exports all functions from all modules, forcing clients to depend
+ * on functionality they don't use. For better ISP compliance, prefer direct imports:
+ *
+ * ✅ Good: import { getUsers } from '@/lib/firestore/users'
+ * ❌ Bad:  import { getUsers } from '@/lib/firestore'
+ *
+ * Direct imports ensure clients only depend on the specific functionality they need.
+ */
+
+// ===== APARTMENTS =====
 export { getApartments, subscribeToApartments } from './apartments';
 
-// Users
+// ===== USERS =====
 export {
   getUsers,
   getAllUsers,
@@ -15,10 +28,10 @@ export {
   subscribeToAllUsers,
 } from './users';
 
-// Categories
+// ===== CATEGORIES =====
 export { getCategories, addCategory, updateCategory, deleteCategory, subscribeToCategories } from './categories';
 
-// Expenses and Balance Sheets
+// ===== EXPENSES AND BALANCE SHEETS =====
 export {
   getExpenses,
   subscribeToExpenses,
@@ -34,7 +47,7 @@ export {
   applyDeltasToBalanceSheets,
 } from './expenses';
 
-// File Metadata
+// ===== FILE METADATA =====
 export {
   getFileMetadata,
   getFileMetadataByCategory,
@@ -47,10 +60,10 @@ export {
   subscribeToFileMetadata,
 } from './file-metadata';
 
-// Vendors
+// ===== VENDORS =====
 export { getVendors, addVendor, updateVendor, deleteVendor, subscribeToVendors } from './vendors';
 
-// Maintenance Budgets
+// ===== MAINTENANCE BUDGETS =====
 export {
   getMaintenanceBudget,
   addMaintenanceBudget,
@@ -58,7 +71,7 @@ export {
   subscribeToMaintenanceBudget,
 } from './maintenance-budgets';
 
-// Maintenance Tasks
+// ===== MAINTENANCE TASKS =====
 export {
   getMaintenanceTasks,
   getUpcomingMaintenanceTasks,
@@ -71,7 +84,7 @@ export {
   applyTaskCostToBudget,
 } from './maintenance-tasks';
 
-// Polls
+// ===== POLLS =====
 export {
   getPolls,
   listenToPolls,
@@ -82,17 +95,17 @@ export {
   deletePoll,
 } from './polls';
 
-// Announcements
+// ===== ANNOUNCEMENTS =====
 export {
   getActiveAnnouncements,
   listenToActiveAnnouncements,
   deleteAnnouncement,
 } from './announcements';
 
-// Faults
+// ===== FAULTS =====
 export { getFaults, addFault, updateFault, deleteFault } from './faults';
 
-// Payments
+// ===== PAYMENTS =====
 export {
   getPayments,
   addPayment,
@@ -103,5 +116,5 @@ export {
   generateAllPaymentEvents,
 } from './payments';
 
-// Shared utilities (if needed externally)
+// ===== SHARED UTILITIES =====
 export { computeExpenseDeltas, calculateDeltaChanges } from '../firestore-utils';
