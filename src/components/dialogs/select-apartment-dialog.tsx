@@ -69,7 +69,7 @@ export function SelectApartmentDialog({
   });
 
   React.useEffect(() => {
-    import('@/lib/firestore').then(({ getApartments }) => {
+    import('@/lib/firestore/apartments').then(({ getApartments }) => {
       getApartments().then(apts => setApartments(apts.map(a => a.id)));
     });
   }, []);

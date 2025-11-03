@@ -17,7 +17,7 @@ import { useRouter } from 'next/navigation';
 
 import { shouldClearSession } from '@/lib/auth-utils';
 import { auth } from '@/lib/firebase';
-import { addUser, getUserByEmail } from '@/lib/firestore';
+import { addUser, getUserByEmail } from '@/lib/firestore/users';
 import { User } from '@/lib/types';
 
 import log from '../lib/logger';

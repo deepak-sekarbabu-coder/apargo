@@ -102,10 +102,7 @@ export function PageHeader(props: PageHeaderProps) {
           </AddExpenseDialog>
         )}
         {user && (
-          <AddPaymentDialog
-            users={users}
-            onAddPayment={onAddPayment}
-          >
+          <AddPaymentDialog users={users} onAddPayment={onAddPayment}>
             <Button
               className="bg-primary hover:bg-primary/90 h-10 w-10 sm:h-8 sm:w-auto sm:px-3 rounded-full sm:rounded-md touch-manipulation"
               disabled={isLoadingApartments}

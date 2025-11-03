@@ -5,6 +5,8 @@ import React from 'react';
 
 import type { Payment, User } from '@/lib/types';
 
+import { PaymentsTable } from '@/components/ledger/payments-table';
+
 // Mock the use-mobile hook before importing the component
 jest.mock('@/hooks/use-mobile', () => ({
   useIsMobile: jest.fn(() => false),
@@ -25,8 +27,6 @@ jest.mock('@/hooks/use-mobile', () => ({
     left: 0,
   })),
 }));
-
-import { PaymentsTable } from '@/components/ledger/payments-table';
 
 // Mock data
 const mockPayments: Payment[] = [
@@ -114,7 +114,7 @@ describe('PaymentsTable responsive behavior', () => {
   beforeEach(() => {
     // Reset all mocks before each test
     jest.clearAllMocks();
-    
+
     // Reset all mock implementations
     (require('@/hooks/use-mobile').useIsMobile as jest.Mock).mockImplementation(() => false);
     (require('@/hooks/use-mobile').useDeviceInfo as jest.Mock).mockImplementation(() => ({
@@ -376,7 +376,7 @@ describe('PaymentsTable responsive behavior', () => {
     // Check that filtering works correctly
     const paymentCards = screen.getAllByTestId('payment-card');
     expect(paymentCards.length).toBe(2);
-    
+
     // Check that Jane Smith is still present in the table (not filtered out completely)
     // The test should verify that we still see Jane Smith in the list of users but filtered out from payments
     const janeSmithElements = screen.queryAllByText('Jane Smith');

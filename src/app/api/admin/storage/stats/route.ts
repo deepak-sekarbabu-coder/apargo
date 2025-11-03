@@ -1,7 +1,7 @@
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { getUserByEmail } from '@/lib/firestore';
+import { getUserByEmail } from '@/lib/firestore/users';
 import { storageService } from '@/lib/storage-enhanced';
 
 // Helper function to verify admin role

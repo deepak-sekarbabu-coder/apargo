@@ -40,6 +40,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+
 import { useIsMobile } from '@/hooks/use-mobile';
 
 // Extend jsPDF type to include autoTable
@@ -87,203 +88,205 @@ interface PaymentsTableProps {
 }
 
 // Memoized Payment Card Component
-const PaymentCard = React.memo(({ 
-  payment, 
-  users, 
-  currentUser, 
-  onApprovePayment, 
-  onRejectPayment, 
-  columnVisibility,
-  isDeleting,
-  setDeleteId
-}: {
-  payment: Payment;
-  users: User[];
-  currentUser: User;
-  onApprovePayment: (paymentId: string) => Promise<void>;
-  onRejectPayment: (paymentId: string) => Promise<void>;
-  columnVisibility: VisibilityState;
-  isDeleting: boolean;
-  setDeleteId: (id: string | null) => void;
-}) => {
-  const payer = users.find(u => u.id === payment.payerId);
-  const category = payment.category || (payment.expenseId ? 'expense' : 'income');
-  const amountFormatted = new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-  }).format(payment.amount);
+const PaymentCard = React.memo(
+  ({
+    payment,
+    users,
+    currentUser,
+    onApprovePayment,
+    onRejectPayment,
+    columnVisibility,
+    isDeleting,
+    setDeleteId,
+  }: {
+    payment: Payment;
+    users: User[];
+    currentUser: User;
+    onApprovePayment: (paymentId: string) => Promise<void>;
+    onRejectPayment: (paymentId: string) => Promise<void>;
+    columnVisibility: VisibilityState;
+    isDeleting: boolean;
+    setDeleteId: (id: string | null) => void;
+  }) => {
+    const payer = users.find(u => u.id === payment.payerId);
+    const category = payment.category || (payment.expenseId ? 'expense' : 'income');
+    const amountFormatted = new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+    }).format(payment.amount);
 
-  // Column visibility flags
-  const showApartment = columnVisibility.apartment !== false;
-  const showOwner = columnVisibility.owner !== false;
-  const showCategory = columnVisibility.category !== false;
-  const showAmount = columnVisibility.amount !== false;
-  const showStatus = columnVisibility.status !== false;
-  const showReason = columnVisibility.reason !== false;
-  const showApprovedBy = columnVisibility.approvedBy !== false;
-  const showReceipt = columnVisibility.receiptURL !== false;
-  const showMonth = columnVisibility.monthYear !== false;
-  const showActions = currentUser.role === 'admin' && columnVisibility.actions !== false;
+    // Column visibility flags
+    const showApartment = columnVisibility.apartment !== false;
+    const showOwner = columnVisibility.owner !== false;
+    const showCategory = columnVisibility.category !== false;
+    const showAmount = columnVisibility.amount !== false;
+    const showStatus = columnVisibility.status !== false;
+    const showReason = columnVisibility.reason !== false;
+    const showApprovedBy = columnVisibility.approvedBy !== false;
+    const showReceipt = columnVisibility.receiptURL !== false;
+    const showMonth = columnVisibility.monthYear !== false;
+    const showActions = currentUser.role === 'admin' && columnVisibility.actions !== false;
 
-  // Approved By display (reuse logic from column)
-  let approvedByDisplay = '';
-  if (payment.approvedByName) {
-    approvedByDisplay = payment.approvedByName;
-  } else if (payment.approvedBy === currentUser.id && currentUser.role === 'admin') {
-    approvedByDisplay = currentUser.name;
-  } else {
-    const approver = users.find(u => u.id === payment.approvedBy);
-    if (approver && approver.role === 'admin') approvedByDisplay = approver.name;
-  }
+    // Approved By display (reuse logic from column)
+    let approvedByDisplay = '';
+    if (payment.approvedByName) {
+      approvedByDisplay = payment.approvedByName;
+    } else if (payment.approvedBy === currentUser.id && currentUser.role === 'admin') {
+      approvedByDisplay = currentUser.name;
+    } else {
+      const approver = users.find(u => u.id === payment.approvedBy);
+      if (approver && approver.role === 'admin') approvedByDisplay = approver.name;
+    }
 
-  return (
-    <Card className="p-3 sm:p-4 rounded-lg shadow-sm border-border/60" data-testid="payment-card">
-      <div className="space-y-3 sm:space-y-4">
-        {/* Header: Apartment / Owner (if visible) & Amount / Status */}
-        {(showApartment || showOwner || showAmount || showStatus) && (
-          <div className="flex items-start justify-between gap-3 sm:gap-4">
-            <div className="text-sm space-y-1 min-w-0 flex-1">
-              {showApartment && (
-                <p className="font-medium text-base truncate">{payer?.apartment || '-'}</p>
-              )}
-              {showOwner && (
-                <p className="text-xs text-muted-foreground truncate">
-                  {payer?.name || payment.payerId}
-                </p>
-              )}
-            </div>
-            <div className="text-right space-y-1 flex-shrink-0">
-              {showAmount && (
-                <p className="font-medium text-sm sm:text-base">{amountFormatted}</p>
-              )}
-              {showStatus && (
-                <Badge
-                  variant={
-                    payment.status === 'approved' || payment.status === 'paid'
-                      ? 'default'
-                      : payment.status === 'rejected'
-                        ? 'destructive'
-                        : 'secondary'
-                  }
-                  className="capitalize text-xs px-2 py-1"
-                >
-                  {payment.status}
-                </Badge>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Details grid for remaining visible fields */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
-          {showCategory && (
-            <div className="space-y-1">
-              <span className="text-muted-foreground text-xs">Category:</span>
-              <p className="font-medium capitalize truncate">{category}</p>
-            </div>
-          )}
-          {showMonth && (
-            <div className="space-y-1">
-              <span className="text-muted-foreground text-xs">Month:</span>
-              <p className="font-medium truncate">{payment.monthYear}</p>
-            </div>
-          )}
-          {showReason && payment.reason && (
-            <div className="space-y-1 sm:col-span-2">
-              <span className="text-muted-foreground text-xs">Reason:</span>
-              <p className="font-medium text-sm break-words">{payment.reason}</p>
-            </div>
-          )}
-          {showReceipt && (
-            <div className="space-y-1 sm:col-span-2">
-              <span className="text-muted-foreground text-xs">Receipt:</span>
-              <div className="flex items-center gap-2">
-                {payment.receiptURL ? (
-                  <a
-                    href={payment.receiptURL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="View receipt"
-                    className="inline-flex items-center justify-center rounded hover:bg-muted p-2 touch-manipulation"
+    return (
+      <Card className="p-3 sm:p-4 rounded-lg shadow-sm border-border/60" data-testid="payment-card">
+        <div className="space-y-3 sm:space-y-4">
+          {/* Header: Apartment / Owner (if visible) & Amount / Status */}
+          {(showApartment || showOwner || showAmount || showStatus) && (
+            <div className="flex items-start justify-between gap-3 sm:gap-4">
+              <div className="text-sm space-y-1 min-w-0 flex-1">
+                {showApartment && (
+                  <p className="font-medium text-base truncate">{payer?.apartment || '-'}</p>
+                )}
+                {showOwner && (
+                  <p className="text-xs text-muted-foreground truncate">
+                    {payer?.name || payment.payerId}
+                  </p>
+                )}
+              </div>
+              <div className="text-right space-y-1 flex-shrink-0">
+                {showAmount && (
+                  <p className="font-medium text-sm sm:text-base">{amountFormatted}</p>
+                )}
+                {showStatus && (
+                  <Badge
+                    variant={
+                      payment.status === 'approved' || payment.status === 'paid'
+                        ? 'default'
+                        : payment.status === 'rejected'
+                          ? 'destructive'
+                          : 'secondary'
+                    }
+                    className="capitalize text-xs px-2 py-1"
                   >
-                    <Eye className="h-4 w-4 text-blue-600" />
-                    <span className="sr-only">View receipt</span>
-                  </a>
-                ) : (
-                  <p className="text-xs text-muted-foreground">No receipt</p>
+                    {payment.status}
+                  </Badge>
                 )}
               </div>
             </div>
           )}
-          {showApprovedBy && approvedByDisplay && (
-            <div className="space-y-1 sm:col-span-2">
-              <span className="text-muted-foreground text-xs">Approved By:</span>
-              <p className="font-medium text-sm truncate">{approvedByDisplay}</p>
-            </div>
-          )}
-        </div>
 
-        {/* Actions (if column toggled on) */}
-        {showActions && (
-          <div className="pt-3 border-t border-border/60">
-            {payment.status === 'pending' ? (
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  size="sm"
-                  variant="default"
-                  onClick={() => onApprovePayment(payment.id)}
-                  className="touch-manipulation h-11"
-                >
-                  <Check className="h-4 w-4 mr-1" />
-                  Approve
-                </Button>
-                <Button
-                  size="sm"
-                  variant="destructive"
-                  onClick={() => onRejectPayment(payment.id)}
-                  className="touch-manipulation h-11"
-                >
-                  <X className="h-4 w-4 mr-1" />
-                  Reject
-                </Button>
+          {/* Details grid for remaining visible fields */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
+            {showCategory && (
+              <div className="space-y-1">
+                <span className="text-muted-foreground text-xs">Category:</span>
+                <p className="font-medium capitalize truncate">{category}</p>
               </div>
-            ) : (
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">
-                  {payment.status === 'approved' ? 'Approved' : 'Rejected'}
-                </span>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="border-red-500 text-red-600 hover:bg-red-50 touch-manipulation h-10 px-3"
-                  onClick={() => setDeleteId(payment.id)}
-                  disabled={isDeleting}
-                  aria-label="Delete payment"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
+            )}
+            {showMonth && (
+              <div className="space-y-1">
+                <span className="text-muted-foreground text-xs">Month:</span>
+                <p className="font-medium truncate">{payment.monthYear}</p>
+              </div>
+            )}
+            {showReason && payment.reason && (
+              <div className="space-y-1 sm:col-span-2">
+                <span className="text-muted-foreground text-xs">Reason:</span>
+                <p className="font-medium text-sm break-words">{payment.reason}</p>
+              </div>
+            )}
+            {showReceipt && (
+              <div className="space-y-1 sm:col-span-2">
+                <span className="text-muted-foreground text-xs">Receipt:</span>
+                <div className="flex items-center gap-2">
+                  {payment.receiptURL ? (
+                    <a
+                      href={payment.receiptURL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="View receipt"
+                      className="inline-flex items-center justify-center rounded hover:bg-muted p-2 touch-manipulation"
+                    >
+                      <Eye className="h-4 w-4 text-blue-600" />
+                      <span className="sr-only">View receipt</span>
+                    </a>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">No receipt</p>
+                  )}
+                </div>
+              </div>
+            )}
+            {showApprovedBy && approvedByDisplay && (
+              <div className="space-y-1 sm:col-span-2">
+                <span className="text-muted-foreground text-xs">Approved By:</span>
+                <p className="font-medium text-sm truncate">{approvedByDisplay}</p>
               </div>
             )}
           </div>
-        )}
-      </div>
-    </Card>
-  );
-});
+
+          {/* Actions (if column toggled on) */}
+          {showActions && (
+            <div className="pt-3 border-t border-border/60">
+              {payment.status === 'pending' ? (
+                <div className="grid grid-cols-2 gap-2">
+                  <Button
+                    size="sm"
+                    variant="default"
+                    onClick={() => onApprovePayment(payment.id)}
+                    className="touch-manipulation h-11"
+                  >
+                    <Check className="h-4 w-4 mr-1" />
+                    Approve
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="destructive"
+                    onClick={() => onRejectPayment(payment.id)}
+                    className="touch-manipulation h-11"
+                  >
+                    <X className="h-4 w-4 mr-1" />
+                    Reject
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">
+                    {payment.status === 'approved' ? 'Approved' : 'Rejected'}
+                  </span>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-red-500 text-red-600 hover:bg-red-50 touch-manipulation h-10 px-3"
+                    onClick={() => setDeleteId(payment.id)}
+                    disabled={isDeleting}
+                    aria-label="Delete payment"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </Card>
+    );
+  }
+);
 
 PaymentCard.displayName = 'PaymentCard';
 
 // Virtualized list component for mobile
-const VirtualizedPaymentList = ({ 
-  payments, 
-  users, 
-  currentUser, 
-  onApprovePayment, 
-  onRejectPayment, 
+const VirtualizedPaymentList = ({
+  payments,
+  users,
+  currentUser,
+  onApprovePayment,
+  onRejectPayment,
   onDeletePayment,
   columnVisibility,
   isDeleting,
-  setDeleteId
+  setDeleteId,
 }: {
   payments: Payment[];
   users: User[];
@@ -671,7 +674,10 @@ export function PaymentsTable({
             <label className="text-sm font-medium">Owner</label>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-full justify-between touch-manipulation h-10">
+                <Button
+                  variant="outline"
+                  className="w-full justify-between touch-manipulation h-10"
+                >
                   {(table.getColumn('owner')?.getFilterValue() as string) || 'All Owners'}
                 </Button>
               </DropdownMenuTrigger>
@@ -697,7 +703,10 @@ export function PaymentsTable({
             <label className="text-sm font-medium">Status</label>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="outline" className="w-full justify-between touch-manipulation h-10">
+                <Button
+                  variant="outline"
+                  className="w-full justify-between touch-manipulation h-10"
+                >
                   {(table.getColumn('status')?.getFilterValue() as string) || 'All Statuses'}
                 </Button>
               </DropdownMenuTrigger>
@@ -834,12 +843,10 @@ export function PaymentsTable({
         <div className="text-sm text-muted-foreground">
           Showing {table.getRowModel().rows.length} of {payments.length} payments
           {table.getFilteredRowModel().rows.length !== payments.length && (
-            <span className="ml-2">
-              (filtered from {payments.length} total)
-            </span>
+            <span className="ml-2">(filtered from {payments.length} total)</span>
           )}
         </div>
-        
+
         {/* Mobile-Optimized Pagination */}
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center justify-between sm:justify-start sm:gap-4">
@@ -850,7 +857,7 @@ export function PaymentsTable({
               </span>
             </div>
           </div>
-          
+
           <div className="flex gap-2 justify-center">
             <Button
               variant="outline"

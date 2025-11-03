@@ -98,7 +98,7 @@ export async function sendPaymentRequests(
     payment.dueDate?.toISOString() || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // Default to 7 days from now
 
   // Create a notification for each owing apartment
-  payment.otherApartments.forEach((apartmentData) => {
+  payment.otherApartments.forEach(apartmentData => {
     if (apartmentData.apartment.id === payment.payingApartment.id) return; // Skip the paying apartment
 
     const notification = createPaymentRequestNotification(payment, apartmentData, dueDate, userId);

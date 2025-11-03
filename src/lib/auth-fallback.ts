@@ -2,7 +2,7 @@
 import { User as FirebaseUser } from 'firebase/auth';
 
 import { auth } from './firebase';
-import { getUserByEmail } from './firestore';
+import { getUserByEmail } from './firestore/users';
 import type { User } from './types';
 
 export async function getCurrentUserFallback(): Promise<User | null> {

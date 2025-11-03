@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { diagnostics, healthMonitor, type ConnectionHealth } from '@/lib/firebase-health-monitor';
+import { type ConnectionHealth, diagnostics, healthMonitor } from '@/lib/firebase-health-monitor';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -133,11 +133,7 @@ export function FirebaseDebugPanel({ className }: FirebaseDebugPanelProps) {
           {/* Diagnostic Report */}
           <div className="space-y-2">
             <div className="flex gap-2">
-              <Button
-                onClick={generateDiagnosticReport}
-                disabled={isGeneratingReport}
-                size="sm"
-              >
+              <Button onClick={generateDiagnosticReport} disabled={isGeneratingReport} size="sm">
                 {isGeneratingReport ? 'Generating...' : 'Generate Diagnostic Report'}
               </Button>
               {diagnosticReport && (
@@ -149,9 +145,7 @@ export function FirebaseDebugPanel({ className }: FirebaseDebugPanelProps) {
 
             {diagnosticReport && (
               <ScrollArea className="h-64 w-full border rounded-md p-4">
-                <pre className="text-xs whitespace-pre-wrap font-mono">
-                  {diagnosticReport}
-                </pre>
+                <pre className="text-xs whitespace-pre-wrap font-mono">{diagnosticReport}</pre>
               </ScrollArea>
             )}
           </div>
@@ -164,7 +158,9 @@ export function FirebaseDebugPanel({ className }: FirebaseDebugPanelProps) {
               <li>{'•'} Check your internet connection</li>
               <li>{'•'} Disable browser extensions temporarily</li>
               <li>{'•'} Try incognito/private browsing mode</li>
-              <li>{'•'} Check if you{`'`}re behind a corporate firewall</li>
+              <li>
+                {'•'} Check if you{`'`}re behind a corporate firewall
+              </li>
             </ul>
           </div>
         </div>

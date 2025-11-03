@@ -1,4 +1,4 @@
-import { database, type QuerySnapshot } from '../database';
+import { type QuerySnapshot, database } from '../database';
 import { removeUndefined } from '../firestore-utils';
 import type { Category } from '../types';
 
@@ -27,8 +27,11 @@ export const deleteCategory = async (id: string): Promise<void> => {
 };
 
 export const subscribeToCategories = async (callback: (categories: Category[]) => void) => {
-  return database.subscribeToCollection<Category>('categories', (snapshot: QuerySnapshot<Category>) => {
-    const categories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Category);
-    callback(categories);
-  });
+  return database.subscribeToCollection<Category>(
+    'categories',
+    (snapshot: QuerySnapshot<Category>) => {
+      const categories = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Category);
+      callback(categories);
+    }
+  );
 };

@@ -7,7 +7,7 @@ import { BarChart3, CreditCard, Download } from 'lucide-react';
 import * as React from 'react';
 
 import { aggregateBalanceSheets } from '@/lib/balance-utils';
-import * as firestore from '@/lib/firestore';
+import { addPayment, deletePayment, updatePayment } from '@/lib/firestore/payments';
 import { uploadImage } from '@/lib/storage';
 import type { BalanceSheet, Payment, User } from '@/lib/types';
 
@@ -194,7 +194,7 @@ export function LedgerView({ payments, users }: LedgerViewProps) {
   const handleDeletePayment = React.useCallback(async (paymentId: string) => {
     setIsDeleting(true);
     try {
-      await firestore.deletePayment(paymentId);
+      await deletePayment(paymentId);
       setDeleteId(null);
     } finally {
       setIsDeleting(false);
@@ -202,88 +202,98 @@ export function LedgerView({ payments, users }: LedgerViewProps) {
   }, []);
 
   // Use auth context for current user, but fallback to users array for other operations
-  const currentUser = React.useMemo(() => 
-    authUser ||
-    users.find(
-      u => u.id === (typeof window !== 'undefined' ? window.localStorage.getItem('userId') : '')
-    ) ||
-    users[0],
+  const currentUser = React.useMemo(
+    () =>
+      authUser ||
+      users.find(
+        u => u.id === (typeof window !== 'undefined' ? window.localStorage.getItem('userId') : '')
+      ) ||
+      users[0],
     [authUser, users]
   );
 
   // Payment creation handler
-  const handleAddPayment = React.useCallback(async (data: {
-    payeeId: string;
-    amount: number;
-    receiptFile?: File;
-    expenseId?: string;
-    monthYear: string;
-    category?: 'income' | 'expense';
-  }) => {
-    let receiptURL = '';
-    // If a receipt file was provided, upload it to Firebase Storage
-    if (data.receiptFile) {
-      try {
-        const path = `receipts/${Date.now()}_${data.receiptFile.name}`;
-        receiptURL = await uploadImage(data.receiptFile, path);
-      } catch (err) {
-        console.error('Receipt upload failed:', err);
-        // Re-throw so caller can surface error if needed
-        throw err;
-      }
-    }
-    const paymentData: {
-      payerId: string;
+  const handleAddPayment = React.useCallback(
+    async (data: {
       payeeId: string;
       amount: number;
-      status: 'pending' | 'approved' | 'rejected';
-      monthYear: string;
-      receiptURL: string;
+      receiptFile?: File;
       expenseId?: string;
-      apartmentId?: string;
+      monthYear: string;
       category?: 'income' | 'expense';
-    } = {
-      payerId: currentUser.id,
-      payeeId: data.payeeId,
-      amount: data.amount,
-      status: 'pending',
-      monthYear: data.monthYear,
-      receiptURL,
-      apartmentId: currentUser.apartment,
-      category: data.category || 'income',
-    };
+    }) => {
+      let receiptURL = '';
+      // If a receipt file was provided, upload it to Firebase Storage
+      if (data.receiptFile) {
+        try {
+          const path = `receipts/${Date.now()}_${data.receiptFile.name}`;
+          receiptURL = await uploadImage(data.receiptFile, path);
+        } catch (err) {
+          console.error('Receipt upload failed:', err);
+          // Re-throw so caller can surface error if needed
+          throw err;
+        }
+      }
+      const paymentData: {
+        payerId: string;
+        payeeId: string;
+        amount: number;
+        status: 'pending' | 'approved' | 'rejected';
+        monthYear: string;
+        receiptURL: string;
+        expenseId?: string;
+        apartmentId?: string;
+        category?: 'income' | 'expense';
+      } = {
+        payerId: currentUser.id,
+        payeeId: data.payeeId,
+        amount: data.amount,
+        status: 'pending',
+        monthYear: data.monthYear,
+        receiptURL,
+        apartmentId: currentUser.apartment,
+        category: data.category || 'income',
+      };
 
-    // Only add expenseId if it is a non-empty string
-    if (data.expenseId && typeof data.expenseId === 'string' && data.expenseId.trim() !== '') {
-      paymentData.expenseId = data.expenseId;
-    }
+      // Only add expenseId if it is a non-empty string
+      if (data.expenseId && typeof data.expenseId === 'string' && data.expenseId.trim() !== '') {
+        paymentData.expenseId = data.expenseId;
+      }
 
-    await firestore.addPayment(paymentData);
-  }, [currentUser]);
+      await addPayment(paymentData);
+    },
+    [currentUser]
+  );
 
   // Admin approval handlers
-  const handleApprovePayment = React.useCallback(async (paymentId: string) => {
-    // Only allow admin to approve and set their name
-    if (currentUser.role === 'admin') {
-      // Use displayName if available, fallback to email, never 'New User'
-      let approverName = currentUser.name;
-      if (approverName === 'New User') {
-        approverName = currentUser.email || currentUser.id;
+  const handleApprovePayment = React.useCallback(
+    async (paymentId: string) => {
+      // Only allow admin to approve and set their name
+      if (currentUser.role === 'admin') {
+        // Use displayName if available, fallback to email, never 'New User'
+        let approverName = currentUser.name;
+        if (approverName === 'New User') {
+          approverName = currentUser.email || currentUser.id;
+        }
+        await updatePayment(paymentId, {
+          status: 'approved',
+          approvedBy: currentUser.id,
+          approvedByName: approverName,
+        });
       }
-      await firestore.updatePayment(paymentId, {
-        status: 'approved',
-        approvedBy: currentUser.id,
-        approvedByName: approverName,
-      });
-    }
-  }, [currentUser]);
-  
-  const handleRejectPayment = React.useCallback(async (paymentId: string) => {
-    // Only allow admin to reject and set their name
-    if (currentUser.role === 'admin') {
-      await firestore.updatePayment(paymentId, { status: 'rejected', approvedBy: currentUser.id });
-    }
-  }, [currentUser]);
+    },
+    [currentUser]
+  );
+
+  const handleRejectPayment = React.useCallback(
+    async (paymentId: string) => {
+      // Only allow admin to reject and set their name
+      if (currentUser.role === 'admin') {
+        await updatePayment(paymentId, { status: 'rejected', approvedBy: currentUser.id });
+      }
+    },
+    [currentUser]
+  );
 
   return (
     <div className="space-y-4 md:space-y-6 px-2 md:px-0">
@@ -318,7 +328,10 @@ export function LedgerView({ payments, users }: LedgerViewProps) {
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
                   {/* Month Filter */}
                   <div className="space-y-2">
-                    <label htmlFor="payment-month" className="text-sm font-medium whitespace-nowrap">
+                    <label
+                      htmlFor="payment-month"
+                      className="text-sm font-medium whitespace-nowrap"
+                    >
                       Filter by Month:
                     </label>
                     <Select value={filterMonth} onValueChange={setFilterMonth}>
@@ -369,7 +382,7 @@ export function LedgerView({ payments, users }: LedgerViewProps) {
                   )}
 
                   {/* Responsive spacer */}
-                  {(filterMonth === 'all' && filterType === 'all') && (
+                  {filterMonth === 'all' && filterType === 'all' && (
                     <div className="hidden lg:block"></div>
                   )}
                 </div>
@@ -394,7 +407,7 @@ export function LedgerView({ payments, users }: LedgerViewProps) {
                     </div>
                   </div>
                 )}
-                
+
                 {filterType === 'regular' && (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <div className="bg-green-50 p-4 rounded-lg border border-green-200">
@@ -468,7 +481,10 @@ export function LedgerView({ payments, users }: LedgerViewProps) {
               {/* Mobile Card Layout for Monthly Balance Sheets (aggregated) */}
               <div className="block lg:hidden space-y-4">
                 {aggregatedSheets.map(sheet => (
-                  <Card key={sheet.monthYear} className="p-4 sm:p-6 rounded-lg shadow-sm border-border/60">
+                  <Card
+                    key={sheet.monthYear}
+                    className="p-4 sm:p-6 rounded-lg shadow-sm border-border/60"
+                  >
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div>
@@ -486,20 +502,30 @@ export function LedgerView({ payments, users }: LedgerViewProps) {
                       {/* Responsive Grid for Balance Details */}
                       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 text-sm">
                         <div className="space-y-2">
-                          <span className="text-muted-foreground text-xs uppercase tracking-wide">Opening</span>
+                          <span className="text-muted-foreground text-xs uppercase tracking-wide">
+                            Opening
+                          </span>
                           <p className="font-medium text-base">₹{sheet.opening}</p>
                         </div>
                         <div className="space-y-2">
-                          <span className="text-muted-foreground text-xs uppercase tracking-wide">Income</span>
+                          <span className="text-muted-foreground text-xs uppercase tracking-wide">
+                            Income
+                          </span>
                           <p className="font-medium text-base text-green-600">₹{sheet.income}</p>
                         </div>
                         <div className="space-y-2">
-                          <span className="text-muted-foreground text-xs uppercase tracking-wide">Expenses</span>
+                          <span className="text-muted-foreground text-xs uppercase tracking-wide">
+                            Expenses
+                          </span>
                           <p className="font-medium text-base text-red-600">₹{sheet.expenses}</p>
                         </div>
                         <div className="space-y-2">
-                          <span className="text-muted-foreground text-xs uppercase tracking-wide">Net Change</span>
-                          <p className={`font-medium text-base ${sheet.closing >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          <span className="text-muted-foreground text-xs uppercase tracking-wide">
+                            Net Change
+                          </span>
+                          <p
+                            className={`font-medium text-base ${sheet.closing >= 0 ? 'text-green-600' : 'text-red-600'}`}
+                          >
                             {sheet.closing >= 0 ? '+₹' : '-₹'}
                             {Math.abs(sheet.closing)}
                           </p>
@@ -510,7 +536,9 @@ export function LedgerView({ payments, users }: LedgerViewProps) {
                       <div className="space-y-2">
                         <div className="flex justify-between text-xs text-muted-foreground">
                           <span>Financial Overview</span>
-                          <span>₹{sheet.income} - ₹{sheet.expenses} = ₹{sheet.closing}</span>
+                          <span>
+                            ₹{sheet.income} - ₹{sheet.expenses} = ₹{sheet.closing}
+                          </span>
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div
@@ -519,7 +547,12 @@ export function LedgerView({ payments, users }: LedgerViewProps) {
                             }`}
                             style={{
                               width: `${Math.min(
-                                Math.abs(sheet.closing) / (Math.abs(sheet.income) + Math.abs(sheet.expenses) + Math.abs(sheet.closing) + 1) * 100,
+                                (Math.abs(sheet.closing) /
+                                  (Math.abs(sheet.income) +
+                                    Math.abs(sheet.expenses) +
+                                    Math.abs(sheet.closing) +
+                                    1)) *
+                                  100,
                                 100
                               )}%`,
                             }}
@@ -556,8 +589,12 @@ export function LedgerView({ payments, users }: LedgerViewProps) {
                       <TableRow key={sheet.monthYear} className="hover:bg-muted/50">
                         <TableCell className="font-medium">{sheet.monthYear}</TableCell>
                         <TableCell>₹{sheet.opening}</TableCell>
-                        <TableCell className="text-green-600 font-medium">₹{sheet.income}</TableCell>
-                        <TableCell className="text-red-600 font-medium">₹{sheet.expenses}</TableCell>
+                        <TableCell className="text-green-600 font-medium">
+                          ₹{sheet.income}
+                        </TableCell>
+                        <TableCell className="text-red-600 font-medium">
+                          ₹{sheet.expenses}
+                        </TableCell>
                         <TableCell>
                           <Badge
                             variant={sheet.closing >= 0 ? 'default' : 'destructive'}

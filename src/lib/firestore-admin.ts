@@ -24,6 +24,15 @@ type Apartment = {
 
 // Simple test function to check Firestore connectivity
 export const testFirestoreConnection = async (): Promise<{ success: boolean; error?: string }> => {
+  // Skip during build time
+  const isBuildTime =
+    process.env.NODE_ENV === 'production' && !process.env.NETLIFY && !process.env.VERCEL;
+  const isStaticGeneration = process.env.NEXT_PHASE === 'phase-production-build';
+
+  if (isBuildTime || isStaticGeneration) {
+    return { success: false, error: 'Build time - Firebase not available' };
+  }
+
   try {
     // Use Firebase Admin SDK for server-side queries
     const { getFirestore } = await import('firebase-admin/firestore');
@@ -54,6 +63,15 @@ export const getPaymentEvents = async (
   monthYear: string,
   apartmentId?: string
 ): Promise<Payment[]> => {
+  // Skip during build time
+  const isBuildTime =
+    process.env.NODE_ENV === 'production' && !process.env.NETLIFY && !process.env.VERCEL;
+  const isStaticGeneration = process.env.NEXT_PHASE === 'phase-production-build';
+
+  if (isBuildTime || isStaticGeneration) {
+    return [];
+  }
+
   try {
     // Use Firebase Admin SDK for server-side queries
     const { getFirestore } = await import('firebase-admin/firestore');
@@ -101,6 +119,15 @@ export const getPaymentEvents = async (
 
 // Get apartments using Admin SDK
 export const getApartmentsAdmin = async (): Promise<Apartment[]> => {
+  // Skip during build time
+  const isBuildTime =
+    process.env.NODE_ENV === 'production' && !process.env.NETLIFY && !process.env.VERCEL;
+  const isStaticGeneration = process.env.NEXT_PHASE === 'phase-production-build';
+
+  if (isBuildTime || isStaticGeneration) {
+    return [];
+  }
+
   try {
     const { getFirestore } = await import('firebase-admin/firestore');
 
@@ -141,9 +168,7 @@ function calculateSummaryTotals(paymentEvents: Payment[]) {
 
 // Helper to build apartment status
 function buildApartmentStatus(apartment: Apartment, paymentEvents: Payment[]) {
-  const apartmentPayments = paymentEvents.filter(
-    payment => payment.apartmentId === apartment.id
-  );
+  const apartmentPayments = paymentEvents.filter(payment => payment.apartmentId === apartment.id);
   const totalOwed = apartmentPayments.reduce((sum, payment) => sum + payment.amount, 0);
   const totalPaid = apartmentPayments
     .filter(payment => payment.status === 'paid' || payment.status === 'approved')

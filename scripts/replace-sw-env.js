@@ -26,7 +26,10 @@ if (missingVars.length > 0) {
     console.warn('Service worker may not function correctly without these variables.');
   } else {
     // In CI/production builds, fail if environment variables are missing
-    console.error('Missing required environment variables for service worker in production build:', missingVars);
+    console.error(
+      'Missing required environment variables for service worker in production build:',
+      missingVars
+    );
     process.exit(1);
   }
 }
@@ -44,7 +47,7 @@ try {
   Object.entries(envVars).forEach(([key, value]) => {
     const placeholder = `self.__${key}`;
     const replacement = value ? JSON.stringify(value) : 'undefined';
-    
+
     // Replace the placeholders in both files
     const regex = new RegExp(placeholder.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g');
     publicSwContent = publicSwContent.replace(regex, replacement);

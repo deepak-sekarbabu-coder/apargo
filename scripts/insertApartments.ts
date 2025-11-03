@@ -1,4 +1,4 @@
-import { initializeApp, cert, getApps } from 'firebase-admin/app';
+import { cert, getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -10,15 +10,15 @@ const initializeFirebaseAdmin = () => {
   if (getApps().length === 0) {
     // Try to read service account from apartgo.json
     const serviceAccountPath = path.join(process.cwd(), 'apartgo.json');
-    
+
     if (fs.existsSync(serviceAccountPath)) {
       const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
-      
+
       // Ensure private key has correct newline characters
       if (serviceAccount.private_key) {
         serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
       }
-      
+
       return initializeApp({
         credential: cert(serviceAccount),
       });
@@ -34,7 +34,7 @@ const insertApartments = async () => {
     // Initialize Firebase Admin
     const app = initializeFirebaseAdmin();
     const db = getFirestore(app);
-    
+
     const apartmentsCol = db.collection('apartments');
     const apartmentIds = getApartmentIds();
 
@@ -52,7 +52,7 @@ const insertApartments = async () => {
         console.log(`Apartment ${id} already exists. Skipping.`);
         continue;
       }
-      
+
       await apartmentsCol.add({
         id: id,
         name: `Apartment ${id}`,

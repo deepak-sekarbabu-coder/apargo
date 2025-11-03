@@ -1,18 +1,9 @@
 // React Error Boundary Component with Unified Error Handling
 // Provides graceful degradation and standardized error display for React components
-
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import type { 
-  ApargoError, 
-  ErrorBoundaryState, 
-  ErrorContext,
-  UserMessageType,
-} from '@/lib/errors';
-import {
-  createError,
-  wrapError,
-  logger,
-} from '@/lib/errors';
+
+import type { ApargoError, ErrorBoundaryState, ErrorContext, UserMessageType } from '@/lib/errors';
+import { createError, logger, wrapError } from '@/lib/errors';
 
 interface ErrorBoundaryProps {
   children: ReactNode;
@@ -40,7 +31,7 @@ export class ApargoErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoun
   static getDerivedStateFromError(error: Error): Partial<ErrorBoundaryState> {
     // Convert the error to an ApargoError
     const apargoError = wrapError(error);
-    
+
     return {
       hasError: true,
       error: apargoError,
@@ -61,7 +52,7 @@ export class ApargoErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoun
     };
 
     const apargoError = wrapError(error, undefined, context);
-    
+
     // Update state with error info
     this.setState({
       errorInfo,
@@ -100,7 +91,13 @@ export class ApargoErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoun
       }
 
       // Default error UI
-      return <DefaultErrorDisplay error={this.state.error} retry={this.handleRetry} reload={this.handleReload} />;
+      return (
+        <DefaultErrorDisplay
+          error={this.state.error}
+          retry={this.handleRetry}
+          reload={this.handleReload}
+        />
+      );
     }
 
     return this.props.children;
@@ -147,21 +144,29 @@ function DefaultErrorDisplay({ error, retry, reload }: DefaultErrorDisplayProps)
     <div className={`p-4 border rounded-lg ${getSeverityColor(error.userMessageType)}`}>
       <div className="flex items-start space-x-3">
         <span className="text-xl">{getIcon(error.userMessageType)}</span>
-        
+
         <div className="flex-1 min-w-0">
           <h3 className="text-sm font-medium">{error.userMessage}</h3>
-          
+
           {process.env.NODE_ENV === 'development' && (
             <div className="mt-2 text-xs">
-              <p><strong>Error Code:</strong> {error.code}</p>
-              <p><strong>Category:</strong> {error.category}</p>
-              <p><strong>Severity:</strong> {error.severity}</p>
+              <p>
+                <strong>Error Code:</strong> {error.code}
+              </p>
+              <p>
+                <strong>Category:</strong> {error.category}
+              </p>
+              <p>
+                <strong>Severity:</strong> {error.severity}
+              </p>
               {error.technicalMessage && (
-                <p><strong>Technical Details:</strong> {error.technicalMessage}</p>
+                <p>
+                  <strong>Technical Details:</strong> {error.technicalMessage}
+                </p>
               )}
             </div>
           )}
-          
+
           {error.recoveryAction && (
             <div className="mt-3">
               <button
@@ -170,21 +175,22 @@ function DefaultErrorDisplay({ error, retry, reload }: DefaultErrorDisplayProps)
               >
                 {error.recoveryAction.label}
               </button>
-              
+
               {error.recoveryAction.hint && (
                 <p className="mt-1 text-xs opacity-75">{error.recoveryAction.hint}</p>
               )}
             </div>
           )}
-          
+
           <div className="mt-3 flex space-x-2">
             <button
               onClick={retry}
               className="px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
-              Try Again ({this.state.retryCount > 0 ? `${this.state.retryCount} attempts` : 'First try'})
+              Try Again (
+              {this.state.retryCount > 0 ? `${this.state.retryCount} attempts` : 'First try'})
             </button>
-            
+
             <button
               onClick={reload}
               className="px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -199,7 +205,7 @@ function DefaultErrorDisplay({ error, retry, reload }: DefaultErrorDisplayProps)
 }
 
 // Helper method for recovery actions
-ApargoErrorBoundary.prototype.getRecoveryActionHandler = function(recoveryAction: any) {
+ApargoErrorBoundary.prototype.getRecoveryActionHandler = function (recoveryAction: any) {
   switch (recoveryAction.type) {
     case 'retry':
       return this.handleRetry;
@@ -226,9 +232,9 @@ export function withErrorBoundary<P extends object>(
       <Component {...props} />
     </ApargoErrorBoundary>
   );
-  
+
   WrappedComponent.displayName = `withErrorBoundary(${Component.displayName || Component.name})`;
-  
+
   return WrappedComponent;
 }
 
@@ -240,13 +246,13 @@ export function useErrorHandler() {
     reportError: (error: Error | ApargoError, context?: Partial<ErrorContext>) => {
       const apargoError = wrapError(error, undefined, context);
       logger.error(apargoError, context);
-      
+
       // In a real implementation, you might also:
       // - Show user notification
       // - Send to monitoring service
       // - Trigger recovery mechanisms
     },
-    
+
     reportValidationError: (field: string, message: string, context?: Partial<ErrorContext>) => {
       const error = createError('VALIDATION_CONSTRAINT', `${field}: ${message}`, {
         category: 'validation',
@@ -255,16 +261,21 @@ export function useErrorHandler() {
         metadata: { field, validationMessage: message },
         context,
       });
-      
+
       logger.error(error, context);
     },
-    
-    reportNetworkError: (url: string, statusCode?: number, error?: Error, context?: Partial<ErrorContext>) => {
+
+    reportNetworkError: (
+      url: string,
+      statusCode?: number,
+      error?: Error,
+      context?: Partial<ErrorContext>
+    ) => {
       const apargoError = wrapError(error || new Error(`Network error: ${statusCode}`), undefined, {
         ...context,
         metadata: { url, statusCode },
       });
-      
+
       logger.error(apargoError, context);
     },
   };
@@ -280,21 +291,26 @@ interface InlineErrorProps {
 }
 
 export function InlineError({ error, className = '', showDetails = false }: InlineErrorProps) {
-  const apargoError = typeof error === 'string' 
-    ? createError('VALIDATION_CONSTRAINT', error, {
-        category: 'validation',
-        severity: 'medium',
-        userMessageType: 'error',
-      })
-    : 'code' in error ? error : wrapError(error);
+  const apargoError =
+    typeof error === 'string'
+      ? createError('VALIDATION_CONSTRAINT', error, {
+          category: 'validation',
+          severity: 'medium',
+          userMessageType: 'error',
+        })
+      : 'code' in error
+        ? error
+        : wrapError(error);
 
   return (
-    <div className={`p-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded ${className}`}>
+    <div
+      className={`p-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded ${className}`}
+    >
       <div className="flex items-center space-x-2">
         <span>❌</span>
         <span>{apargoError.userMessage}</span>
       </div>
-      
+
       {showDetails && process.env.NODE_ENV === 'development' && (
         <div className="mt-1 text-xs text-red-500">
           <p>Code: {apargoError.code}</p>
@@ -318,11 +334,11 @@ export function withErrorProtection<T extends any[], R>(
     } catch (error) {
       const apargoError = wrapError(error as Error);
       logger.error(apargoError);
-      
+
       if (errorHandler) {
         errorHandler(apargoError);
       }
-      
+
       return undefined;
     }
   };

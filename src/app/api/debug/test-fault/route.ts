@@ -1,7 +1,7 @@
 // API endpoint to test fault creation
 import { NextResponse } from 'next/server';
 
-import { addFault } from '@/lib/firestore';
+import { addFault } from '@/lib/firestore/faults';
 
 export async function POST() {
   return createTestFault();

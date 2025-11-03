@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { sendPushNotificationToApartments, testFCMConfiguration } from '@/lib/fcm-admin';
 import { getFirebaseAdminApp } from '@/lib/firebase-admin';
-import { getUserByEmail } from '@/lib/firestore';
+import { getUserByEmail } from '@/lib/firestore/users';
 
 async function verifySessionCookie(sessionCookie: string) {
   try {

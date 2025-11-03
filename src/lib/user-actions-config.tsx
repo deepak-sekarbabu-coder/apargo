@@ -1,5 +1,7 @@
+import { Check, Pencil, Trash2, X } from 'lucide-react';
+
 import React from 'react';
-import { Pencil, Trash2, Check, X } from 'lucide-react';
+
 import type { User } from './types';
 
 /**
@@ -104,18 +106,19 @@ userActionRegistry.register({
   label: 'Approve',
   variant: 'default',
   icon: Check,
-  handler: (user) => {
+  handler: user => {
     // This will be overridden by the parent component
     console.warn('Approve handler not implemented');
   },
-  condition: (user) => !user.isApproved,
+  condition: user => !user.isApproved,
   priority: 100,
   group: 'primary',
   confirm: {
     title: 'Approve User?',
     description: (user: User) => (
       <>
-        This will approve <strong>{user.name || 'this user'}</strong>'s application and grant them access to the system.
+        This will approve <strong>{user.name || 'this user'}</strong>'s application and grant them
+        access to the system.
       </>
     ),
     actionLabel: 'Approve User',
@@ -128,17 +131,18 @@ userActionRegistry.register({
   label: 'Reject',
   variant: 'destructive',
   icon: X,
-  handler: (user) => {
+  handler: user => {
     console.warn('Reject handler not implemented');
   },
-  condition: (user) => !user.isApproved,
+  condition: user => !user.isApproved,
   priority: 90,
   group: 'danger',
   confirm: {
     title: 'Reject Application?',
     description: (user: User) => (
       <>
-        This will permanently reject <strong>{user.name || 'this user'}</strong>'s application and remove their data.
+        This will permanently reject <strong>{user.name || 'this user'}</strong>'s application and
+        remove their data.
       </>
     ),
     actionLabel: 'Reject Application',
@@ -152,10 +156,10 @@ userActionRegistry.register({
   label: 'Edit',
   variant: 'outline',
   icon: Pencil,
-  handler: (user) => {
+  handler: user => {
     console.warn('Edit handler not implemented');
   },
-  condition: (user) => user.isApproved,
+  condition: user => user.isApproved,
   priority: 80,
   group: 'secondary',
 });
@@ -166,17 +170,18 @@ userActionRegistry.register({
   label: 'Delete',
   variant: 'ghost',
   icon: Trash2,
-  handler: (user) => {
+  handler: user => {
     console.warn('Delete handler not implemented');
   },
-  condition: (user) => user.isApproved,
+  condition: user => user.isApproved,
   priority: 70,
   group: 'danger',
   confirm: {
     title: 'Delete User?',
     description: (user: User) => (
       <>
-        This will permanently delete <strong>{user.name || 'this user'}</strong>'s account and all associated data.
+        This will permanently delete <strong>{user.name || 'this user'}</strong>'s account and all
+        associated data.
       </>
     ),
     actionLabel: 'Delete User',
@@ -195,14 +200,15 @@ export const createSuspendAction = (
   variant: 'outline',
   icon: X,
   handler: onSuspend,
-  condition: (user) => user.isApproved && !user.isSuspended,
+  condition: user => user.isApproved && !user.isSuspended,
   priority: 75,
   group: 'secondary',
   confirm: {
     title: 'Suspend User?',
     description: (user: User) => (
       <>
-        This will temporarily suspend <strong>{user.name || 'this user'}</strong>'s access to the system.
+        This will temporarily suspend <strong>{user.name || 'this user'}</strong>'s access to the
+        system.
       </>
     ),
     actionLabel: 'Suspend User',
@@ -218,14 +224,14 @@ export const createChangeRoleAction = (
   id: 'change-role',
   label: 'Change Role',
   variant: 'outline',
-  handler: (user) => {
+  handler: user => {
     // This would typically open a role selection dialog
     const newRole = prompt('Enter new role:', user.role || 'user');
     if (newRole && newRole !== user.role) {
       onChangeRole(user, newRole);
     }
   },
-  condition: (user) => user.isApproved,
+  condition: user => user.isApproved,
   priority: 85,
   group: 'secondary',
 });
@@ -242,15 +248,12 @@ export const createStandardAdminConfig = (
   },
   customActions: UserAction[] = []
 ): AdminUsersTabConfig => {
-  const config = userActionRegistry.createConfig(
-    ['approve', 'reject', 'edit', 'delete'],
-    {
-      approve: { handler: (user) => handlers.onUpdateUser({ ...user, isApproved: true }) },
-      reject: { handler: (user) => handlers.onRejectUser(user.id) },
-      edit: { handler: handlers.onUpdateUser },
-      delete: { handler: (user) => handlers.onDeleteUser(user.id) },
-    }
-  );
+  const config = userActionRegistry.createConfig(['approve', 'reject', 'edit', 'delete'], {
+    approve: { handler: user => handlers.onUpdateUser({ ...user, isApproved: true }) },
+    reject: { handler: user => handlers.onRejectUser(user.id) },
+    edit: { handler: handlers.onUpdateUser },
+    delete: { handler: user => handlers.onDeleteUser(user.id) },
+  });
 
   // Add any custom actions
   config.actions.push(...customActions);

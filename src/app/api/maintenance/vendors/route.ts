@@ -4,8 +4,8 @@ import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getFirebaseAdminApp } from '@/lib/firebase-admin';
-import { getUserByEmail } from '@/lib/firestore';
-import { addVendor, deleteVendor, getVendors, updateVendor } from '@/lib/firestore';
+import { getUserByEmail } from '@/lib/firestore/users';
+import { addVendor, deleteVendor, getVendors, updateVendor } from '@/lib/firestore/vendors';
 
 // Helper function to verify authentication and get user
 async function verifyAuth() {

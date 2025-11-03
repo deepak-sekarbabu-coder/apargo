@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import { getCategories } from '@/lib/firestore';
+import { getCategories } from '@/lib/firestore/categories';
 
 import { ApargoApp } from '@/components/apargo-app';
 

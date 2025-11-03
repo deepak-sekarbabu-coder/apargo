@@ -1,15 +1,24 @@
-import { getAuth } from 'firebase-admin/auth';
-
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
 import { shouldClearSession } from '@/lib/auth-utils';
-import { getFirebaseAdminApp } from '@/lib/firebase-admin';
-import { getUserByEmail } from '@/lib/firestore';
 import log from '@/lib/logger';
+
+// Force dynamic rendering to avoid static generation issues with Firebase Admin
+export const dynamic = 'force-dynamic';
 
 // Server-side function to get authenticated user
 async function getAuthenticatedUser() {
+  // Skip Firebase operations during build time
+  const isBuildTime =
+    process.env.NODE_ENV === 'production' && !process.env.NETLIFY && !process.env.VERCEL;
+  const isStaticGeneration = process.env.NEXT_PHASE === 'phase-production-build';
+
+  if (isBuildTime || isStaticGeneration) {
+    // During build, don't attempt Firebase operations
+    return null;
+  }
+
   const cookieStore = await cookies(); // Await the cookies() function
   const sessionCookie = cookieStore.get('session')?.value;
   const userRoleCookie = cookieStore.get('user-role')?.value; // Used for dev fallback
@@ -19,6 +28,11 @@ async function getAuthenticatedUser() {
   }
 
   try {
+    // Dynamic imports to avoid top-level Firebase Admin imports
+    const { getAuth } = await import('firebase-admin/auth');
+    const { getFirebaseAdminApp } = await import('@/lib/firebase-admin');
+    const { getUserByEmail } = await import('@/lib/firestore/users');
+
     const adminApp = getFirebaseAdminApp();
     const decodedToken = await getAuth(adminApp).verifySessionCookie(sessionCookie, true);
     const user = await getUserByEmail(decodedToken.email || '');

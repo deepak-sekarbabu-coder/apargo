@@ -99,11 +99,11 @@ export function FeatureGrid({ onSelect, className, isAdmin }: FeatureGridProps) 
 
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (!isDragging) return;
-    
+
     const touch = e.changedTouches[0];
     const deltaX = touch.clientX - dragOffset.x;
     const deltaY = touch.clientY - dragOffset.y;
-    
+
     // Minimum swipe distance (50px)
     if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY)) {
       if (deltaX > 0 && currentIndex > 0) {
@@ -114,7 +114,7 @@ export function FeatureGrid({ onSelect, className, isAdmin }: FeatureGridProps) 
         setCurrentIndex(prev => prev + 1);
       }
     }
-    
+
     setIsDragging(false);
   };
 
@@ -123,12 +123,10 @@ export function FeatureGrid({ onSelect, className, isAdmin }: FeatureGridProps) 
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Quick Actions</h2>
         <div className="flex items-center gap-2 sm:hidden">
-          <span className="text-xs text-muted-foreground">
-            Swipe to navigate
-          </span>
+          <span className="text-xs text-muted-foreground">Swipe to navigate</span>
         </div>
       </div>
-      
+
       <div
         ref={containerRef}
         className="relative overflow-hidden"
@@ -188,7 +186,7 @@ export function FeatureGrid({ onSelect, className, isAdmin }: FeatureGridProps) 
           ))}
         </div>
       </div>
-      
+
       {/* Mobile pagination dots */}
       <div className="flex justify-center gap-2 sm:hidden">
         {Array.from({ length: Math.ceil(features.length / 2) }).map((_, index) => (

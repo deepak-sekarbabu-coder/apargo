@@ -58,7 +58,9 @@ export function AdminPaymentsTab({
                     <div className="flex items-start justify-between">
                       <div className="space-y-1 min-w-0 flex-1">
                         <p className="font-semibold text-base truncate">
-                          {payer ? payer.name || payer.apartment || payment.payerId : payment.payerId}
+                          {payer
+                            ? payer.name || payer.apartment || payment.payerId
+                            : payment.payerId}
                         </p>
                         <p className="text-sm text-muted-foreground">
                           Apartment: {payer ? payer.apartment || 'N/A' : payment.payerId}
@@ -73,7 +75,9 @@ export function AdminPaymentsTab({
                     <div className="grid grid-cols-2 gap-3">
                       <div className="flex justify-between items-center">
                         <div>
-                          <p className="text-xs text-muted-foreground uppercase tracking-wide">Type</p>
+                          <p className="text-xs text-muted-foreground uppercase tracking-wide">
+                            Type
+                          </p>
                           <p className="font-medium">
                             {payment.category
                               ? payment.category === 'income'
@@ -113,7 +117,9 @@ export function AdminPaymentsTab({
                             <span>View Receipt</span>
                           </a>
                         ) : (
-                          <span className="text-muted-foreground text-sm mt-1">No receipt attached</span>
+                          <span className="text-muted-foreground text-sm mt-1">
+                            No receipt attached
+                          </span>
                         )}
                       </div>
                     </div>

@@ -1,6 +1,7 @@
 # AGENTS.md
 
 ## Commands
+
 - **Build**: `npm run build` (includes SW env injection and cleanup)
 - **Dev**: `npm run dev` (Turbopack enabled)
 - **Lint**: `npm run lint` / `npm run lint:fix`
@@ -9,6 +10,7 @@
 - **Typecheck**: `npm run typecheck`
 
 ## Architecture
+
 - **Frontend**: Next.js 15.5.4 App Router, React 18, TypeScript, Tailwind CSS, ShadCN UI (Radix), Lucide icons
 - **Backend**: Firebase Admin SDK (server), Client SDK (browser) for Auth, Firestore, Storage, FCM
 - **Database**: Firestore (NoSQL), with security rules in `firestore.rules`
@@ -18,6 +20,7 @@
 - **Deployment**: Netlify, with standalone Docker option
 
 ## Code Style
+
 - **TypeScript**: Strict mode, explicit types, no `any`, interfaces/types in `src/lib/types.ts`
 - **Imports**: Absolute with `@/*` (maps to `src/*`), sorted by `@trivago/prettier-plugin-sort-imports`
 - **Formatting**: Prettier (`npm run format`), no semicolons, double quotes

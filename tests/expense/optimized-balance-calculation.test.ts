@@ -1,9 +1,9 @@
-import { 
-  calculateApartmentBalances, 
+import {
+  calculateApartmentBalances,
   calculateApartmentBalancesOptimized,
-  calculateUnpaidBillsCount
+  calculateUnpaidBillsCount,
 } from '@/lib/balance-calculation';
-import type { Expense, Apartment } from '@/lib/types';
+import type { Apartment, Expense } from '@/lib/types';
 
 describe('Optimized Balance Calculation Tests', () => {
   // Mock expense data
@@ -43,7 +43,7 @@ describe('Optimized Balance Calculation Tests', () => {
       perApartmentShare: 233.33, // 1400 ÷ 6 ≈ 233.33 per apartment
       paidByApartments: ['T2', 'T3'], // T2 and T3 have paid
       paid: false,
-    }
+    },
   ];
 
   const mockApartments: Apartment[] = [
@@ -68,14 +68,16 @@ describe('Optimized Balance Calculation Tests', () => {
 
       expect(optimized).toBeDefined();
       expect(optimized.name).toBe(original.name);
-      expect(Math.round(optimized.balance * 100) / 100).toBe(Math.round(original.balance * 100) / 100);
+      expect(Math.round(optimized.balance * 100) / 100).toBe(
+        Math.round(original.balance * 100) / 100
+      );
 
       // Compare owes and isOwed maps
       const originalOwesKeys = Object.keys(original.owes).sort();
       const optimizedOwesKeys = Object.keys(optimized.owes).sort();
-      
+
       expect(originalOwesKeys).toEqual(optimizedOwesKeys);
-      
+
       originalOwesKeys.forEach(debtorId => {
         expect(Math.round((optimized.owes[debtorId] || 0) * 100) / 100).toBe(
           Math.round((original.owes[debtorId] || 0) * 100) / 100
@@ -84,9 +86,9 @@ describe('Optimized Balance Calculation Tests', () => {
 
       const originalIsOwedKeys = Object.keys(original.isOwed).sort();
       const optimizedIsOwedKeys = Object.keys(optimized.isOwed).sort();
-      
+
       expect(originalIsOwedKeys).toEqual(optimizedIsOwedKeys);
-      
+
       originalIsOwedKeys.forEach(creditorId => {
         expect(Math.round((optimized.isOwed[creditorId] || 0) * 100) / 100).toBe(
           Math.round((original.isOwed[creditorId] || 0) * 100) / 100
@@ -97,19 +99,19 @@ describe('Optimized Balance Calculation Tests', () => {
 
   test('should calculate unpaid bills count correctly', () => {
     const unpaidCount = calculateUnpaidBillsCount(mockExpenses);
-    
+
     // Expected unpaid bills:
     // Expense 1: 6 unpaid (all apartments except T2 who paid)
     // Expense 2: 5 unpaid (all except T1 who paid, and T3 is paying)
     // Expense 3: 4 unpaid (all except T2, T3 who paid)
     // Total: 6 + 5 + 4 = 15 unpaid bills
-    
+
     expect(unpaidCount).toBe(15);
   });
 
   test('should handle edge case with no expenses', () => {
     const emptyResult = calculateApartmentBalances([], mockApartments);
-    
+
     mockApartments.forEach(apartment => {
       const result = emptyResult[apartment.id];
       expect(result.balance).toBe(0);
@@ -121,11 +123,11 @@ describe('Optimized Balance Calculation Tests', () => {
   test('should handle edge case with no unpaid apartments', () => {
     const paidExpenses = mockExpenses.map(expense => ({
       ...expense,
-      paidByApartments: expense.owedByApartments
+      paidByApartments: expense.owedByApartments,
     }));
 
     const result = calculateApartmentBalances(paidExpenses, mockApartments);
-    
+
     mockApartments.forEach(apartment => {
       const aptResult = result[apartment.id];
       expect(aptResult.balance).toBe(0);
@@ -136,15 +138,17 @@ describe('Optimized Balance Calculation Tests', () => {
 
   test('should handle single apartment scenario', () => {
     const singleApartment: Apartment[] = [{ id: 'T1', name: 'Apartment T1', members: [] }];
-    const singleExpense: Expense[] = [{
-      ...mockExpenses[0],
-      paidByApartment: 'T1', // Same as the single apartment
-      owedByApartments: ['T1'], // T1 owes to itself
-      perApartmentShare: 700
-    }];
+    const singleExpense: Expense[] = [
+      {
+        ...mockExpenses[0],
+        paidByApartment: 'T1', // Same as the single apartment
+        owedByApartments: ['T1'], // T1 owes to itself
+        perApartmentShare: 700,
+      },
+    ];
 
     const result = calculateApartmentBalances(singleExpense, singleApartment);
-    
+
     expect(result['T1'].balance).toBe(0); // No money owed to anyone when paying and owing are the same
     expect(Object.keys(result['T1'].owes).length).toBe(0);
     expect(Object.keys(result['T1'].isOwed).length).toBe(0);
@@ -154,20 +158,23 @@ describe('Optimized Balance Calculation Tests', () => {
     // Create large dataset
     const largeApartmentCount = 100;
     const largeExpensesCount = 1000;
-    
+
     const largeApartments: Apartment[] = Array.from({ length: largeApartmentCount }, (_, i) => ({
       id: `apt-${i}`,
       name: `Apartment ${i}`,
-      members: []
+      members: [],
     }));
-    
+
     const largeExpenses: Expense[] = Array.from({ length: largeExpensesCount }, (_, i) => ({
       id: `exp-${i}`,
       description: `Expense ${i}`,
       amount: Math.random() * 1000 + 100,
       date: new Date().toISOString(),
       paidByApartment: `apt-${Math.floor(Math.random() * largeApartmentCount)}`,
-      owedByApartments: Array.from({ length: 10 }, () => `apt-${Math.floor(Math.random() * largeApartmentCount)}`),
+      owedByApartments: Array.from(
+        { length: 10 },
+        () => `apt-${Math.floor(Math.random() * largeApartmentCount)}`
+      ),
       perApartmentShare: Math.random() * 100 + 10,
       categoryId: `category-${i % 10}`,
       paidByApartments: [],

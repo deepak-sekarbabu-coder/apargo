@@ -1,6 +1,7 @@
 # Firebase Firestore Notification System Fix
 
 ## Problem Summary
+
 Your apartment F2 notification system was experiencing `ERR_QUIC_PROTOCOL_ERROR` and subsequent 400 Bad Request errors when setting up Firestore `onSnapshot` listeners. This was causing the real-time notification system to fail.
 
 ## Root Causes Identified
@@ -13,6 +14,7 @@ Your apartment F2 notification system was experiencing `ERR_QUIC_PROTOCOL_ERROR`
 ## Solutions Implemented
 
 ### 1. Firebase Configuration Optimization (`src/lib/firebase.ts`)
+
 - **Forced Long Polling**: Disabled QUIC/HTTP3 by setting `experimentalForceLongPolling: true`
 - **Reduced Cache Size**: Lowered from 40MB to 10MB to prevent memory issues
 - **Environment Variables**: Added fallback to environment variables for better configuration management
@@ -30,22 +32,26 @@ db = initializeFirestore(app, {
 ```
 
 ### 2. Robust Notification Listener (`src/lib/notification-listener.ts`)
+
 - **Single Unified Query**: Replaced dual parallel queries with a single query to reduce conflicts
 - **Exponential Backoff Retry**: Implemented intelligent retry logic with increasing delays
 - **Connection Health Monitoring**: Added proper error handling and connection state management
 - **Graceful Fallback**: Falls back to separate queries if unified query fails
 
 ### 3. Connection Health Monitor (`src/lib/firebase-health-monitor.ts`)
+
 - **Real-time Health Tracking**: Monitors connection status, error counts, and connection type
 - **Diagnostic Capabilities**: Detects QUIC usage, network conditions, and proxy interference
 - **Performance Monitoring**: Tracks successful operations and connection stability
 
 ### 4. Service Worker Optimization (`public/firebase-messaging-sw.js`)
+
 - **Connection Stability**: Forces HTTP/1.1 for Firebase requests to avoid QUIC issues
 - **Background Message Handling**: Proper handling of push notifications
 - **Error Recovery**: Graceful handling of network failures
 
 ### 5. Debug and Testing Tools
+
 - **Firebase Debug Panel**: Real-time connection monitoring and diagnostic report generation
 - **Notification System Test**: Comprehensive testing suite for all notification components
 - **Configuration Validator**: Validates Firebase setup and provides troubleshooting guidance
@@ -53,13 +59,16 @@ db = initializeFirestore(app, {
 ## How to Use the Fix
 
 ### 1. Immediate Testing
+
 1. Start your development server: `npm run dev`
 2. Look for the debug panels in the bottom-right corner (development only)
 3. Click "Test Notification System" to run comprehensive diagnostics
 4. Check the "Firebase Debug Panel" for real-time connection health
 
 ### 2. Environment Configuration
+
 Create or update your `.env.local` file:
+
 ```env
 NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
@@ -71,7 +80,9 @@ NEXT_PUBLIC_FIREBASE_VAPID_KEY=your_vapid_key
 ```
 
 ### 3. Firestore Security Rules
+
 Ensure your rules allow authenticated users to access notifications:
+
 ```javascript
 rules_version = '2';
 service cloud.firestore {
@@ -152,6 +163,7 @@ Before deploying to production:
 ## Expected Results
 
 After implementing this fix, you should see:
+
 - ✅ Stable Firestore connections without QUIC protocol errors
 - ✅ Reliable real-time notification updates
 - ✅ Proper error handling and automatic recovery

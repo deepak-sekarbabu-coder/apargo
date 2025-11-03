@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { adminAuth } from '@/lib/auth';
-import * as firestore from '@/lib/firestore';
 import * as firestoreAdmin from '@/lib/firestore-admin';
+import { getCategories } from '@/lib/firestore/categories';
+import { generatePaymentEvents } from '@/lib/firestore/payments';
 
 // POST /api/payment-events/scheduler
 // Automated scheduler endpoint for generating monthly payment events
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get all categories configured for payment events
-    const categories = await firestore.getCategories();
+    const categories = await getCategories();
     const paymentEventCategories = categories.filter(
       cat => cat.isPaymentEvent && cat.autoGenerate && cat.monthlyAmount && cat.monthlyAmount > 0
     );
@@ -117,7 +118,7 @@ export async function POST(request: NextRequest) {
           }
         }
 
-        const createdPayments = await firestore.generatePaymentEvents(category.id, targetMonth);
+        const createdPayments = await generatePaymentEvents(category.id, targetMonth);
         totalEventsCreated += createdPayments.length;
 
         results.push({
@@ -173,7 +174,7 @@ export async function GET() {
     }
 
     // Get all categories configured for payment events
-    const categories = await firestore.getCategories();
+    const categories = await getCategories();
     const paymentEventCategories = categories.filter(
       cat => cat.isPaymentEvent && cat.autoGenerate && cat.monthlyAmount && cat.monthlyAmount > 0
     );

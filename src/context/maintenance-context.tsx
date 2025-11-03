@@ -4,19 +4,23 @@ import React, { createContext, useCallback, useContext, useEffect, useState } fr
 
 import {
   addMaintenanceBudget,
-  addMaintenanceTask,
-  addVendor,
-  deleteMaintenanceTask,
-  deleteVendor,
   getMaintenanceBudget,
-  getMaintenanceTasks,
-  getVendors,
-  subscribeToMaintenanceTasks,
-  subscribeToVendors,
   updateMaintenanceBudget,
+} from '@/lib/firestore/maintenance-budgets';
+import {
+  addMaintenanceTask,
+  deleteMaintenanceTask,
+  getMaintenanceTasks,
+  subscribeToMaintenanceTasks,
   updateMaintenanceTask,
+} from '@/lib/firestore/maintenance-tasks';
+import {
+  addVendor,
+  deleteVendor,
+  getVendors,
+  subscribeToVendors,
   updateVendor,
-} from '@/lib/firestore';
+} from '@/lib/firestore/vendors';
 import { MaintenanceBudget, MaintenanceTask, Vendor } from '@/lib/types';
 
 interface MaintenanceContextValue {

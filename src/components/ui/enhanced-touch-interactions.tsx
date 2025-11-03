@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
-
+import { useCallback, useRef, useState } from 'react';
 import * as React from 'react';
 
 import { cn } from '@/lib/utils';
@@ -30,32 +29,35 @@ export const TouchFeedback: React.FC<TouchFeedbackProps> = ({
   const { isTouchDevice } = useDeviceInfo();
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleTouchStart = useCallback((e: React.TouchEvent) => {
-    if (disabled) return;
+  const handleTouchStart = useCallback(
+    (e: React.TouchEvent) => {
+      if (disabled) return;
 
-    setIsPressed(true);
+      setIsPressed(true);
 
-    // Create ripple effect
-    if (isTouchDevice) {
-      const touch = e.touches[0];
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = touch.clientX - rect.left;
-      const y = touch.clientY - rect.top;
+      // Create ripple effect
+      if (isTouchDevice) {
+        const touch = e.touches[0];
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = touch.clientX - rect.left;
+        const y = touch.clientY - rect.top;
 
-      const newRipple = {
-        id: Date.now(),
-        x,
-        y,
-      };
+        const newRipple = {
+          id: Date.now(),
+          x,
+          y,
+        };
 
-      setRipples(prev => [...prev, newRipple]);
+        setRipples(prev => [...prev, newRipple]);
 
-      // Remove ripple after animation
-      timeoutRef.current = setTimeout(() => {
-        setRipples(prev => prev.filter(ripple => ripple.id !== newRipple.id));
-      }, 600);
-    }
-  }, [disabled, isTouchDevice]);
+        // Remove ripple after animation
+        timeoutRef.current = setTimeout(() => {
+          setRipples(prev => prev.filter(ripple => ripple.id !== newRipple.id));
+        }, 600);
+      }
+    },
+    [disabled, isTouchDevice]
+  );
 
   const handleTouchEnd = useCallback(() => {
     if (disabled) return;
@@ -90,7 +92,7 @@ export const TouchFeedback: React.FC<TouchFeedbackProps> = ({
       {...props}
     >
       {children}
-      
+
       {/* Ripple effect */}
       {ripples.map(ripple => (
         <span
@@ -322,8 +324,10 @@ export const EnhancedTouchButton = React.forwardRef<HTMLButtonElement, EnhancedT
           isTouchDevice && 'min-h-[44px] px-4 py-2',
           // Variants
           variant === 'default' && 'bg-primary text-primary-foreground hover:bg-primary/90',
-          variant === 'destructive' && 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-          variant === 'outline' && 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
+          variant === 'destructive' &&
+            'bg-destructive text-destructive-foreground hover:bg-destructive/90',
+          variant === 'outline' &&
+            'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
           variant === 'secondary' && 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
           variant === 'ghost' && 'hover:bg-accent hover:text-accent-foreground',
           variant === 'link' && 'text-primary underline-offset-4 hover:underline',
@@ -419,11 +423,14 @@ TouchScrollContainer.displayName = 'TouchScrollContainer';
 export function useHapticFeedback() {
   const { isTouchDevice } = useDeviceInfo();
 
-  const vibrate = useCallback((pattern: number | number[] = 50) => {
-    if (isTouchDevice && 'vibrate' in navigator) {
-      navigator.vibrate(pattern);
-    }
-  }, [isTouchDevice]);
+  const vibrate = useCallback(
+    (pattern: number | number[] = 50) => {
+      if (isTouchDevice && 'vibrate' in navigator) {
+        navigator.vibrate(pattern);
+      }
+    },
+    [isTouchDevice]
+  );
 
   const light = useCallback(() => vibrate(20), [vibrate]);
   const medium = useCallback(() => vibrate(50), [vibrate]);

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { getFaults } from '@/lib/firestore';
+import { getFaults } from '@/lib/firestore/faults';
 
 export async function GET() {
   try {

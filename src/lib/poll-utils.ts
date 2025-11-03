@@ -1,7 +1,7 @@
 import { collection, getDocs, query, where } from 'firebase/firestore';
 
 import { db } from './firebase';
-import { listenToPolls } from './firestore';
+import { listenToPolls } from './firestore/polls';
 import { Poll, PollNotification, User } from './types';
 
 /**

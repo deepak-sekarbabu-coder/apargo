@@ -2,10 +2,9 @@
  * Example implementations demonstrating how to extend the expense calculation system
  * using the Open/Closed Principle with the Strategy Pattern.
  */
-
-import type { Expense } from './types';
 import type { ExpenseCalculationStrategy } from './expense-calculation-strategies';
 import { registerExpenseCalculationStrategy } from './expense-calculation-strategies';
+import type { Expense } from './types';
 
 /**
  * Example: Maintenance Fee Expense Strategy
@@ -71,12 +70,13 @@ export class UtilityBillExpenseStrategy implements ExpenseCalculationStrategy {
     // For utilities, we might want to prorate based on apartment size
     // This is a simplified example - in reality, you'd look up apartment sizes from a database
     const apartmentSizes: Record<string, number> = {
-      'apt1': 800, // sq ft
-      'apt2': 1000,
-      'apt3': 1200,
+      apt1: 800, // sq ft
+      apt2: 1000,
+      apt3: 1200,
     };
 
-    const totalSize = expense.owedByApartments?.reduce((sum, aptId) => sum + (apartmentSizes[aptId] || 1), 0) || 1;
+    const totalSize =
+      expense.owedByApartments?.reduce((sum, aptId) => sum + (apartmentSizes[aptId] || 1), 0) || 1;
 
     expense.owedByApartments?.forEach(apartmentId => {
       const apartmentSize = apartmentSizes[apartmentId] || 1;

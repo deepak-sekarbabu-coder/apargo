@@ -1,10 +1,10 @@
-import { database, type QuerySnapshot } from '../database';
-import { applyDeltasToBalanceSheets } from './expenses';
+import { type QuerySnapshot, database } from '../database';
 import { computeApprovedExpensePaymentDeltas } from '../payments';
+import type { Apartment, Category, Payment, User } from '../types';
 import { getApartments } from './apartments';
 import { getCategories } from './categories';
+import { applyDeltasToBalanceSheets } from './expenses';
 import { getUsers } from './users';
-import type { Apartment, Category, Payment, User } from '../types';
 
 // Helper function to validate category
 const validateCategory = async (categoryId: string): Promise<Category> => {
@@ -15,28 +15,45 @@ const validateCategory = async (categoryId: string): Promise<Category> => {
 
   const category = { id: categoryDoc.id, ...categoryDoc.data() } as Category;
 
-  if (!category.isPaymentEvent || !category.monthlyAmount || typeof category.monthlyAmount !== 'number' || category.monthlyAmount <= 0) {
-    throw new Error(`Category ${category.name} is not configured for payment events or has invalid monthlyAmount: ${category.monthlyAmount}`);
+  if (
+    !category.isPaymentEvent ||
+    !category.monthlyAmount ||
+    typeof category.monthlyAmount !== 'number' ||
+    category.monthlyAmount <= 0
+  ) {
+    throw new Error(
+      `Category ${category.name} is not configured for payment events or has invalid monthlyAmount: ${category.monthlyAmount}`
+    );
   }
 
   return category;
 };
 
 // Helper function to check if payment event exists
-const checkExistingPayment = async (apartmentId: string, monthYear: string, categoryName: string): Promise<boolean> => {
+const checkExistingPayment = async (
+  apartmentId: string,
+  monthYear: string,
+  categoryName: string
+): Promise<boolean> => {
   const existingPayments = await getPayments(apartmentId, monthYear);
   return existingPayments.some(
     payment =>
-      payment.reason?.includes('Monthly maintenance fee') ||
-      payment.reason?.includes(categoryName)
+      payment.reason?.includes('Monthly maintenance fee') || payment.reason?.includes(categoryName)
   );
 };
 
 // Helper function to create apartment payment
-const createApartmentPayment = async (apartment: Apartment, category: Category, firstMember: User, monthYear: string): Promise<Payment | null> => {
+const createApartmentPayment = async (
+  apartment: Apartment,
+  category: Category,
+  firstMember: User,
+  monthYear: string
+): Promise<Payment | null> => {
   const monthlyAmount = typeof category.monthlyAmount === 'number' ? category.monthlyAmount : 0;
   if (monthlyAmount <= 0) {
-    console.warn(`Skipping payment event for category ${category.name} with invalid amount: ${monthlyAmount}`);
+    console.warn(
+      `Skipping payment event for category ${category.name} with invalid amount: ${monthlyAmount}`
+    );
     return null;
   }
 
@@ -192,17 +209,34 @@ export const subscribeToPayments = async (
   monthYear?: string
 ) => {
   const paymentsCollection = database.collection<Payment>('payments');
-  const filters: Array<{ field: string; operator: '==' | '!=' | '<' | '<=' | '>' | '>=' | 'array-contains' | 'in' | 'array-contains-any'; value: any }> = [];
+  const filters: Array<{
+    field: string;
+    operator:
+      | '=='
+      | '!='
+      | '<'
+      | '<='
+      | '>'
+      | '>='
+      | 'array-contains'
+      | 'in'
+      | 'array-contains-any';
+    value: any;
+  }> = [];
   if (apartmentId) {
     filters.push({ field: 'apartmentId', operator: '==', value: apartmentId });
   }
   if (monthYear) {
     filters.push({ field: 'monthYear', operator: '==', value: monthYear });
   }
-  return database.subscribeToCollection<Payment>('payments', (snapshot: QuerySnapshot<Payment>) => {
-    const payments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Payment);
-    callback(payments);
-  }, filters);
+  return database.subscribeToCollection<Payment>(
+    'payments',
+    (snapshot: QuerySnapshot<Payment>) => {
+      const payments = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Payment);
+      callback(payments);
+    },
+    filters
+  );
 };
 
 // Generate monthly payment events for configured categories

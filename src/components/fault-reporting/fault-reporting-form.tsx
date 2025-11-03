@@ -7,7 +7,7 @@ import React, { useEffect, useState } from 'react';
 
 import Image from 'next/image';
 
-import { addFault } from '@/lib/firestore';
+import { addFault } from '@/lib/firestore/faults';
 import { uploadImage } from '@/lib/storage';
 import type { FaultSeverity } from '@/lib/types';
 

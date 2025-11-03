@@ -88,17 +88,22 @@ function validateBrowserSupport(result: ValidationResult): void {
 
 function validateNetworkAndExtensions(result: ValidationResult): void {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const connection = (navigator as {
-    connection?: {
-      effectiveType?: string;
-    };
-    mozConnection?: {
-      effectiveType?: string;
-    };
-    webkitConnection?: {
-      effectiveType?: string;
-    };
-  }).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
+  const connection =
+    (
+      navigator as {
+        connection?: {
+          effectiveType?: string;
+        };
+        mozConnection?: {
+          effectiveType?: string;
+        };
+        webkitConnection?: {
+          effectiveType?: string;
+        };
+      }
+    ).connection ||
+    (navigator as any).mozConnection ||
+    (navigator as any).webkitConnection;
   if (connection) {
     if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
       result.warnings.push('Slow network detected - consider enabling offline persistence');
@@ -112,7 +117,9 @@ function validateNetworkAndExtensions(result: ValidationResult): void {
 }
 
 function addSecuritySuggestions(result: ValidationResult): void {
-  result.suggestions.push('Ensure Firestore security rules allow authenticated users to read/write notifications');
+  result.suggestions.push(
+    'Ensure Firestore security rules allow authenticated users to read/write notifications'
+  );
   result.suggestions.push('Test Firestore rules in Firebase Console simulator');
 }
 
@@ -135,7 +142,8 @@ export function validateFirebaseConfig(): ValidationResult {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || 'AIzaSyA7g7daznFO-dDWYv8-jT08DDZlJSFT1lE',
     authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || 'unicorndev-b532a.firebaseapp.com',
     projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || 'unicorndev-b532a',
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'unicorndev-b532a.firebasestorage.app',
+    storageBucket:
+      process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || 'unicorndev-b532a.firebasestorage.app',
     messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '1047490636656',
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '1:1047490636656:web:851d9f253f1c7da6057db5',
   };

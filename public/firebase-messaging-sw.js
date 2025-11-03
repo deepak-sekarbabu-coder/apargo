@@ -22,9 +22,17 @@ const firebaseConfig = {
 // In production, we require all values to be present
 const isDevelopment = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 if (!isDevelopment) {
-  if (!firebaseConfig.apiKey || !firebaseConfig.authDomain || !firebaseConfig.projectId || 
-      !firebaseConfig.storageBucket || !firebaseConfig.messagingSenderId || !firebaseConfig.appId) {
-    console.error('Firebase configuration is missing required values. Please ensure all environment variables are set during build time.');
+  if (
+    !firebaseConfig.apiKey ||
+    !firebaseConfig.authDomain ||
+    !firebaseConfig.projectId ||
+    !firebaseConfig.storageBucket ||
+    !firebaseConfig.messagingSenderId ||
+    !firebaseConfig.appId
+  ) {
+    console.error(
+      'Firebase configuration is missing required values. Please ensure all environment variables are set during build time.'
+    );
     throw new Error('Missing Firebase configuration values in service worker');
   }
 }
@@ -35,7 +43,7 @@ if (firebaseConfig.apiKey && firebaseConfig.projectId) {
   const messaging = firebase.messaging();
 
   // Handle background messages
-  messaging.onBackgroundMessage((payload) => {
+  messaging.onBackgroundMessage(payload => {
     console.log('Received background message:', payload);
 
     const notificationTitle = payload.notification?.title || 'New Notification';
@@ -62,33 +70,31 @@ if (firebaseConfig.apiKey && firebaseConfig.projectId) {
 }
 
 // Handle notification clicks
-self.addEventListener('notificationclick', (event) => {
+self.addEventListener('notificationclick', event => {
   console.log('Notification clicked:', event);
 
   event.notification.close();
 
   if (event.action === 'view') {
     // Open the app
-    event.waitUntil(
-      clients.openWindow('/')
-    );
+    event.waitUntil(clients.openWindow('/'));
   }
 });
 
 // Handle service worker installation
-self.addEventListener('install', (event) => {
+self.addEventListener('install', event => {
   console.log('Firebase messaging service worker installed');
   self.skipWaiting();
 });
 
 // Handle service worker activation
-self.addEventListener('activate', (event) => {
+self.addEventListener('activate', event => {
   console.log('Firebase messaging service worker activated');
   event.waitUntil(self.clients.claim());
 });
 
 // Add connection stability improvements
-self.addEventListener('fetch', (event) => {
+self.addEventListener('fetch', event => {
   // Only handle Firebase requests
   if (event.request.url.includes('firestore.googleapis.com')) {
     event.respondWith(
@@ -96,9 +102,9 @@ self.addEventListener('fetch', (event) => {
         // Force HTTP/1.1 to avoid QUIC issues
         headers: {
           ...event.request.headers,
-          'Connection': 'keep-alive',
+          Connection: 'keep-alive',
         },
-      }).catch((error) => {
+      }).catch(error => {
         console.error('Firebase request failed:', error);
         // Return a basic error response
         return new Response(JSON.stringify({ error: 'Network error' }), {

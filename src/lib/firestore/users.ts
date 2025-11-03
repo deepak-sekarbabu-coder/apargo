@@ -1,10 +1,12 @@
-import { database, type DocumentSnapshot, type QuerySnapshot } from '../database';
+import { type DocumentSnapshot, type QuerySnapshot, database } from '../database';
 import { removeUndefined } from '../firestore-utils';
 import type { User } from '../types';
 
 export const getUsers = async (apartment?: string): Promise<User[]> => {
   const usersCollection = database.collection<User>('users');
-  let queryBuilder = usersCollection.query().where({ field: 'isApproved', operator: '==', value: true });
+  let queryBuilder = usersCollection
+    .query()
+    .where({ field: 'isApproved', operator: '==', value: true });
   if (apartment) {
     queryBuilder = queryBuilder.where({ field: 'apartment', operator: '==', value: apartment });
   }
@@ -33,7 +35,9 @@ export const getUser = async (id: string): Promise<User | null> => {
 
 export const getUserByEmail = async (email: string): Promise<User | null> => {
   const usersCollection = database.collection<User>('users');
-  const queryBuilder = usersCollection.query().where({ field: 'email', operator: '==', value: email });
+  const queryBuilder = usersCollection
+    .query()
+    .where({ field: 'email', operator: '==', value: email });
   try {
     const userSnapshot = await queryBuilder.get();
     if (userSnapshot.empty) {
@@ -76,19 +80,43 @@ export const subscribeToUsers = async (callback: (users: User[]) => void, apartm
   if (apartment) {
     filters.push({ field: 'apartment', operator: '==' as const, value: apartment });
   }
-  return database.subscribeToCollection<User>('users', (snapshot: QuerySnapshot<User>) => {
-    const users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as User);
-    callback(users);
-  }, filters);
+  return database.subscribeToCollection<User>(
+    'users',
+    (snapshot: QuerySnapshot<User>) => {
+      const users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as User);
+      callback(users);
+    },
+    filters
+  );
 };
 
-export const subscribeToAllUsers = async (callback: (users: User[]) => void, apartment?: string) => {
-  const filters: Array<{ field: string; operator: '==' | '!=' | '<' | '<=' | '>' | '>=' | 'array-contains' | 'in' | 'array-contains-any'; value: any }> = [];
+export const subscribeToAllUsers = async (
+  callback: (users: User[]) => void,
+  apartment?: string
+) => {
+  const filters: Array<{
+    field: string;
+    operator:
+      | '=='
+      | '!='
+      | '<'
+      | '<='
+      | '>'
+      | '>='
+      | 'array-contains'
+      | 'in'
+      | 'array-contains-any';
+    value: any;
+  }> = [];
   if (apartment) {
     filters.push({ field: 'apartment', operator: '==', value: apartment });
   }
-  return database.subscribeToCollection<User>('users', (snapshot: QuerySnapshot<User>) => {
-    const users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as User);
-    callback(users);
-  }, filters);
+  return database.subscribeToCollection<User>(
+    'users',
+    (snapshot: QuerySnapshot<User>) => {
+      const users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as User);
+      callback(users);
+    },
+    filters
+  );
 };

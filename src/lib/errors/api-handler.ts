@@ -1,22 +1,15 @@
 // Base API Handler with Unified Error Handling
 // Provides standardized error handling for Next.js API routes
-
 import { NextRequest, NextResponse } from 'next/server';
-import type { 
-  ApargoError, 
-  ErrorContext, 
-  ErrorCode,
-  OperationResult,
-} from '@/lib/errors';
-import {
-  createError,
-  wrapError,
-  logger,
-  createOperationResult,
-} from '@/lib/errors';
+
+import type { ApargoError, ErrorCode, ErrorContext, OperationResult } from '@/lib/errors';
+import { createError, createOperationResult, logger, wrapError } from '@/lib/errors';
 
 // Type for API handler functions
-type ApiHandler<T = any> = (request: NextRequest, context: ErrorContext) => Promise<OperationResult<T>>;
+type ApiHandler<T = any> = (
+  request: NextRequest,
+  context: ErrorContext
+) => Promise<OperationResult<T>>;
 
 // Base error response format
 interface ApiErrorResponse {
@@ -75,7 +68,10 @@ function createErrorResponse(error: ApargoError): NextResponse<ApiErrorResponse>
 /**
  * Create a standardized API success response
  */
-function createSuccessResponse<T>(data: T, requestId?: string): NextResponse<ApiSuccessResponse<T>> {
+function createSuccessResponse<T>(
+  data: T,
+  requestId?: string
+): NextResponse<ApiSuccessResponse<T>> {
   const response: ApiSuccessResponse<T> = {
     success: true,
     data,
@@ -97,37 +93,37 @@ function getHttpStatusFromError(error: ApargoError): number {
     case 'AUTH_INVALID_TOKEN':
     case 'AUTH_EXPIRED':
       return 401;
-    
+
     case 'AUTHZ_INSUFFICIENT_PERMISSIONS':
     case 'AUTHZ_ROLE_INSUFFICIENT':
     case 'AUTHZ_RESOURCE_ACCESS_DENIED':
       return 403;
-    
+
     case 'VALIDATION_REQUIRED_FIELD':
     case 'VALIDATION_INVALID_FORMAT':
     case 'VALIDATION_OUT_OF_RANGE':
     case 'VALIDATION_DUPLICATE':
     case 'VALIDATION_CONSTRAINT':
       return 400;
-    
+
     case 'DB_NOT_FOUND':
       return 404;
-    
+
     case 'DB_CONNECTION_FAILED':
     case 'DB_OPERATION_FAILED':
     case 'SYSTEM_OUT_OF_MEMORY':
     case 'SYSTEM_DISK_FULL':
       return 500;
-    
+
     case 'NETWORK_TIMEOUT':
     case 'NETWORK_OFFLINE':
     case 'NETWORK_SERVICE_UNAVAILABLE':
       return 503;
-    
+
     case 'STORAGE_QUOTA_EXCEEDED':
     case 'STORAGE_SIZE_EXCEEDED':
       return 413;
-    
+
     default:
       return 500;
   }
@@ -178,7 +174,7 @@ export function createApiHandler<T>(
       if (!result.success) {
         // Log the error
         logger.error(result.error!, context);
-        
+
         // Return error response
         return createErrorResponse(result.error!);
       }
@@ -191,11 +187,10 @@ export function createApiHandler<T>(
 
       // Return success response
       return createSuccessResponse(result.data, requestId);
-
     } catch (error) {
       // Handle unexpected errors
       const apargoError = wrapError(error as Error, 'GENERIC_UNKNOWN_ERROR', context);
-      
+
       // Log the error
       logger.error(apargoError, {
         ...context,
@@ -239,16 +234,20 @@ export async function verifyAuth(
     // 1. Verify the session cookie with Firebase Admin
     // 2. Get the user from Firestore
     // 3. Check permissions if required
-    
-    return { user: { id: 'user123', role: 'user' } }; // Mock user for now
 
+    return { user: { id: 'user123', role: 'user' } }; // Mock user for now
   } catch (error) {
     if (error instanceof Error && error.message.includes('Firebase')) {
       return {
-        error: createSystemError('SYSTEM_MAINTENANCE', 'Authentication service unavailable', error as Error, context),
+        error: createSystemError(
+          'SYSTEM_MAINTENANCE',
+          'Authentication service unavailable',
+          error as Error,
+          context
+        ),
       };
     }
-    
+
     return {
       error: createAuthError('AUTH_INVALID_TOKEN', 'Invalid authentication session', context),
     };
@@ -258,7 +257,10 @@ export async function verifyAuth(
 /**
  * Admin role verification
  */
-export function requireAdmin(user: any, context: ErrorContext): { valid: boolean; error?: ApargoError } {
+export function requireAdmin(
+  user: any,
+  context: ErrorContext
+): { valid: boolean; error?: ApargoError } {
   if (!user) {
     return {
       valid: false,
@@ -336,20 +338,23 @@ function createValidationError(
  * Health check endpoint handler
  */
 export function createHealthCheckHandler() {
-  return createApiHandler(async (request, context) => {
-    return createOperationResult({
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      version: '1.0.0',
-      environment: process.env.NODE_ENV || 'development',
-      features: {
-        errorHandling: true,
-        logging: true,
-        monitoring: true,
-      },
-    });
-  }, {
-    operationName: 'health_check',
-    feature: 'system',
-  });
+  return createApiHandler(
+    async (request, context) => {
+      return createOperationResult({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        version: '1.0.0',
+        environment: process.env.NODE_ENV || 'development',
+        features: {
+          errorHandling: true,
+          logging: true,
+          monitoring: true,
+        },
+      });
+    },
+    {
+      operationName: 'health_check',
+      feature: 'system',
+    }
+  );
 }

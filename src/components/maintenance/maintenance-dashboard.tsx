@@ -233,9 +233,9 @@ export function MaintenanceDashboard({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button 
-            onClick={handleRefresh} 
-            disabled={loading} 
+          <Button
+            onClick={handleRefresh}
+            disabled={loading}
             size="lg"
             className="inline-flex items-center gap-2 shadow-md hover:shadow-lg transition-shadow"
           >

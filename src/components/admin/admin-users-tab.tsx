@@ -3,8 +3,8 @@ import { PlusCircle, Search, Users, X } from 'lucide-react';
 import React, { useState } from 'react';
 
 import type { User } from '@/lib/types';
-import { DEBOUNCE_CONFIG, DEBOUNCE_OPTIONS } from '@/lib/utils';
 import type { AdminUsersTabConfig, UserAction } from '@/lib/user-actions-config.tsx';
+import { DEBOUNCE_CONFIG, DEBOUNCE_OPTIONS } from '@/lib/utils';
 
 import { AddUserDialog } from '@/components/dialogs/add-user-dialog';
 import { EditUserDialog } from '@/components/dialogs/edit-user-dialog';
@@ -63,18 +63,21 @@ const UserActionButton: React.FC<UserActionButtonProps> = ({ action, user, isMob
       <AlertDialog>
         <AlertDialogTrigger asChild>
           <Button
-          variant={action.variant || 'outline'}
-          size={buttonSize}
-          className={`${buttonClass} ${
-          action.variant === 'destructive'
-          ? 'text-destructive border-destructive/30 hover:bg-destructive/10'
-          : action.variant === 'ghost' && action.id === 'delete'
-          ? 'text-destructive hover:text-destructive'
-          : ''
-          }`}
+            variant={action.variant || 'outline'}
+            size={buttonSize}
+            className={`${buttonClass} ${
+              action.variant === 'destructive'
+                ? 'text-destructive border-destructive/30 hover:bg-destructive/10'
+                : action.variant === 'ghost' && action.id === 'delete'
+                  ? 'text-destructive hover:text-destructive'
+                  : ''
+            }`}
           >
-          {action.icon && React.createElement(action.icon, { className: isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4' })}
-          {isMobile ? action.label : null}
+            {action.icon &&
+              React.createElement(action.icon, {
+                className: isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4',
+              })}
+            {isMobile ? action.label : null}
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
@@ -108,28 +111,26 @@ const UserActionButton: React.FC<UserActionButtonProps> = ({ action, user, isMob
   if (action.id === 'edit') {
     return (
       <EditUserDialog user={user} onUpdateUser={action.handler}>
-        <Button
-        variant={action.variant || 'outline'}
-        size={buttonSize}
-        className={buttonClass}
-        >
-        {action.icon && React.createElement(action.icon, { className: isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4' })}
-        {isMobile ? action.label : null}
+        <Button variant={action.variant || 'outline'} size={buttonSize} className={buttonClass}>
+          {action.icon &&
+            React.createElement(action.icon, { className: isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4' })}
+          {isMobile ? action.label : null}
         </Button>
       </EditUserDialog>
     );
   }
 
   return (
-  <Button
-  variant={action.variant || 'outline'}
-  size={buttonSize}
-  className={buttonClass}
-  onClick={handleClick}
-  >
-  {action.icon && React.createElement(action.icon, { className: isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4' })}
-  {isMobile ? action.label : null}
-  </Button>
+    <Button
+      variant={action.variant || 'outline'}
+      size={buttonSize}
+      className={buttonClass}
+      onClick={handleClick}
+    >
+      {action.icon &&
+        React.createElement(action.icon, { className: isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4' })}
+      {isMobile ? action.label : null}
+    </Button>
   );
 };
 
@@ -138,14 +139,11 @@ interface AdminUsersTabProps {
   config: AdminUsersTabConfig;
 }
 
-export function AdminUsersTab({
-  users,
-  config,
-}: AdminUsersTabProps) {
+export function AdminUsersTab({ users, config }: AdminUsersTabProps) {
   // Helper function to render user actions based on configuration
   const renderUserActions = (user: User, isMobile = false) => {
-    const availableActions = config.actions.filter(action =>
-      !action.condition || action.condition(user)
+    const availableActions = config.actions.filter(
+      action => !action.condition || action.condition(user)
     );
 
     if (isMobile) {
@@ -153,12 +151,7 @@ export function AdminUsersTab({
       return (
         <div className="space-y-2">
           {availableActions.map(action => (
-            <UserActionButton
-              key={action.id}
-              action={action}
-              user={user}
-              isMobile={true}
-            />
+            <UserActionButton key={action.id} action={action} user={user} isMobile={true} />
           ))}
         </div>
       );
@@ -172,28 +165,13 @@ export function AdminUsersTab({
     return (
       <div className="flex gap-2 justify-end">
         {primaryActions.map(action => (
-          <UserActionButton
-            key={action.id}
-            action={action}
-            user={user}
-            isMobile={false}
-          />
+          <UserActionButton key={action.id} action={action} user={user} isMobile={false} />
         ))}
         {secondaryActions.map(action => (
-          <UserActionButton
-            key={action.id}
-            action={action}
-            user={user}
-            isMobile={false}
-          />
+          <UserActionButton key={action.id} action={action} user={user} isMobile={false} />
         ))}
         {dangerActions.map(action => (
-          <UserActionButton
-            key={action.id}
-            action={action}
-            user={user}
-            isMobile={false}
-          />
+          <UserActionButton key={action.id} action={action} user={user} isMobile={false} />
         ))}
       </div>
     );
@@ -248,9 +226,9 @@ export function AdminUsersTab({
             {config.canAddUsers && config.onAddUser && (
               <AddUserDialog onAddUser={config.onAddUser}>
                 <Button className="w-full sm:w-auto admin-mobile-action-button">
-                <PlusCircle className="mr-2 h-4 w-4" /> Add User
-            </Button>
-            </AddUserDialog>
+                  <PlusCircle className="mr-2 h-4 w-4" /> Add User
+                </Button>
+              </AddUserDialog>
             )}
           </div>
         </div>
@@ -301,7 +279,9 @@ export function AdminUsersTab({
                     </Avatar>
                     <div className="min-w-0 flex-1">
                       <p className="font-medium text-sm truncate">{u.name || 'Unnamed User'}</p>
-                      <p className="text-xs text-muted-foreground">{u.apartment || 'No apartment'}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {u.apartment || 'No apartment'}
+                      </p>
                       <div className="flex gap-1 mt-1">
                         <Badge
                           variant={u.role === 'admin' ? 'default' : 'secondary'}
@@ -402,9 +382,7 @@ export function AdminUsersTab({
                         </Badge>
                       )}
                     </TableCell>
-                    <TableCell className="text-right">
-                      {renderUserActions(u, false)}
-                    </TableCell>
+                    <TableCell className="text-right">{renderUserActions(u, false)}</TableCell>
                   </TableRow>
                 ))
               )}

@@ -1,21 +1,29 @@
 import { useQuery } from '@tanstack/react-query';
 
+import { getActiveAnnouncements, listenToActiveAnnouncements } from '@/lib/firestore/announcements';
 // ISP-compliant: Import only what you need from specific modules
 import { getApartments, subscribeToApartments } from '@/lib/firestore/apartments';
-import { getUsers, getAllUsers, getUser, subscribeToUsers } from '@/lib/firestore/users';
 import { getCategories, subscribeToCategories } from '@/lib/firestore/categories';
-import { getExpenses, subscribeToExpenses, subscribeToRelevantExpenses, getBalanceSheets } from '@/lib/firestore/expenses';
-import { getPayments, subscribeToPayments } from '@/lib/firestore/payments';
-import { getVendors, subscribeToVendors } from '@/lib/firestore/vendors';
-import { getMaintenanceTasks, subscribeToMaintenanceTasks } from '@/lib/firestore/maintenance-tasks';
-import { getPolls, listenToPolls } from '@/lib/firestore/polls';
-import { getActiveAnnouncements, listenToActiveAnnouncements } from '@/lib/firestore/announcements';
+import {
+  getBalanceSheets,
+  getExpenses,
+  subscribeToExpenses,
+  subscribeToRelevantExpenses,
+} from '@/lib/firestore/expenses';
 import { getFaults } from '@/lib/firestore/faults';
+import {
+  getMaintenanceTasks,
+  subscribeToMaintenanceTasks,
+} from '@/lib/firestore/maintenance-tasks';
+import { getPayments, subscribeToPayments } from '@/lib/firestore/payments';
+import { getPolls, listenToPolls } from '@/lib/firestore/polls';
+import { getAllUsers, getUser, getUsers, subscribeToUsers } from '@/lib/firestore/users';
+import { getVendors, subscribeToVendors } from '@/lib/firestore/vendors';
 
 export function useUsers(apartment?: string, includeAll?: boolean) {
   return useQuery({
     queryKey: ['users', apartment, includeAll],
-    queryFn: () => includeAll ? getAllUsers(apartment) : getUsers(apartment),
+    queryFn: () => (includeAll ? getAllUsers(apartment) : getUsers(apartment)),
     staleTime: 1000 * 60 * 2,
   });
 }

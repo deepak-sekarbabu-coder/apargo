@@ -6,15 +6,15 @@ This document provides a comprehensive reference for all API endpoints in the Ap
 
 All API endpoints are relative to your application's base URL:
 
--   **Development:** `http://localhost:3000/api`
--   **Production:** `https://your-domain.com/api`
+- **Development:** `http://localhost:3000/api`
+- **Production:** `https://your-domain.com/api`
 
 ## Authentication
 
 Most endpoints require authentication via Firebase session cookies.
 
--   **Admin Authentication:** Requires a valid Firebase session cookie and `role: 'admin'` in the user's document.
--   **User Authentication:** Requires a valid Firebase session cookie.
+- **Admin Authentication:** Requires a valid Firebase session cookie and `role: 'admin'` in the user's document.
+- **User Authentication:** Requires a valid Firebase session cookie.
 
 ## Response Format
 
@@ -48,13 +48,13 @@ All responses follow a consistent JSON format:
 
 Get all uploaded files with metadata (Admin only).
 
--   **Authentication:** Admin
+- **Authentication:** Admin
 
 #### `GET /api/admin/storage/stats`
 
 Get storage usage statistics (Admin only).
 
--   **Authentication:** Admin
+- **Authentication:** Admin
 
 ### Announcements
 
@@ -62,15 +62,15 @@ Get storage usage statistics (Admin only).
 
 Create a new announcement (Admin only).
 
--   **Authentication:** Admin
--   **Request Body:**
-    ```json
-    {
-      "title": "Building Maintenance Notice",
-      "message": "Water will be shut off tomorrow from 9 AM to 12 PM",
-      "priority": "high"
-    }
-    ```
+- **Authentication:** Admin
+- **Request Body:**
+  ```json
+  {
+    "title": "Building Maintenance Notice",
+    "message": "Water will be shut off tomorrow from 9 AM to 12 PM",
+    "priority": "high"
+  }
+  ```
 
 ### Auth
 
@@ -78,7 +78,7 @@ Create a new announcement (Admin only).
 
 Verify the current user session and return user information.
 
--   **Authentication:** User
+- **Authentication:** User
 
 ### Debug
 
@@ -86,19 +86,19 @@ Verify the current user session and return user information.
 
 Get debug data for troubleshooting (Admin only).
 
--   **Authentication:** Admin
+- **Authentication:** Admin
 
 #### `POST /api/debug/test-fault`
 
 Create a test fault for debugging (Development only).
 
--   **Authentication:** None
+- **Authentication:** None
 
 #### `GET /api/debug/faults`
 
 Get fault reporting debug information (Development only).
 
--   **Authentication:** None
+- **Authentication:** None
 
 ### Expenses
 
@@ -106,23 +106,23 @@ Get fault reporting debug information (Development only).
 
 Retrieve all expenses.
 
--   **Authentication:** User
+- **Authentication:** User
 
 #### `POST /api/expenses`
 
 Create a new expense.
 
--   **Authentication:** User
--   **Request Body:**
-    ```json
-    {
-      "description": "Grocery shopping",
-      "amount": 150.5,
-      "categoryId": "category123",
-      "paidByApartment": "A1",
-      "owedByApartments": ["A2", "A3", "A4"]
-    }
-    ```
+- **Authentication:** User
+- **Request Body:**
+  ```json
+  {
+    "description": "Grocery shopping",
+    "amount": 150.5,
+    "categoryId": "category123",
+    "paidByApartment": "A1",
+    "owedByApartments": ["A2", "A3", "A4"]
+  }
+  ```
 
 ### Health
 
@@ -130,7 +130,7 @@ Create a new expense.
 
 Basic health check endpoint to verify API availability.
 
--   **Authentication:** None
+- **Authentication:** None
 
 ### Maintenance
 
@@ -138,46 +138,46 @@ Basic health check endpoint to verify API availability.
 
 Retrieve all maintenance tasks.
 
--   **Authentication:** User
+- **Authentication:** User
 
 #### `POST /api/maintenance/tasks`
 
 Create a new maintenance task.
 
--   **Authentication:** User
--   **Request Body:**
-    ```json
-    {
-      "title": "Elevator Inspection",
-      "description": "Monthly elevator safety check",
-      "category": "elevator",
-      "scheduledDate": "2024-01-01T00:00:00Z"
-    }
-    ```
+- **Authentication:** User
+- **Request Body:**
+  ```json
+  {
+    "title": "Elevator Inspection",
+    "description": "Monthly elevator safety check",
+    "category": "elevator",
+    "scheduledDate": "2024-01-01T00:00:00Z"
+  }
+  ```
 
 #### `PUT /api/maintenance/tasks`
 
 Update a maintenance task.
 
--   **Authentication:** User
+- **Authentication:** User
 
 #### `GET /api/maintenance/vendors`
 
 Retrieve all vendors.
 
--   **Authentication:** User
+- **Authentication:** User
 
 #### `POST /api/maintenance/vendors`
 
 Create a new vendor (Admin only).
 
--   **Authentication:** Admin
+- **Authentication:** Admin
 
 #### `PUT /api/maintenance/vendors`
 
 Update a vendor (Admin only).
 
--   **Authentication:** Admin
+- **Authentication:** Admin
 
 ### Payments
 
@@ -185,13 +185,13 @@ Update a vendor (Admin only).
 
 Get specific payment details.
 
--   **Authentication:** User
+- **Authentication:** User
 
 #### `PUT /api/payments/[id]`
 
 Update payment status.
 
--   **Authentication:** User
+- **Authentication:** User
 
 ### Payment Events
 
@@ -199,13 +199,13 @@ Update payment status.
 
 Retrieve all payment events.
 
--   **Authentication:** User
+- **Authentication:** User
 
 #### `POST /api/payment-events/generate`
 
 Manually trigger payment event generation (Admin only).
 
--   **Authentication:** Admin
+- **Authentication:** Admin
 
 ### Storage
 
@@ -213,13 +213,13 @@ Manually trigger payment event generation (Admin only).
 
 Upload files (receipts, fault images, etc.).
 
--   **Authentication:** User
+- **Authentication:** User
 
 #### `GET /api/storage/upload`
 
 Get upload configuration.
 
--   **Authentication:** User
+- **Authentication:** User
 
 ### Testing & Utility
 
@@ -227,49 +227,49 @@ Get upload configuration.
 
 Basic API functionality test.
 
--   **Authentication:** None
+- **Authentication:** None
 
 #### `POST /api/test-fcm`
 
 Test Firebase Cloud Messaging functionality.
 
--   **Authentication:** User
+- **Authentication:** User
 
 #### `POST /api/test-notification`
 
 Create a test notification to all apartments for debugging the notification system.
 
--   **Authentication:** None
+- **Authentication:** None
 
 #### `POST /api/test-notifications`
 
 Test notification system.
 
--   **Authentication:** User
+- **Authentication:** User
 
 #### `GET /api/notification-debug`
 
 Debug notification system (Admin only).
 
--   **Authentication:** Admin
+- **Authentication:** Admin
 
 #### `POST /api/fix-notifications`
 
 Fix notification display issues (Admin only).
 
--   **Authentication:** Admin
+- **Authentication:** Admin
 
 #### `POST /api/quick-fix-user`
 
 Quick user data fixes (Admin only).
 
--   **Authentication:** Admin
+- **Authentication:** Admin
 
 #### `GET /api/netlify-test`
 
 Test Netlify deployment functionality.
 
--   **Authentication:** None
+- **Authentication:** None
 
 ### Webhooks
 
@@ -277,4 +277,4 @@ Test Netlify deployment functionality.
 
 Handle payment approval webhooks.
 
--   **Authentication:** None (webhook)
+- **Authentication:** None (webhook)

@@ -2,14 +2,13 @@
  * Tests for Open/Closed Principle implementation in expense calculations
  * Verifies that the system can be extended without modifying existing code
  */
-
-import { computeExpenseDeltas } from '../src/lib/firestore-utils';
 import {
+  type ExpenseCalculationStrategy,
   ExpenseCalculationStrategyRegistry,
   StandardExpenseCalculationStrategy,
   registerExpenseCalculationStrategy,
-  type ExpenseCalculationStrategy,
 } from '../src/lib/expense-calculation-strategies';
+import { computeExpenseDeltas } from '../src/lib/firestore-utils';
 import type { Expense } from '../src/lib/types';
 
 // Mock expense data

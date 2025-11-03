@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getApartmentIds } from '@/lib/apartment-constants';
 import { getFirebaseAdminApp } from '@/lib/firebase-admin';
-import { getUserByEmail } from '@/lib/firestore';
+import { getUserByEmail } from '@/lib/firestore/users';
 
 interface UserData {
   id: string;

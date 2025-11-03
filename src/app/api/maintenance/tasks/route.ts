@@ -4,7 +4,6 @@ import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getFirebaseAdminApp } from '@/lib/firebase-admin';
-import { getUserByEmail } from '@/lib/firestore';
 import {
   addMaintenanceTask,
   deleteMaintenanceTask,
@@ -13,7 +12,8 @@ import {
   getMaintenanceTasksCount,
   getUpcomingMaintenanceTasks,
   updateMaintenanceTask,
-} from '@/lib/firestore';
+} from '@/lib/firestore/maintenance-tasks';
+import { getUserByEmail } from '@/lib/firestore/users';
 
 // Helper function to verify authentication and get user
 async function verifyAuth() {

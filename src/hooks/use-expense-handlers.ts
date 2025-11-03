@@ -4,7 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import * as React from 'react';
 
-import * as firestore from '@/lib/firestore';
+import { addExpense, deleteExpense } from '@/lib/firestore/expenses';
 import log from '@/lib/logger';
 import type { Apartment, Category, Expense, User } from '@/lib/types';
 
@@ -109,7 +109,7 @@ export function useExpenseHandlers({
         updateCacheWithTemp();
 
         // Add to database
-        const newExpense = await firestore.addExpense(expenseWithApartmentDebts);
+        const newExpense = await addExpense(expenseWithApartmentDebts);
 
         // Replace temporary expense with real one and force cache update
         setTimeout(() => {
@@ -165,7 +165,7 @@ export function useExpenseHandlers({
   const handleDeleteExpense = React.useCallback(
     async (expenseId: string) => {
       try {
-        await firestore.deleteExpense(expenseId);
+        await deleteExpense(expenseId);
         // Update the React Query cache
         queryClient.setQueryData<Expense[]>(['expenses', user?.apartment], (oldExpenses = []) =>
           oldExpenses.filter(e => e.id !== expenseId)

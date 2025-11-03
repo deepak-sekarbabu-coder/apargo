@@ -3,7 +3,7 @@ import { getAuth } from 'firebase-admin/auth';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getFirebaseAdminApp } from '@/lib/firebase-admin';
-import { addExpense } from '@/lib/firestore';
+import { addExpense } from '@/lib/firestore/expenses';
 
 export async function POST(request: NextRequest) {
   try {

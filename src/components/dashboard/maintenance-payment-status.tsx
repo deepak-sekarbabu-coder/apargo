@@ -4,7 +4,7 @@ import { AlertCircle, CheckCircle2, Clock, UploadCloud } from 'lucide-react';
 
 import * as React from 'react';
 
-import * as firestore from '@/lib/firestore';
+import { addPayment, updatePayment } from '@/lib/firestore/payments';
 import { uploadImage } from '@/lib/storage';
 import type { Payment, User } from '@/lib/types';
 
@@ -73,13 +73,13 @@ export function MaintenancePaymentStatus({
       const path = `receipts/${Date.now()}_${file.name}`;
       const receiptURL = await uploadImage(file, path);
       if (existingPending) {
-        await firestore.updatePayment(existingPending.id, {
+        await updatePayment(existingPending.id, {
           receiptURL,
           status: 'paid',
           payerId: user.id,
         });
       } else {
-        await firestore.addPayment({
+        await addPayment({
           payerId: user.id,
           // Admin (system) user can be left blank; use same user as payee for now
           payeeId: user.id,

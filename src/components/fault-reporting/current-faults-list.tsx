@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react';
 
 import Image from 'next/image';
 
-import { deleteFault, getFaults, updateFault } from '@/lib/firestore';
+import { deleteFault, getFaults, updateFault } from '@/lib/firestore/faults';
 import type { Fault } from '@/lib/types';
 
 import { Button } from '@/components/ui/button';

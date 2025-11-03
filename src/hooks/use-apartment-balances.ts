@@ -5,15 +5,17 @@ import { useMemo } from 'react';
  * Separates business calculation logic from UI rendering.
  */
 export const useApartmentBalances = (
-  apartmentBalances: Record<
-    string,
-    {
-      name: string;
-      balance: number;
-      owes: Record<string, number>;
-      isOwed: Record<string, number>;
-    }
-  > | undefined,
+  apartmentBalances:
+    | Record<
+        string,
+        {
+          name: string;
+          balance: number;
+          owes: Record<string, number>;
+          isOwed: Record<string, number>;
+        }
+      >
+    | undefined,
   currentUserApartment?: string
 ) => {
   return useMemo(() => {
@@ -78,9 +80,7 @@ export const useApartmentBalances = (
       amount: Math.abs(balance),
       isPositive: balance >= 0,
       displayText: balance >= 0 ? 'Your apartment is owed' : 'Your apartment owes',
-      description: balance >= 0
-        ? 'in total across all apartments'
-        : 'in total to other apartments',
+      description: balance >= 0 ? 'in total across all apartments' : 'in total to other apartments',
       formattedAmount: `${balance >= 0 ? '+' : ''}₹${Math.abs(balance).toFixed(2)}`,
     };
 

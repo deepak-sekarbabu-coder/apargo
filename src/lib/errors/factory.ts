@@ -1,15 +1,14 @@
 // Core Error Creation Utilities
 // Provides standardized error creation with consistent context and formatting
-
 import type {
   ApargoError,
-  ErrorCode,
   ErrorCategory,
-  ErrorSeverity,
-  UserMessageType,
+  ErrorCode,
   ErrorContext,
   ErrorHandlingOptions,
+  ErrorSeverity,
   OperationResult,
+  UserMessageType,
   ValidationResult,
 } from './types';
 
@@ -44,7 +43,7 @@ export function createError(
   } = options;
 
   const error = new Error(message) as ApargoError;
-  
+
   // Core error properties
   Object.assign(error, {
     code,
@@ -55,10 +54,10 @@ export function createError(
     technicalMessage,
     userMessage,
     userMessageType,
-    
+
     // User feedback and recovery
     recoveryAction: getRecoveryAction(code, severity),
-    
+
     // Context and metadata
     timestamp: new Date().toISOString(),
     requestId: context.requestId || generateRequestId(),
@@ -71,7 +70,7 @@ export function createError(
       environment: process.env.NODE_ENV,
       ...context.metadata,
     },
-    
+
     // Error chain
     originalError,
     stackTrace: error.stack,
@@ -218,7 +217,7 @@ export function wrapError(
 
   // Map common error patterns to appropriate error codes
   const mappedCode = mapCommonErrorToCode(originalError);
-  
+
   return createError(mappedCode, originalError.message, {
     category: 'unknown',
     severity: 'medium',
@@ -268,23 +267,23 @@ export async function withRetry<T>(
   context?: Partial<ErrorContext>
 ): Promise<T> {
   let lastError: ApargoError;
-  
+
   for (let attempt = 1; attempt <= maxRetries + 1; attempt++) {
     try {
       return await operation();
     } catch (error) {
       lastError = wrapError(error as Error, undefined, context);
-      
+
       // Don't retry on certain types of errors
       if (isNonRetryableError(lastError.code) || attempt > maxRetries) {
         throw lastError;
       }
-      
+
       // Wait before retrying
       await new Promise(resolve => setTimeout(resolve, delay * attempt));
     }
   }
-  
+
   throw lastError!;
 }
 
@@ -311,7 +310,7 @@ function inferSeverityFromCode(code: ErrorCode): ErrorSeverity {
     case 'NETWORK_SERVER_ERROR':
     case 'DB_CONNECTION_FAILED':
       return 'critical';
-    
+
     case 'AUTH_INVALID_TOKEN':
     case 'AUTH_EXPIRED':
     case 'AUTHZ_INSUFFICIENT_PERMISSIONS':
@@ -319,14 +318,14 @@ function inferSeverityFromCode(code: ErrorCode): ErrorSeverity {
     case 'NETWORK_TIMEOUT':
     case 'STORAGE_UPLOAD_FAILED':
       return 'high';
-    
+
     case 'VALIDATION_CONSTRAINT':
     case 'VALIDATION_INVALID_FORMAT':
     case 'NETWORK_CLIENT_ERROR':
     case 'BUSINESS_INSUFFICIENT_FUNDS':
     case 'UI_COMPONENT_ERROR':
       return 'medium';
-    
+
     default:
       return 'low';
   }
@@ -353,7 +352,7 @@ function getRecoveryAction(code: ErrorCode, severity: ErrorSeverity) {
       hint: 'Check your internet connection and try again',
     };
   }
-  
+
   if (code.startsWith('VALIDATION_')) {
     return {
       type: 'check_input' as const,
@@ -361,7 +360,7 @@ function getRecoveryAction(code: ErrorCode, severity: ErrorSeverity) {
       hint: 'Please review and correct the highlighted fields',
     };
   }
-  
+
   if (code.startsWith('AUTH_') || code.startsWith('AUTHZ_')) {
     return {
       type: 'refresh' as const,
@@ -369,7 +368,7 @@ function getRecoveryAction(code: ErrorCode, severity: ErrorSeverity) {
       hint: 'Please refresh the page and sign in again',
     };
   }
-  
+
   if (severity === 'critical' || severity === 'high') {
     return {
       type: 'contact_support' as const,
@@ -377,7 +376,7 @@ function getRecoveryAction(code: ErrorCode, severity: ErrorSeverity) {
       hint: 'Our team has been notified and will help resolve this issue',
     };
   }
-  
+
   return {
     type: 'none' as const,
     label: 'OK',
@@ -386,22 +385,22 @@ function getRecoveryAction(code: ErrorCode, severity: ErrorSeverity) {
 
 function mapCommonErrorToCode(error: Error): ErrorCode {
   const message = error.message.toLowerCase();
-  
+
   // Firebase/Firestore errors
   if (message.includes('permission denied')) return 'AUTHZ_INSUFFICIENT_PERMISSIONS';
   if (message.includes('not found')) return 'DB_NOT_FOUND';
   if (message.includes('quota exceeded')) return 'STORAGE_QUOTA_EXCEEDED';
   if (message.includes('network error')) return 'NETWORK_TIMEOUT';
-  
+
   // Network errors
   if (message.includes('fetch')) return 'NETWORK_CLIENT_ERROR';
   if (message.includes('timeout')) return 'NETWORK_TIMEOUT';
   if (message.includes('offline')) return 'NETWORK_OFFLINE';
-  
+
   // File/Storage errors
   if (message.includes('file too large')) return 'STORAGE_SIZE_EXCEEDED';
   if (message.includes('format')) return 'STORAGE_INVALID_FORMAT';
-  
+
   return 'GENERIC_UNKNOWN_ERROR';
 }
 
@@ -415,7 +414,7 @@ function isNonRetryableError(code: ErrorCode): boolean {
     'SYSTEM_OUT_OF_MEMORY',
     'SYSTEM_DISK_FULL',
   ];
-  
+
   return nonRetryableCodes.includes(code);
 }
 

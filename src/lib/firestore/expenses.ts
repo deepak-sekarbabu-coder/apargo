@@ -1,4 +1,4 @@
-import { database, type DocumentSnapshot, type QuerySnapshot } from '../database';
+import { type DocumentSnapshot, type QuerySnapshot, database } from '../database';
 import {
   calculateDeltaChanges,
   computeExpenseDeltas,
@@ -7,7 +7,9 @@ import {
 } from '../firestore-utils';
 import type { BalanceSheet, Expense } from '../types';
 
-const updateBalanceSheets = async (deltas: ReturnType<typeof calculateDeltaChanges>): Promise<void> => {
+const updateBalanceSheets = async (
+  deltas: ReturnType<typeof calculateDeltaChanges>
+): Promise<void> => {
   if (deltas.oldMonth === deltas.newMonth) {
     await applyDeltasToBalanceSheets(deltas.mergedDeltas, deltas.newMonth);
   } else {
@@ -18,7 +20,12 @@ const updateBalanceSheets = async (deltas: ReturnType<typeof calculateDeltaChang
 
 // Apply deltas (positive or negative) to balanceSheets documents using updateDoc/addDoc
 
-async function updateExistingBalanceSheet(db: any, sheetDocId: string, delta: {totalIncomeDelta: number, totalExpensesDelta: number}, opening: number) {
+async function updateExistingBalanceSheet(
+  db: any,
+  sheetDocId: string,
+  delta: { totalIncomeDelta: number; totalExpensesDelta: number },
+  opening: number
+) {
   const sheetDoc = db.collection<BalanceSheet>('balanceSheets').doc(sheetDocId);
   const snapshot = await sheetDoc.get();
   const data = snapshot.data() as Partial<BalanceSheet>;
@@ -34,7 +41,13 @@ async function updateExistingBalanceSheet(db: any, sheetDocId: string, delta: {t
   return sheetDoc.update(removeUndefined(updated));
 }
 
-async function createNewBalanceSheet(db: any, sheetDocId: string, apartmentId: string, monthYear: string, delta: {totalIncomeDelta: number, totalExpensesDelta: number}) {
+async function createNewBalanceSheet(
+  db: any,
+  sheetDocId: string,
+  apartmentId: string,
+  monthYear: string,
+  delta: { totalIncomeDelta: number; totalExpensesDelta: number }
+) {
   let openingBalance = 0;
 
   try {
@@ -62,7 +75,8 @@ async function createNewBalanceSheet(db: any, sheetDocId: string, apartmentId: s
     openingBalance,
     totalIncome: delta.totalIncomeDelta || 0,
     totalExpenses: delta.totalExpensesDelta || 0,
-    closingBalance: openingBalance + (delta.totalIncomeDelta || 0) - (delta.totalExpensesDelta || 0),
+    closingBalance:
+      openingBalance + (delta.totalIncomeDelta || 0) - (delta.totalExpensesDelta || 0),
   };
   const sheetDoc = db.collection<BalanceSheet>('balanceSheets').doc(sheetDocId);
   return sheetDoc.set(newSheet);
@@ -106,8 +120,12 @@ export const getExpenses = async (apartment?: string): Promise<Expense[]> => {
   // Firestore doesn't support OR across different fields in a single query (except in newer SDKs with 'in'/'array-contains-any').
   // We'll run two queries in parallel and merge results client-side (this avoids downloading the entire collection).
   const expensesCollection = database.collection<Expense>('expenses');
-  const paidByQuery = expensesCollection.query().where({ field: 'paidByApartment', operator: '==', value: apartment });
-  const owedByQuery = expensesCollection.query().where({ field: 'owedByApartments', operator: 'array-contains', value: apartment });
+  const paidByQuery = expensesCollection
+    .query()
+    .where({ field: 'paidByApartment', operator: '==', value: apartment });
+  const owedByQuery = expensesCollection
+    .query()
+    .where({ field: 'owedByApartments', operator: 'array-contains', value: apartment });
 
   const [paidSnap, owedSnap] = await Promise.all([paidByQuery.get(), owedByQuery.get()]);
   const paid = paidSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Expense);
@@ -123,12 +141,18 @@ export const subscribeToExpenses = async (
   callback: (expenses: Expense[]) => void,
   apartment?: string
 ) => {
-  const filters = apartment ? [{ field: 'paidByApartment', operator: '==' as const, value: apartment }] : [];
+  const filters = apartment
+    ? [{ field: 'paidByApartment', operator: '==' as const, value: apartment }]
+    : [];
   // Only use real-time listener if UI requires live updates
-  return database.subscribeToCollection<Expense>('expenses', (snapshot: QuerySnapshot<Expense>) => {
-    const expenses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Expense);
-    callback(expenses);
-  }, filters);
+  return database.subscribeToCollection<Expense>(
+    'expenses',
+    (snapshot: QuerySnapshot<Expense>) => {
+      const expenses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Expense);
+      callback(expenses);
+    },
+    filters
+  );
 };
 
 async function updateBalanceSheetsForExpense(expense: Expense) {
@@ -197,7 +221,10 @@ export const deleteExpense = async (id: string): Promise<void> => {
   await expenseDoc.delete();
 };
 
-export const getBalanceSheets = async (apartmentId?: string, monthYear?: string): Promise<BalanceSheet[]> => {
+export const getBalanceSheets = async (
+  apartmentId?: string,
+  monthYear?: string
+): Promise<BalanceSheet[]> => {
   const db = await database;
   const sheetsCollection = db.collection<BalanceSheet>('balanceSheets');
   let queryBuilder = sheetsCollection.query();
@@ -250,32 +277,52 @@ export const subscribeToBalanceSheets = async (
   monthYear?: string
 ) => {
   const db = await database;
-  const filters: Array<{ field: string; operator: '==' | '!=' | '<' | '<=' | '>' | '>=' | 'array-contains' | 'in' | 'array-contains-any'; value: any }> = [];
+  const filters: Array<{
+    field: string;
+    operator:
+      | '=='
+      | '!='
+      | '<'
+      | '<='
+      | '>'
+      | '>='
+      | 'array-contains'
+      | 'in'
+      | 'array-contains-any';
+    value: any;
+  }> = [];
   if (apartmentId) {
     filters.push({ field: 'apartmentId', operator: '==', value: apartmentId });
   }
   if (monthYear) {
     filters.push({ field: 'monthYear', operator: '==', value: monthYear });
   }
-  return db.subscribeToCollection<BalanceSheet>('balanceSheets', (snapshot: QuerySnapshot<BalanceSheet>) => {
-    const sheets = snapshot.docs.map(doc => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        apartmentId: data?.apartmentId,
-        monthYear: data?.monthYear,
-        openingBalance: data?.openingBalance,
-        totalIncome: data?.totalIncome,
-        totalExpenses: data?.totalExpenses,
-        closingBalance: data?.closingBalance,
-      } as BalanceSheet;
-    });
-    callback(sheets);
-  }, filters);
+  return db.subscribeToCollection<BalanceSheet>(
+    'balanceSheets',
+    (snapshot: QuerySnapshot<BalanceSheet>) => {
+      const sheets = snapshot.docs.map(doc => {
+        const data = doc.data();
+        return {
+          id: doc.id,
+          apartmentId: data?.apartmentId,
+          monthYear: data?.monthYear,
+          openingBalance: data?.openingBalance,
+          totalIncome: data?.totalIncome,
+          totalExpenses: data?.totalExpenses,
+          closingBalance: data?.closingBalance,
+        } as BalanceSheet;
+      });
+      callback(sheets);
+    },
+    filters
+  );
 };
 
 // Helper function to create snapshot handlers for expense subscriptions
-const createExpenseSnapshotHandler = (expenseMap: Map<string, Expense>, emitCallback: () => void) => {
+const createExpenseSnapshotHandler = (
+  expenseMap: Map<string, Expense>,
+  emitCallback: () => void
+) => {
   return (snapshot: QuerySnapshot<Expense>) => {
     snapshot.docs.forEach(doc => {
       const expense = { id: doc.id, ...doc.data() } as Expense;
@@ -309,12 +356,16 @@ export const subscribeToRelevantExpenses = async (
     callback(Array.from(merged.values()));
   };
 
-  const paidUnsub = await db.subscribeToCollection<Expense>('expenses', createExpenseSnapshotHandler(paidMap, emitMerged), [
-    { field: 'paidByApartment', operator: '==', value: apartment }
-  ]);
-  const owedUnsub = await db.subscribeToCollection<Expense>('expenses', createExpenseSnapshotHandler(owedMap, emitMerged), [
-    { field: 'owedByApartments', operator: 'array-contains', value: apartment }
-  ]);
+  const paidUnsub = await db.subscribeToCollection<Expense>(
+    'expenses',
+    createExpenseSnapshotHandler(paidMap, emitMerged),
+    [{ field: 'paidByApartment', operator: '==', value: apartment }]
+  );
+  const owedUnsub = await db.subscribeToCollection<Expense>(
+    'expenses',
+    createExpenseSnapshotHandler(owedMap, emitMerged),
+    [{ field: 'owedByApartments', operator: 'array-contains', value: apartment }]
+  );
 
   // Return a combined unsubscribe
   return () => {

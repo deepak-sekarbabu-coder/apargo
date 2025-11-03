@@ -18,7 +18,12 @@ import {
 
 import { db } from '../firebase';
 import { removeUndefined } from '../firestore-utils';
-import { createRecurringTaskFromCompleted, createRecurringTaskFromSkipped, shouldCreateRecurringTask, shouldCreateRecurringTaskOnSkip } from '../maintenance-utils';
+import {
+  createRecurringTaskFromCompleted,
+  createRecurringTaskFromSkipped,
+  shouldCreateRecurringTask,
+  shouldCreateRecurringTaskOnSkip,
+} from '../maintenance-utils';
 import type { MaintenanceTask } from '../types';
 
 const computeTaskStatus = (task: MaintenanceTask): MaintenanceTask => {
@@ -258,5 +263,7 @@ export const applyTaskCostToBudget = async (taskId: string): Promise<void> => {
   // Simplified: always increment (risk double count if editing). TODO: Add an idempotent marker (e.g., budgetApplied=true) later.
   spentByCategory[cat] = prev + (task.actualCost || 0);
   const totalSpent = (budget.totalSpent || 0) + (task.actualCost || 0);
-  await import('./maintenance-budgets').then(m => m.updateMaintenanceBudget(budget.id, { spentByCategory, totalSpent }));
+  await import('./maintenance-budgets').then(m =>
+    m.updateMaintenanceBudget(budget.id, { spentByCategory, totalSpent })
+  );
 };

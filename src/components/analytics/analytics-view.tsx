@@ -1,16 +1,18 @@
 'use client';
 
-import { format, isToday, isYesterday, subDays, isThisWeek, isThisMonth } from 'date-fns';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  PieChart as LucidePieChart, 
+import { format, isThisMonth, isThisWeek, isToday, isYesterday, subDays } from 'date-fns';
+import {
   Activity,
   AlertCircle,
   CheckCircle2,
-  Clock
+  Clock,
+  PieChart as LucidePieChart,
+  TrendingDown,
+  TrendingUp,
 } from 'lucide-react';
 import {
+  Area,
+  AreaChart,
   Bar,
   BarChart,
   CartesianGrid,
@@ -20,11 +22,9 @@ import {
   Pie,
   PieChart,
   Tooltip as RechartsTooltip,
+  ResponsiveContainer,
   XAxis,
   YAxis,
-  ResponsiveContainer,
-  Area,
-  AreaChart
 } from 'recharts';
 
 import * as React from 'react';
@@ -32,9 +32,11 @@ import * as React from 'react';
 import type { Category, Expense } from '@/lib/types';
 
 import { CategoryIcon } from '@/components/icons/category-icon';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
+import { Progress } from '@/components/ui/progress';
 import {
   Select,
   SelectContent,
@@ -42,8 +44,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 
 interface AnalyticsViewProps {
   expenses: Expense[];
@@ -77,11 +77,14 @@ function calculateSpendingVelocity(expenses: Expense[], days: number = 7): numbe
       return false;
     }
   });
-  
+
   return recentExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
 }
 
-function calculateTrendIndicator(currentValue: number, previousValue: number): {
+function calculateTrendIndicator(
+  currentValue: number,
+  previousValue: number
+): {
   trend: 'up' | 'down' | 'neutral';
   percentage: number;
   icon: React.ReactNode;
@@ -90,17 +93,18 @@ function calculateTrendIndicator(currentValue: number, previousValue: number): {
     return {
       trend: currentValue > 0 ? 'up' : 'neutral',
       percentage: 0,
-      icon: currentValue > 0 ? <TrendingUp className="h-3 w-3" /> : <Activity className="h-3 w-3" />
+      icon:
+        currentValue > 0 ? <TrendingUp className="h-3 w-3" /> : <Activity className="h-3 w-3" />,
     };
   }
-  
+
   const percentage = ((currentValue - previousValue) / previousValue) * 100;
   const isIncrease = percentage > 5; // 5% threshold for meaningful change
-  
+
   return {
     trend: isIncrease ? 'up' : 'down',
     percentage: Math.abs(percentage),
-    icon: isIncrease ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />
+    icon: isIncrease ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />,
   };
 }
 
@@ -120,14 +124,16 @@ export function AnalyticsView({
   // Real-time analytics calculations
   const currentMonth = format(new Date(), 'yyyy-MM');
   const lastMonth = format(subDays(new Date(), 30), 'yyyy-MM');
-  
-  const currentMonthSpending = analyticsData.monthlySpending.find(m => 
-    m.name.includes(format(new Date(currentMonth), 'MMM yyyy'))
-  )?.total || 0;
-  
-  const lastMonthSpending = analyticsData.monthlySpending.find(m => 
-    m.name.includes(format(new Date(lastMonth), 'MMM yyyy'))
-  )?.total || 0;
+
+  const currentMonthSpending =
+    analyticsData.monthlySpending.find(m =>
+      m.name.includes(format(new Date(currentMonth), 'MMM yyyy'))
+    )?.total || 0;
+
+  const lastMonthSpending =
+    analyticsData.monthlySpending.find(m =>
+      m.name.includes(format(new Date(lastMonth), 'MMM yyyy'))
+    )?.total || 0;
 
   const trendIndicator = calculateTrendIndicator(currentMonthSpending, lastMonthSpending);
   const weeklyVelocity = calculateSpendingVelocity(expenses, 7);
@@ -156,17 +162,23 @@ export function AnalyticsView({
 
   const getFreshnessIcon = () => {
     switch (dataFreshness) {
-      case 'fresh': return <CheckCircle2 className="h-3 w-3 text-green-500" />;
-      case 'recent': return <Clock className="h-3 w-3 text-yellow-500" />;
-      default: return <AlertCircle className="h-3 w-3 text-red-500" />;
+      case 'fresh':
+        return <CheckCircle2 className="h-3 w-3 text-green-500" />;
+      case 'recent':
+        return <Clock className="h-3 w-3 text-yellow-500" />;
+      default:
+        return <AlertCircle className="h-3 w-3 text-red-500" />;
     }
   };
 
   const getFreshnessText = () => {
     switch (dataFreshness) {
-      case 'fresh': return 'Live';
-      case 'recent': return 'Recent';
-      default: return 'Stale';
+      case 'fresh':
+        return 'Live';
+      case 'recent':
+        return 'Recent';
+      default:
+        return 'Stale';
     }
   };
 
@@ -203,7 +215,7 @@ export function AnalyticsView({
               <p className="text-xs font-medium text-muted-foreground">Current Month</p>
               <div className="flex items-center gap-2">
                 <p className="text-2xl font-bold">₹{currentMonthSpending.toFixed(0)}</p>
-                <Badge 
+                <Badge
                   variant={trendIndicator.trend === 'up' ? 'destructive' : 'secondary'}
                   className="flex items-center gap-1 text-xs"
                 >
@@ -219,8 +231,7 @@ export function AnalyticsView({
               <div className="flex items-center gap-2">
                 <p className="text-2xl font-bold">₹{weeklyVelocity.toFixed(0)}</p>
                 <div className="flex items-center text-xs text-muted-foreground">
-                  <TrendingUp className="h-3 w-3 mr-1" />
-                  7 days
+                  <TrendingUp className="h-3 w-3 mr-1" />7 days
                 </div>
               </div>
             </div>
@@ -241,7 +252,10 @@ export function AnalyticsView({
             <div className="space-y-1">
               <p className="text-xs font-medium text-muted-foreground">This Week</p>
               <div className="flex items-center gap-2">
-                <p className="text-2xl font-bold">₹{thisWeekExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0).toFixed(0)}</p>
+                <p className="text-2xl font-bold">
+                  ₹
+                  {thisWeekExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0).toFixed(0)}
+                </p>
                 <div className="flex items-center text-xs text-muted-foreground">
                   <TrendingUp className="h-3 w-3 mr-1" />
                   total
@@ -341,10 +355,15 @@ export function AnalyticsView({
                             cx="50%"
                             cy="50%"
                             outerRadius={80}
-                            label={({ name, total }) => total > 0 ? `${name}: ₹${total.toFixed(0)}` : ''}
+                            label={({ name, total }) =>
+                              total > 0 ? `${name}: ₹${total.toFixed(0)}` : ''
+                            }
                           >
                             {filteredData.map((entry, index) => (
-                              <Cell key={`cell-${index}`} fill={entry.fill || 'hsl(var(--primary))'} />
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={entry.fill || 'hsl(var(--primary))'}
+                              />
                             ))}
                           </Pie>
                         </PieChart>
@@ -356,18 +375,21 @@ export function AnalyticsView({
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         {filteredData.map(item => {
                           const category = categories.find(cat => cat.name === item.name);
-                          const categoryExpenses = analyticsMonth === 'all' 
-                            ? expenses.filter(e => e.categoryId === category?.id)
-                            : expenses.filter(e => {
-                                try {
-                                  return e.categoryId === category?.id && 
-                                         e.date && 
-                                         format(new Date(e.date), 'yyyy-MM') === analyticsMonth;
-                                } catch {
-                                  return false;
-                                }
-                              });
-                          
+                          const categoryExpenses =
+                            analyticsMonth === 'all'
+                              ? expenses.filter(e => e.categoryId === category?.id)
+                              : expenses.filter(e => {
+                                  try {
+                                    return (
+                                      e.categoryId === category?.id &&
+                                      e.date &&
+                                      format(new Date(e.date), 'yyyy-MM') === analyticsMonth
+                                    );
+                                  } catch {
+                                    return false;
+                                  }
+                                });
+
                           const recentExpenses = categoryExpenses.filter(e => {
                             try {
                               return e.date && isThisWeek(new Date(e.date));
@@ -376,7 +398,9 @@ export function AnalyticsView({
                             }
                           });
 
-                          const percentage = (item.total / filteredData.reduce((sum, cat) => sum + cat.total, 0)) * 100;
+                          const percentage =
+                            (item.total / filteredData.reduce((sum, cat) => sum + cat.total, 0)) *
+                            100;
 
                           return (
                             <div
@@ -395,7 +419,9 @@ export function AnalyticsView({
                                   <p className="text-lg font-bold">₹{item.total.toFixed(0)}</p>
                                 </div>
                                 <div className="text-right">
-                                  <p className="text-xs text-muted-foreground">{percentage.toFixed(1)}%</p>
+                                  <p className="text-xs text-muted-foreground">
+                                    {percentage.toFixed(1)}%
+                                  </p>
                                   <Badge variant="outline" className="text-xs">
                                     {recentExpenses.length} recent
                                   </Badge>
@@ -545,7 +571,11 @@ export function AnalyticsView({
                         <div className="flex items-center justify-center gap-1">
                           <TrendingUp className="h-4 w-4" />
                           <p className="text-lg font-bold">
-                            ₹{(analyticsData.monthlySpending.reduce((sum, m) => sum + m.total, 0) / analyticsData.monthlySpending.length).toFixed(0)}
+                            ₹
+                            {(
+                              analyticsData.monthlySpending.reduce((sum, m) => sum + m.total, 0) /
+                              analyticsData.monthlySpending.length
+                            ).toFixed(0)}
                           </p>
                         </div>
                         <p className="text-xs text-muted-foreground">last 6 months</p>
@@ -557,7 +587,14 @@ export function AnalyticsView({
                         <div className="flex items-center justify-center gap-1">
                           <TrendingUp className="h-4 w-4" />
                           <p className="text-lg font-bold">
-                            {analyticsData.monthlySpending.reduce((max, m) => m.total > max.total ? m : max, { name: '', total: 0 }).name.split(' ')[0]}
+                            {
+                              analyticsData.monthlySpending
+                                .reduce((max, m) => (m.total > max.total ? m : max), {
+                                  name: '',
+                                  total: 0,
+                                })
+                                .name.split(' ')[0]
+                            }
                           </p>
                         </div>
                         <p className="text-xs text-muted-foreground">

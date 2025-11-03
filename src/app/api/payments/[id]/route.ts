@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { basicAuth } from '@/lib/auth';
-import * as firestore from '@/lib/firestore';
+import { getPayments, updatePayment } from '@/lib/firestore/payments';
 import type { PaymentStatus } from '@/lib/types';
 
 // PUT /api/payments/[id]
@@ -22,7 +22,7 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     const { status, receiptURL, reason } = body;
 
     // Get the existing payment to validate permissions
-    const payments = await firestore.getPayments();
+    const payments = await getPayments();
     const payment = payments.find(p => p.id === paymentId);
 
     if (!payment) {
@@ -89,10 +89,10 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     // Update the payment
-    await firestore.updatePayment(paymentId, updateData);
+    await updatePayment(paymentId, updateData);
 
     // Get updated payment to return
-    const updatedPayments = await firestore.getPayments();
+    const updatedPayments = await getPayments();
     const updatedPayment = updatedPayments.find(p => p.id === paymentId);
 
     return NextResponse.json({
@@ -128,7 +128,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     const { id: paymentId } = await params;
 
     // Get the payment
-    const payments = await firestore.getPayments();
+    const payments = await getPayments();
     const payment = payments.find(p => p.id === paymentId);
 
     if (!payment) {

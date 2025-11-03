@@ -1,7 +1,7 @@
 import { getMessaging, getToken } from 'firebase/messaging';
 
 import { app } from './firebase-client';
-import * as firestore from './firestore';
+import { updateUser } from './firestore/users';
 
 export const registerServiceWorker = async () => {
   if ('serviceWorker' in navigator) {
@@ -44,7 +44,7 @@ export const requestNotificationPermission = async (userId: string) => {
 
       if (currentToken) {
         // Save the token to Firestore
-        await firestore.updateUser(userId, { fcmToken: currentToken });
+        await updateUser(userId, { fcmToken: currentToken });
       }
     }
   } catch (error) {

@@ -1,4 +1,4 @@
-import { initializeApp, cert, getApps } from 'firebase-admin/app';
+import { cert, getApps, initializeApp } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -8,15 +8,15 @@ const initializeFirebaseAdmin = () => {
   if (getApps().length === 0) {
     // Try to read service account from apartgo.json
     const serviceAccountPath = path.join(process.cwd(), 'apartgo.json');
-    
+
     if (fs.existsSync(serviceAccountPath)) {
       const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
-      
+
       // Ensure private key has correct newline characters
       if (serviceAccount.private_key) {
         serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
       }
-      
+
       return initializeApp({
         credential: cert(serviceAccount),
       });
@@ -32,7 +32,7 @@ const insertCategories = async () => {
     // Initialize Firebase Admin
     const app = initializeFirebaseAdmin();
     const db = getFirestore(app);
-    
+
     const categoriesCol = db.collection('categories');
     const categories = [
       { name: 'Utilities', icon: '🏠', noSplit: false },
@@ -49,7 +49,9 @@ const insertCategories = async () => {
 
     // Check for existing categories to avoid duplicates
     const existingCategoriesSnapshot = await categoriesCol.get();
-    const existingCategoryNames = new Set(existingCategoriesSnapshot.docs.map(doc => doc.data().name));
+    const existingCategoryNames = new Set(
+      existingCategoriesSnapshot.docs.map(doc => doc.data().name)
+    );
 
     if (existingCategoryNames.size > 0) {
       console.log(`Found ${existingCategoryNames.size} existing categories.`);
@@ -60,7 +62,7 @@ const insertCategories = async () => {
         console.log(`Category "${category.name}" already exists. Skipping.`);
         continue;
       }
-      
+
       await categoriesCol.add(category);
       console.log(`Added category: ${category.name}`);
     }

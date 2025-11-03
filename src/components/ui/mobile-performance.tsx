@@ -1,7 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-
+import { useCallback, useEffect, useRef, useState } from 'react';
 import * as React from 'react';
 
 import { useDeviceInfo } from '@/hooks/use-mobile';
@@ -65,7 +64,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
 
     const isRetina = devicePixelRatio > 1;
     const qualityMultiplier = isRetina ? quality * 1.5 : quality;
-    
+
     // For now, just use the original src
     // In a real implementation, you would generate responsive image URLs
     setCurrentSrc(src);
@@ -81,15 +80,11 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
       {placeholder === 'blur' && !isLoaded && (
         <div className="absolute inset-0 bg-muted animate-pulse">
           {blurDataURL && (
-            <img
-              src={blurDataURL}
-              alt=""
-              className="w-full h-full object-cover filter blur-sm"
-            />
+            <img src={blurDataURL} alt="" className="w-full h-full object-cover filter blur-sm" />
           )}
         </div>
       )}
-      
+
       {/* Main image */}
       <img
         ref={imgRef}
@@ -166,9 +161,7 @@ export function VirtualScroll<T>({
       onScroll={handleScroll}
     >
       {/* Spacer for total height */}
-      <div style={{ height: items.length * itemHeight, position: 'relative' }}>
-        {visibleItems}
-      </div>
+      <div style={{ height: items.length * itemHeight, position: 'relative' }}>{visibleItems}</div>
     </div>
   );
 }
@@ -239,7 +232,9 @@ export const LazyComponent: React.FC<LazyComponentProps> = ({
   return (
     <div ref={ref}>
       {isVisible ? (
-        <div className={`transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}>
+        <div
+          className={`transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+        >
           {isLoaded ? children : fallback || <MobileSkeleton className="w-full h-32" />}
         </div>
       ) : (
@@ -283,7 +278,7 @@ export function useMobileIntersectionObserver(
       entries => {
         const entry = entries[0];
         setIsIntersecting(entry.isIntersecting);
-        
+
         if (entry.isIntersecting && !hasIntersected) {
           setHasIntersected(true);
         }
@@ -312,8 +307,11 @@ export function useMemoryEfficientState<T>(initialValue: T) {
 
   // Only trigger re-renders if value actually changed
   const setMemoryEfficientValue = useCallback((newValue: T | ((prev: T) => T)) => {
-    const valueToSet = typeof newValue === 'function' ? (newValue as (prev: T) => T)(previousValue.current) : newValue;
-    
+    const valueToSet =
+      typeof newValue === 'function'
+        ? (newValue as (prev: T) => T)(previousValue.current)
+        : newValue;
+
     // Shallow equality check to avoid unnecessary re-renders
     if (JSON.stringify(valueToSet) !== JSON.stringify(previousValue.current)) {
       previousValue.current = valueToSet;
@@ -396,7 +394,7 @@ export function useBatchedUpdates<T>(initialValue: T) {
 
   const batchedSetState = useCallback((updates: Array<(prev: T) => T>) => {
     pendingUpdates.current.push(...updates);
-    
+
     requestAnimationFrame(() => {
       if (pendingUpdates.current.length > 0) {
         setState(prev => {
@@ -431,13 +429,16 @@ export function useMobileEventListener<K extends keyof WindowEventMap>(
 // Optimized re-render prevention
 export function useOptimizedCallback<T extends (...args: any[]) => any>(callback: T): T {
   const callbackRef = useRef(callback);
-  
+
   // Update the ref only if callback changes
   useEffect(() => {
     callbackRef.current = callback;
   });
 
-  return useCallback(((...args: Parameters<T>) => {
-    return callbackRef.current(...args);
-  }) as T, []);
+  return useCallback(
+    ((...args: Parameters<T>) => {
+      return callbackRef.current(...args);
+    }) as T,
+    []
+  );
 }

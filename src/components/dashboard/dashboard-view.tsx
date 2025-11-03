@@ -1,24 +1,24 @@
 'use client';
 
-import { Bell, TrendingDown, TrendingUp, Wallet, Plus, CreditCard } from 'lucide-react';
+import { Bell, CreditCard, Plus, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
 
 import * as React from 'react';
 
 import type { Expense, Payment, User } from '@/lib/types';
 import { Category } from '@/lib/types';
 
-import { useApartmentBalances } from '@/hooks/use-apartment-balances';
-import { useAccountSummary } from '@/hooks/use-account-summary';
-
 import { FeatureGrid } from '@/components/dashboard/feature-grid';
 import { MaintenancePaymentStatus } from '@/components/dashboard/maintenance-payment-status';
-import type { ExpensesListProps } from '@/components/expenses/expenses-list';
-import { OutstandingBalance } from '@/components/outstanding-balance';
 import { AddExpenseDialog } from '@/components/dialogs/add-expense-dialog';
 import { AddPaymentDialog } from '@/components/dialogs/add-payment-dialog';
+import type { ExpensesListProps } from '@/components/expenses/expenses-list';
+import { OutstandingBalance } from '@/components/outstanding-balance';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+
+import { useAccountSummary } from '@/hooks/use-account-summary';
+import { useApartmentBalances } from '@/hooks/use-apartment-balances';
 
 // Base dashboard props that are always required
 interface BaseDashboardProps {
@@ -105,19 +105,11 @@ export function DashboardView({
     isLoadingApartments = false,
   } = expenseManagement || {};
 
-  const {
-    payments = [],
-    onAddPayment,
-  } = paymentManagement || {};
+  const { payments = [], onAddPayment } = paymentManagement || {};
 
-  const {
-    apartmentBalances,
-  } = balanceDisplay || {};
+  const { apartmentBalances } = balanceDisplay || {};
 
-  const {
-    apartmentsCount = 0,
-    unpaidBillsCount = 0,
-  } = summaryStats || {};
+  const { apartmentsCount = 0, unpaidBillsCount = 0 } = summaryStats || {};
 
   const currentApartmentBalance = balanceDisplay?.apartmentBalances
     ? balanceDisplay.apartmentBalances[currentUserApartment || '']
@@ -174,90 +166,92 @@ export function DashboardView({
       <OutstandingBalance expenses={expenses} currentUserApartment={currentUserApartment} />
 
       {/* Monthly Maintenance Payment Status */}
-      <MaintenancePaymentStatus 
-        user={user} 
-        payments={payments} 
-        defaultMonthlyAmount={categories.find(cat => cat.name === 'Maintenance')?.monthlyAmount || 0} 
+      <MaintenancePaymentStatus
+        user={user}
+        payments={payments}
+        defaultMonthlyAmount={
+          categories.find(cat => cat.name === 'Maintenance')?.monthlyAmount || 0
+        }
       />
 
       {/* Apartment Balances - only show if balance display is enabled */}
       {balanceDisplay && hasBalances && (
-      <Card>
-      <CardHeader>
-      <CardTitle>Apartment Balances</CardTitle>
-      <CardDescription>Summary of amounts owed between apartments</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
-      {/* What you are owed */}
-      {owedItems.map(({ apartmentId, apartmentName, formattedAmount }) => (
-      <div
-      key={`owed-${apartmentId}`}
-      className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"
-      >
-      <div className="flex items-center gap-3">
-      <div className="p-2 rounded-full bg-green-100 dark:bg-green-800/30">
-      <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
-      </div>
-      <div>
-      <p className="font-medium">{apartmentName}</p>
-      <p className="text-sm text-muted-foreground dark:text-green-200">
-      owes your apartment
-      </p>
-      </div>
-      </div>
-      <span className="text-lg font-semibold text-green-700 dark:text-green-400">
-      {formattedAmount}
-      </span>
-      </div>
-      ))}
-
-      {/* What you owe */}
-      {owesItems.map(({ apartmentId, apartmentName, formattedAmount }) => (
-      <div
-          key={`owes-${apartmentId}`}
-                className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
-        >
-          <div className="flex items-center gap-3">
-          <div className="p-2 rounded-full bg-red-100 dark:bg-red-800/30">
-          <TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
-      </div>
-      <div>
-      <p className="font-medium">You owe {apartmentName}</p>
-        <p className="text-sm text-muted-foreground dark:text-red-200">
-        for shared expenses
-      </p>
-      </div>
-      </div>
-      <span className="text-lg font-semibold text-red-700 dark:text-red-400">
-      {formattedAmount}
-      </span>
-      </div>
-      ))}
-
-      {/* Net balance */}
-      {netBalance.amount > 0 && (
-      <div
-      className={`mt-4 p-4 rounded-lg ${netBalance.isPositive ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20'}`}
-      >
-      <div className="flex items-center justify-between">
-      <div>
-          <p className="font-medium">{netBalance.displayText}</p>
-              <p
-                      className={`text-sm ${netBalance.isPositive ? 'text-muted-foreground dark:text-green-200' : 'text-muted-foreground dark:text-red-200'}`}
+        <Card>
+          <CardHeader>
+            <CardTitle>Apartment Balances</CardTitle>
+            <CardDescription>Summary of amounts owed between apartments</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {/* What you are owed */}
+            {owedItems.map(({ apartmentId, apartmentName, formattedAmount }) => (
+              <div
+                key={`owed-${apartmentId}`}
+                className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"
               >
-                {netBalance.description}
-            </p>
-        </div>
-          <span
-          className={`text-xl font-bold ${netBalance.isPositive ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}
-      >
-      {netBalance.formattedAmount}
-      </span>
-      </div>
-      </div>
-      )}
-      </CardContent>
-      </Card>
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-green-100 dark:bg-green-800/30">
+                    <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
+                  </div>
+                  <div>
+                    <p className="font-medium">{apartmentName}</p>
+                    <p className="text-sm text-muted-foreground dark:text-green-200">
+                      owes your apartment
+                    </p>
+                  </div>
+                </div>
+                <span className="text-lg font-semibold text-green-700 dark:text-green-400">
+                  {formattedAmount}
+                </span>
+              </div>
+            ))}
+
+            {/* What you owe */}
+            {owesItems.map(({ apartmentId, apartmentName, formattedAmount }) => (
+              <div
+                key={`owes-${apartmentId}`}
+                className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 rounded-full bg-red-100 dark:bg-red-800/30">
+                    <TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
+                  </div>
+                  <div>
+                    <p className="font-medium">You owe {apartmentName}</p>
+                    <p className="text-sm text-muted-foreground dark:text-red-200">
+                      for shared expenses
+                    </p>
+                  </div>
+                </div>
+                <span className="text-lg font-semibold text-red-700 dark:text-red-400">
+                  {formattedAmount}
+                </span>
+              </div>
+            ))}
+
+            {/* Net balance */}
+            {netBalance.amount > 0 && (
+              <div
+                className={`mt-4 p-4 rounded-lg ${netBalance.isPositive ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20'}`}
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">{netBalance.displayText}</p>
+                    <p
+                      className={`text-sm ${netBalance.isPositive ? 'text-muted-foreground dark:text-green-200' : 'text-muted-foreground dark:text-red-200'}`}
+                    >
+                      {netBalance.description}
+                    </p>
+                  </div>
+                  <span
+                    className={`text-xl font-bold ${netBalance.isPositive ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}
+                  >
+                    {netBalance.formattedAmount}
+                  </span>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       )}
 
       {/* Expense Management Section - only show if expense management is enabled */}
@@ -294,50 +288,50 @@ export function DashboardView({
             </CardContent>
           </Card>
 
-        <Card>
-          <CardHeader>
-          <CardTitle>Account Summary</CardTitle>
-          <CardDescription>Your personal balance status and account overview.</CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-4">
-          <div className="flex items-center gap-4">
-          <Bell className="h-6 w-6 text-accent" />
-          <div className="grid gap-1">
-          <p className="text-sm font-medium">Welcome to Apargo, {user?.name}!</p>
-          <p className="text-sm text-muted-foreground">Here is a summary of your account.</p>
-          </div>
-          </div>
-          <Separator />
-          <div className="flex items-center gap-4">
-          <Wallet
-          className={`h-6 w-6 ${accountSummary.isSettled ? 'text-green-600 dark:text-green-400' : accountSummary.isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
-          />
-          <div className="grid gap-1">
-          <p className="text-sm font-medium">
-          Your balance is {accountSummary.formattedAmount}
-          </p>
-          <p className="text-sm text-muted-foreground">
-          {accountSummary.statusText}
-          </p>
-          </div>
-          </div>
-          {showReminder && (
-          <>
-          <Separator />
-          <div className="flex items-center gap-4">
-          <TrendingUp className="h-6 w-6 text-blue-500" />
-          <div className="grid gap-1">
-          <p className="text-sm font-medium">Settle Up Reminder</p>
-          <p className="text-sm text-muted-foreground">
-          Please pay your outstanding balance to keep the records updated.
-          </p>
-          </div>
-          </div>
-          </>
-          )}
-          </CardContent>
+          <Card>
+            <CardHeader>
+              <CardTitle>Account Summary</CardTitle>
+              <CardDescription>Your personal balance status and account overview.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4">
+              <div className="flex items-center gap-4">
+                <Bell className="h-6 w-6 text-accent" />
+                <div className="grid gap-1">
+                  <p className="text-sm font-medium">Welcome to Apargo, {user?.name}!</p>
+                  <p className="text-sm text-muted-foreground">
+                    Here is a summary of your account.
+                  </p>
+                </div>
+              </div>
+              <Separator />
+              <div className="flex items-center gap-4">
+                <Wallet
+                  className={`h-6 w-6 ${accountSummary.isSettled ? 'text-green-600 dark:text-green-400' : accountSummary.isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+                />
+                <div className="grid gap-1">
+                  <p className="text-sm font-medium">
+                    Your balance is {accountSummary.formattedAmount}
+                  </p>
+                  <p className="text-sm text-muted-foreground">{accountSummary.statusText}</p>
+                </div>
+              </div>
+              {showReminder && (
+                <>
+                  <Separator />
+                  <div className="flex items-center gap-4">
+                    <TrendingUp className="h-6 w-6 text-blue-500" />
+                    <div className="grid gap-1">
+                      <p className="text-sm font-medium">Settle Up Reminder</p>
+                      <p className="text-sm text-muted-foreground">
+                        Please pay your outstanding balance to keep the records updated.
+                      </p>
+                    </div>
+                  </div>
+                </>
+              )}
+            </CardContent>
           </Card>
-          </div>
+        </div>
       )}
 
       {/* Mobile Floating Action Buttons - only show if management features are enabled */}
@@ -364,10 +358,7 @@ export function DashboardView({
 
             {/* Quick Add Payment Button - only if payment management enabled */}
             {paymentManagement && onAddPayment && (
-              <AddPaymentDialog
-                users={users}
-                onAddPayment={onAddPayment}
-              >
+              <AddPaymentDialog users={users} onAddPayment={onAddPayment}>
                 <Button
                   className="w-14 h-14 rounded-full bg-primary hover:bg-primary/90 shadow-lg active:shadow-md transition-all duration-200 active:scale-95"
                   disabled={isLoadingApartments}

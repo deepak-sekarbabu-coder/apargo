@@ -1,6 +1,6 @@
-import { db } from './firebase';
 import { expenseCalculationRegistry } from './expense-calculation-strategies';
-import type { Expense, BalanceSheet } from './types';
+import { db } from './firebase';
+import type { BalanceSheet, Expense } from './types';
 
 // Helper: derive monthYear (YYYY-MM) from ISO date or now
 export const getMonthYearFromDate = (isoDate?: string) => {
@@ -11,7 +11,8 @@ export const getMonthYearFromDate = (isoDate?: string) => {
 };
 
 // Helper: deterministic balance sheet doc id per apartment+month
-export const getBalanceDocId = (apartmentId: string, monthYear: string) => `${apartmentId}_${monthYear}`;
+export const getBalanceDocId = (apartmentId: string, monthYear: string) =>
+  `${apartmentId}_${monthYear}`;
 
 export const removeUndefined = <T extends Record<string, unknown>>(obj: T): T => {
   Object.keys(obj).forEach(
@@ -32,10 +33,7 @@ export const removeUndefined = <T extends Record<string, unknown>>(obj: T): T =>
  * Computes expense deltas using the appropriate strategy pattern.
  * This function is now open for extension through strategy registration.
  */
-export const computeExpenseDeltas = (
-  expense: Expense,
-  registry = expenseCalculationRegistry
-) => {
+export const computeExpenseDeltas = (expense: Expense, registry = expenseCalculationRegistry) => {
   const strategy = registry.getStrategyForExpense(expense);
   return strategy.calculateDeltas(expense);
 };
@@ -49,7 +47,10 @@ type DeltaCalculation = {
   mergedDeltas: Record<string, { totalIncomeDelta: number; totalExpensesDelta: number }>;
 };
 
-export const calculateDeltaChanges = (oldExpense: Expense, newExpense: Expense): DeltaCalculation => {
+export const calculateDeltaChanges = (
+  oldExpense: Expense,
+  newExpense: Expense
+): DeltaCalculation => {
   const { monthYear: oldMonth, deltas: oldD } = computeExpenseDeltas(oldExpense);
   const { monthYear: newMonth, deltas: newD } = computeExpenseDeltas(newExpense);
 

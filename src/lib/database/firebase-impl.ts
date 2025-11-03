@@ -10,27 +10,25 @@ import type {
   WhereFilter,
 } from './interfaces';
 
-// Synchronous initialization for server-side compatibility
+// Initialization
 let firestoreModule: any;
 let db: any;
 let isInitialized = false;
 
-// Initialize synchronously for server-side compatibility
-if (typeof window === 'undefined') {
-  // Server-side: use Firebase Admin SDK
-  try {
-    // Dynamic require for server-side
-    const adminFirestore = require('firebase-admin/firestore');
-    const firebaseAdmin = require('../firebase-admin');
-    db = adminFirestore.getFirestore(firebaseAdmin.getFirebaseAdminApp());
-    isInitialized = true;
-  } catch (error) {
-    console.error('Failed to initialize Firebase Admin Firestore:', error);
-    // Don't throw here - let it fail gracefully
-  }
-} else {
-  // Client-side: initialize asynchronously
-  (async () => {
+// Initialize asynchronously for compatibility
+const initPromise = (async () => {
+  if (typeof window === 'undefined') {
+    // Server-side: use Firebase Admin SDK
+    try {
+      const adminFirestore = await import('firebase-admin/firestore');
+      const firebaseAdmin = await import('../firebase-admin');
+      db = adminFirestore.getFirestore(firebaseAdmin.getFirebaseAdminApp());
+      isInitialized = true;
+    } catch (error) {
+      console.error('Failed to initialize Firebase Admin Firestore:', error);
+    }
+  } else {
+    // Client-side: initialize asynchronously
     try {
       firestoreModule = await import('firebase/firestore');
       const { db: clientDb } = await import('../firebase');
@@ -39,8 +37,8 @@ if (typeof window === 'undefined') {
     } catch (error) {
       console.error('Failed to initialize Firebase Client Firestore:', error);
     }
-  })();
-}
+  }
+})();
 
 // Firebase-specific implementations
 class FirebaseDocumentSnapshot<T = DocumentData> implements DocumentSnapshot<T> {
@@ -57,9 +55,10 @@ class FirebaseDocumentSnapshot<T = DocumentData> implements DocumentSnapshot<T> 
   }
 
   data(): T | undefined {
-    const data = typeof window === 'undefined'
-      ? this.snapshot.data() // Admin SDK
-      : this.snapshot.data(); // Client SDK
+    const data =
+      typeof window === 'undefined'
+        ? this.snapshot.data() // Admin SDK
+        : this.snapshot.data(); // Client SDK
     return data ? (data as T) : undefined;
   }
 }
@@ -89,6 +88,9 @@ class FirebaseDocumentReference<T = DocumentData> implements DocumentReference<T
   async get(): Promise<DocumentSnapshot<T>> {
     if (typeof window === 'undefined') {
       // Server-side: Admin SDK
+      if (!isInitialized) {
+        await initPromise;
+      }
       const docRef = db.doc(`${this.collectionName}/${this.docId}`);
       const snapshot = await docRef.get();
       return new FirebaseDocumentSnapshot<T>(snapshot);
@@ -104,6 +106,9 @@ class FirebaseDocumentReference<T = DocumentData> implements DocumentReference<T
   async set(data: T): Promise<void> {
     if (typeof window === 'undefined') {
       // Server-side: Admin SDK
+      if (!isInitialized) {
+        await initPromise;
+      }
       const docRef = db.doc(`${this.collectionName}/${this.docId}`);
       await docRef.set(data);
     } else {
@@ -117,6 +122,9 @@ class FirebaseDocumentReference<T = DocumentData> implements DocumentReference<T
   async update(data: Partial<T>): Promise<void> {
     if (typeof window === 'undefined') {
       // Server-side: Admin SDK
+      if (!isInitialized) {
+        await initPromise;
+      }
       const docRef = db.doc(`${this.collectionName}/${this.docId}`);
       await docRef.update(data);
     } else {
@@ -130,6 +138,9 @@ class FirebaseDocumentReference<T = DocumentData> implements DocumentReference<T
   async delete(): Promise<void> {
     if (typeof window === 'undefined') {
       // Server-side: Admin SDK
+      if (!isInitialized) {
+        await initPromise;
+      }
       const docRef = db.doc(`${this.collectionName}/${this.docId}`);
       await docRef.delete();
     } else {
@@ -154,6 +165,9 @@ class FirebaseQueryBuilder<T = DocumentData> implements QueryBuilder<T> {
   async get(): Promise<QuerySnapshot<T>> {
     if (typeof window === 'undefined') {
       // Server-side: Admin SDK
+      if (!isInitialized) {
+        await initPromise;
+      }
       let queryRef = db.collection(this.collectionName);
 
       for (const filter of this.filters) {
@@ -192,6 +206,9 @@ class FirebaseCollectionReference<T = DocumentData> implements CollectionReferen
   async add(data: T): Promise<DocumentReference<T>> {
     if (typeof window === 'undefined') {
       // Server-side: Admin SDK
+      if (!isInitialized) {
+        await initPromise;
+      }
       const docRef = db.collection(this.collectionName).doc();
       await docRef.set(data);
       return new FirebaseDocumentReference<T>(this.collectionName, docRef.id);

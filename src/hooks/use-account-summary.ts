@@ -17,13 +17,13 @@ export const useAccountSummary = (loggedInUserBalance: number) => {
       formattedAmount: isSettled
         ? '₹0.00'
         : isPositive
-        ? `-₹${loggedInUserBalance.toFixed(2)}`
-        : `+₹${absBalance.toFixed(2)}`,
+          ? `-₹${loggedInUserBalance.toFixed(2)}`
+          : `+₹${absBalance.toFixed(2)}`,
       statusText: isSettled
         ? 'You are all settled up.'
         : isPositive
-        ? 'Others owe you money.'
-        : 'You have outstanding balances.',
+          ? 'Others owe you money.'
+          : 'You have outstanding balances.',
     };
 
     const showReminder = loggedInUserBalance < -0.01;

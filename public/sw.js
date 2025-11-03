@@ -10,23 +10,23 @@ const CACHE_CONFIG = {
   static: {
     maxEntries: 50,
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-    strategy: 'cache-first'
+    strategy: 'cache-first',
   },
   dynamic: {
     maxEntries: 100,
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    strategy: 'stale-while-revalidate'
+    strategy: 'stale-while-revalidate',
   },
   api: {
     maxEntries: 50,
     maxAge: 5 * 60 * 1000, // 5 minutes
-    strategy: 'network-first'
+    strategy: 'network-first',
   },
   images: {
     maxEntries: 200,
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-    strategy: 'cache-first'
-  }
+    strategy: 'cache-first',
+  },
 };
 
 // Enhanced static assets to cache
@@ -38,7 +38,7 @@ const STATIC_ASSETS = [
   '/android-chrome-192x192.png',
   '/android-chrome-512x512.png',
   '/apple-touch-icon.png',
-  '/site.webmanifest'
+  '/site.webmanifest',
 ];
 
 // API endpoints that should be cached
@@ -47,7 +47,7 @@ const API_ENDPOINTS = [
   '/api/payments',
   '/api/categories',
   '/api/users',
-  '/api/analytics'
+  '/api/analytics',
 ];
 
 // Network timeout for API calls
@@ -59,7 +59,7 @@ const SYNC_TAG_PAYMENTS = 'sync-payments';
 
 self.addEventListener('install', event => {
   console.log('🔄 Service Worker installing...');
-  
+
   event.waitUntil(
     Promise.all([
       // Cache static assets
@@ -71,27 +71,31 @@ self.addEventListener('install', event => {
       caches.open(API_CACHE).then(cache => {
         console.log('🚀 Pre-caching API endpoints');
         return Promise.allSettled(
-          API_ENDPOINTS.map(endpoint => 
-            fetch(endpoint).catch(() => null) // Don't fail if APIs aren't available
+          API_ENDPOINTS.map(
+            endpoint => fetch(endpoint).catch(() => null) // Don't fail if APIs aren't available
           )
         );
       }),
       // Skip waiting to activate immediately
-      self.skipWaiting()
+      self.skipWaiting(),
     ])
   );
 });
 
 self.addEventListener('activate', event => {
   console.log('✅ Service Worker activating...');
-  
+
   event.waitUntil(
     Promise.all([
       // Clean up old caches
       caches.keys().then(cacheNames => {
         return Promise.all(
           cacheNames.map(cacheName => {
-            if (!Object.values({STATIC_CACHE, DYNAMIC_CACHE, API_CACHE, IMAGE_CACHE}).includes(cacheName)) {
+            if (
+              !Object.values({ STATIC_CACHE, DYNAMIC_CACHE, API_CACHE, IMAGE_CACHE }).includes(
+                cacheName
+              )
+            ) {
               console.log('🗑️ Deleting old cache:', cacheName);
               return caches.delete(cacheName);
             }
@@ -101,7 +105,7 @@ self.addEventListener('activate', event => {
       // Take control of all pages immediately
       self.clients.claim(),
       // Initialize offline queue
-      initializeOfflineQueue()
+      initializeOfflineQueue(),
     ])
   );
 });
@@ -109,17 +113,17 @@ self.addEventListener('activate', event => {
 self.addEventListener('fetch', event => {
   const { request } = event;
   const url = new URL(request.url);
-  
+
   // Skip non-GET requests
   if (request.method !== 'GET') {
     return;
   }
-  
+
   // Skip cross-origin requests (except for Firebase APIs)
   if (!url.origin.includes(self.location.origin) && !url.hostname.includes('googleapis.com')) {
     return;
   }
-  
+
   // Route to appropriate caching strategy
   if (isNavigationRequest(request)) {
     event.respondWith(handleNavigationRequest(request));
@@ -139,12 +143,12 @@ async function handleNavigationRequest(request) {
   try {
     // Network first for navigation
     const response = await fetchWithTimeout(request, NETWORK_TIMEOUT);
-    
+
     if (response && response.status === 200) {
       const cache = await caches.open(DYNAMIC_CACHE);
       cache.put(request, response.clone());
     }
-    
+
     return response;
   } catch (error) {
     // Fallback to cache, then to offline page
@@ -152,9 +156,9 @@ async function handleNavigationRequest(request) {
     if (cachedResponse) {
       return cachedResponse;
     }
-    
+
     // Return cached homepage or create a basic offline response
-    const offlineResponse = await caches.match('/') || createOfflineResponse();
+    const offlineResponse = (await caches.match('/')) || createOfflineResponse();
     return offlineResponse;
   }
 }
@@ -165,7 +169,7 @@ async function handleImageRequest(request) {
   if (cachedResponse) {
     return cachedResponse;
   }
-  
+
   try {
     const response = await fetch(request);
     if (response && response.status === 200) {
@@ -183,12 +187,12 @@ async function handleAPIRequest(request) {
   // Network first with cache fallback for APIs
   try {
     const response = await fetchWithTimeout(request, NETWORK_TIMEOUT);
-    
+
     if (response && response.status === 200) {
       const cache = await caches.open(API_CACHE);
       cache.put(request, response.clone());
     }
-    
+
     return response;
   } catch (error) {
     // Fallback to cache
@@ -196,18 +200,18 @@ async function handleAPIRequest(request) {
     if (cachedResponse) {
       return cachedResponse;
     }
-    
+
     // Return offline response for APIs
     return new Response(
-      JSON.stringify({ 
-        offline: true, 
+      JSON.stringify({
+        offline: true,
         message: 'This content is not available offline',
-        timestamp: new Date().toISOString()
-      }), 
+        timestamp: new Date().toISOString(),
+      }),
       {
         status: 503,
         statusText: 'Service Unavailable',
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 'Content-Type': 'application/json' },
       }
     );
   }
@@ -219,7 +223,7 @@ async function handleStaticAsset(request) {
   if (cachedResponse) {
     return cachedResponse;
   }
-  
+
   try {
     const response = await fetch(request);
     if (response && response.status === 200) {
@@ -235,50 +239,57 @@ async function handleStaticAsset(request) {
 async function handleDynamicRequest(request) {
   // Stale-while-revalidate for dynamic content
   const cachedResponse = await caches.match(request);
-  
-  const networkResponsePromise = fetch(request).then(response => {
-    if (response && response.status === 200) {
-      const cache = caches.open(DYNAMIC_CACHE);
-      cache.then(c => c.put(request, response.clone()));
-    }
-    return response;
-  }).catch(() => null);
-  
-  return cachedResponse || await networkResponsePromise || createOfflineResponse();
+
+  const networkResponsePromise = fetch(request)
+    .then(response => {
+      if (response && response.status === 200) {
+        const cache = caches.open(DYNAMIC_CACHE);
+        cache.then(c => c.put(request, response.clone()));
+      }
+      return response;
+    })
+    .catch(() => null);
+
+  return cachedResponse || (await networkResponsePromise) || createOfflineResponse();
 }
 
 // Utility functions
 function isNavigationRequest(request) {
-  return request.mode === 'navigate' || 
-         (request.method === 'GET' && request.headers.get('Accept').includes('text/html'));
+  return (
+    request.mode === 'navigate' ||
+    (request.method === 'GET' && request.headers.get('Accept').includes('text/html'))
+  );
 }
 
 function isImageRequest(request) {
-  return request.destination === 'image' || 
-         /\.(png|jpg|jpeg|svg|gif|webp|ico)$/i.test(request.url);
+  return request.destination === 'image' || /\.(png|jpg|jpeg|svg|gif|webp|ico)$/i.test(request.url);
 }
 
 function isAPIRequest(request) {
-  return request.url.includes('/api/') || 
-         API_ENDPOINTS.some(endpoint => request.url.includes(endpoint));
+  return (
+    request.url.includes('/api/') || API_ENDPOINTS.some(endpoint => request.url.includes(endpoint))
+  );
 }
 
 function isStaticAsset(request) {
-  return request.destination === 'style' ||
-         request.destination === 'script' ||
-         /\.(css|js|woff|woff2|ttf|eot)$/i.test(request.url);
+  return (
+    request.destination === 'style' ||
+    request.destination === 'script' ||
+    /\.(css|js|woff|woff2|ttf|eot)$/i.test(request.url)
+  );
 }
 
 async function fetchWithTimeout(request, timeout) {
-  const timeoutPromise = new Promise((_, reject) => 
+  const timeoutPromise = new Promise((_, reject) =>
     setTimeout(() => reject(new Error('Network timeout')), timeout)
   );
-  
+
   return Promise.race([fetch(request), timeoutPromise]);
 }
 
 function createOfflineResponse() {
-  return new Response(`
+  return new Response(
+    `
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -329,15 +340,17 @@ function createOfflineResponse() {
       </div>
     </body>
     </html>
-  `, {
-    headers: { 'Content-Type': 'text/html' }
-  });
+  `,
+    {
+      headers: { 'Content-Type': 'text/html' },
+    }
+  );
 }
 
 // Background sync for offline actions
 self.addEventListener('sync', event => {
   console.log('🔄 Background sync triggered:', event.tag);
-  
+
   if (event.tag === SYNC_TAG_EXPENSES) {
     event.waitUntil(syncOfflineExpenses());
   } else if (event.tag === SYNC_TAG_PAYMENTS) {
@@ -354,13 +367,13 @@ async function initializeOfflineQueue() {
 async function syncOfflineExpenses() {
   const offlineData = await getOfflineData();
   const expenses = offlineData.expenses || [];
-  
+
   for (const expense of expenses) {
     try {
       await fetch('/api/expenses', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(expense)
+        body: JSON.stringify(expense),
       });
       await removeOfflineExpense(expense.id);
     } catch (error) {
@@ -372,13 +385,13 @@ async function syncOfflineExpenses() {
 async function syncOfflinePayments() {
   const offlineData = await getOfflineData();
   const payments = offlineData.payments || [];
-  
+
   for (const payment of payments) {
     try {
       await fetch('/api/payments', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payment)
+        body: JSON.stringify(payment),
       });
       await removeOfflinePayment(payment.id);
     } catch (error) {
@@ -426,7 +439,7 @@ async function removeOfflinePayment(paymentId) {
 async function saveOfflineData(data) {
   const cache = await caches.open(DYNAMIC_CACHE);
   const response = new Response(JSON.stringify(data), {
-    headers: { 'Content-Type': 'application/json' }
+    headers: { 'Content-Type': 'application/json' },
   });
   await cache.put('offline-data', response);
 }
@@ -434,7 +447,7 @@ async function saveOfflineData(data) {
 // Message handling for communication with main thread
 self.addEventListener('message', event => {
   const { type, data } = event.data;
-  
+
   switch (type) {
     case 'SAVE_OFFLINE_EXPENSE':
       saveOfflineExpense(data);
@@ -449,8 +462,8 @@ self.addEventListener('message', event => {
           data: {
             hasOfflineExpenses: offlineData.expenses.length > 0,
             hasOfflinePayments: offlineData.payments.length > 0,
-            totalOfflineItems: offlineData.expenses.length + offlineData.payments.length
-          }
+            totalOfflineItems: offlineData.expenses.length + offlineData.payments.length,
+          },
         });
       });
       break;
@@ -466,11 +479,11 @@ self.addEventListener('message', event => {
 // Cache cleanup for storage optimization
 async function cleanupCaches() {
   const cacheNames = [DYNAMIC_CACHE, API_CACHE, IMAGE_CACHE];
-  
+
   for (const cacheName of cacheNames) {
     const cache = await caches.open(cacheName);
     const keys = await cache.keys();
-    
+
     // Limit cache size
     if (keys.length > 100) {
       const keysToDelete = keys.slice(0, keys.length - 100);

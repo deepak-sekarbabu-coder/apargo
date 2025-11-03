@@ -219,10 +219,13 @@ export async function POST(request: NextRequest) {
         if (paymentEventExists) continue;
 
         // Validate amount before creating the payment event
-        const monthlyAmount = typeof category.monthlyAmount === 'number' ? category.monthlyAmount : 0;
-        
+        const monthlyAmount =
+          typeof category.monthlyAmount === 'number' ? category.monthlyAmount : 0;
+
         if (monthlyAmount <= 0) {
-          console.warn(`Skipping payment event for category ${category.name} with invalid amount: ${monthlyAmount}`);
+          console.warn(
+            `Skipping payment event for category ${category.name} with invalid amount: ${monthlyAmount}`
+          );
           continue;
         }
 

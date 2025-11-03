@@ -146,7 +146,7 @@ describe('Pending Users Visibility for Admin', () => {
     const approveButtons = screen.getAllByText('Approve');
     if (approveButtons.length > 0) {
       approveButtons[0].click();
-      
+
       // Should call onUpdateUser with isApproved: true
       expect(mockOnUpdateUser).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -162,14 +162,14 @@ describe('Pending Users Visibility for Admin', () => {
     // Should show "Reject" buttons for pending users
     const rejectButtons = screen.getAllByText('Reject');
     expect(rejectButtons.length).toBeGreaterThan(0);
-    
+
     // Click the first reject button to open dialog
     rejectButtons[0].click();
-    
+
     // Should show confirmation dialog
     const dialogTitles = screen.getAllByText('Reject User Application?');
     expect(dialogTitles.length).toBeGreaterThan(0);
-    
+
     // Should show confirmation button
     const confirmButtons = screen.getAllByText('Reject Application');
     expect(confirmButtons.length).toBeGreaterThan(0);

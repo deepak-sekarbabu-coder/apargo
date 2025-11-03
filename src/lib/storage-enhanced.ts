@@ -203,7 +203,15 @@ export class StorageService {
       const downloadURL = await getDownloadURL(uploadResult.ref);
 
       // Create file metadata
-      const fileMetadata = this.createFileMetadata(file, storagePath, downloadURL, category, userId, relatedId, apartmentId);
+      const fileMetadata = this.createFileMetadata(
+        file,
+        storagePath,
+        downloadURL,
+        category,
+        userId,
+        relatedId,
+        apartmentId
+      );
 
       // Store metadata in Firestore
       const metadataCollection = collection(db, 'fileMetadata');

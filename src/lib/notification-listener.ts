@@ -6,11 +6,11 @@ import {
   DocumentData,
   Query,
   QuerySnapshot,
+  Unsubscribe,
   collection,
   onSnapshot,
   query,
   where,
-  Unsubscribe,
 } from 'firebase/firestore';
 
 import { db } from '@/lib/firebase';
@@ -107,13 +107,13 @@ export class NotificationListener {
 
   private handleSnapshot(snapshot: QuerySnapshot<DocumentData>, source?: string): void {
     const now = new Date();
-    
+
     // Choose the appropriate map based on query source
     const targetMap = source === 'string' ? this.stringNotifications : this.arrayNotifications;
-    
+
     // Clear the target map and repopulate it
     targetMap.clear();
-    
+
     snapshot.docs.forEach(doc => {
       const data = doc.data() as Omit<Notification, 'id'>;
 
@@ -140,12 +140,15 @@ export class NotificationListener {
     });
 
     this.emitNotifications();
-    
+
     if (source) {
       console.log(`🔔 ${source} query updated:`, snapshot.size, 'notifications');
       if (this.apartment === 'T2') {
         console.log(`🔍 T2 ${source} map size:`, targetMap.size);
-        console.log(`🔍 T2 total notifications:`, this.stringNotifications.size + this.arrayNotifications.size);
+        console.log(
+          `🔍 T2 total notifications:`,
+          this.stringNotifications.size + this.arrayNotifications.size
+        );
       }
     } else {
       console.log('🔔 Unified query updated:', snapshot.size, 'notifications');
@@ -155,25 +158,29 @@ export class NotificationListener {
   private emitNotifications(): void {
     // Merge notifications from both maps, avoiding duplicates
     const mergedMap = new Map<string, Notification>();
-    
+
     // Add notifications from string query
     this.stringNotifications.forEach((notification, id) => {
       mergedMap.set(id, notification);
     });
-    
+
     // Add notifications from array query (will overwrite duplicates, which is fine)
     this.arrayNotifications.forEach((notification, id) => {
       mergedMap.set(id, notification);
     });
-    
-    const notifications = Array.from(mergedMap.values())
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    const notifications = Array.from(mergedMap.values()).sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
 
     if (this.apartment === 'T2') {
-      console.log(`🔍 Emitting ${notifications.length} notifications for T2:`, 
+      console.log(
+        `🔍 Emitting ${notifications.length} notifications for T2:`,
         notifications.map(n => ({ id: n.id, title: n.title, isRead: n.isRead }))
       );
-      console.log(`🔍 String map: ${this.stringNotifications.size}, Array map: ${this.arrayNotifications.size}`);
+      console.log(
+        `🔍 String map: ${this.stringNotifications.size}, Array map: ${this.arrayNotifications.size}`
+      );
     }
 
     this.onNotifications(notifications);
@@ -203,11 +210,11 @@ export class NotificationListener {
     const isErrorLike = (err: unknown): err is { message?: string; code?: number } =>
       typeof err === 'object' && err !== null;
 
-    const isIdleTimeout = isErrorLike(error) && (
-      error.message?.includes('CANCELLED') ||
-      error.message?.includes('Timed out waiting for new targets') ||
-      error.code === 1
-    );
+    const isIdleTimeout =
+      isErrorLike(error) &&
+      (error.message?.includes('CANCELLED') ||
+        error.message?.includes('Timed out waiting for new targets') ||
+        error.code === 1);
 
     return isIdleTimeout ? 'idle-timeout' : 'other';
   }
@@ -239,7 +246,9 @@ export class NotificationListener {
     this.currentRetries++;
     const delay = this.calculateRetryDelay(this.currentRetries, this.retryDelay);
 
-    console.log(`🔄 Retrying notification listener in ${delay}ms (attempt ${this.currentRetries}/${this.maxRetries})`);
+    console.log(
+      `🔄 Retrying notification listener in ${delay}ms (attempt ${this.currentRetries}/${this.maxRetries})`
+    );
 
     this.retryTimeout = setTimeout(() => {
       if (this.isActive) {
@@ -260,13 +269,16 @@ export class NotificationListener {
 
   private startKeepAlive(): void {
     // Restart listeners every 5 minutes to prevent idle timeouts
-    this.keepAliveInterval = setInterval(() => {
-      if (this.isActive) {
-        console.log('🔄 Refreshing notification listeners to prevent idle timeout');
-        this.cleanup();
-        this.setupListeners();
-      }
-    }, 5 * 60 * 1000); // 5 minutes
+    this.keepAliveInterval = setInterval(
+      () => {
+        if (this.isActive) {
+          console.log('🔄 Refreshing notification listeners to prevent idle timeout');
+          this.cleanup();
+          this.setupListeners();
+        }
+      },
+      5 * 60 * 1000
+    ); // 5 minutes
   }
 
   private isNotificationExpired(data: Omit<Notification, 'id'>, now: Date): boolean {
@@ -285,7 +297,12 @@ export class NotificationListener {
     }
   }
 
-  private logNotificationProcessing(apartmentId: string, source: string, docId: string, data: Omit<Notification, 'id'>): void {
+  private logNotificationProcessing(
+    apartmentId: string,
+    source: string,
+    docId: string,
+    data: Omit<Notification, 'id'>
+  ): void {
     if (apartmentId === 'T2') {
       console.log(`🔍 Processing notification for T2 (${source}):`, {
         id: docId,
@@ -293,7 +310,7 @@ export class NotificationListener {
         type: data.type,
         toApartmentId: data.toApartmentId,
         isRead: data.isRead,
-        source
+        source,
       });
     }
   }
@@ -304,13 +321,17 @@ export class NotificationListener {
     }
   }
 
-  private logReadStatus(apartmentId: string, data: Omit<Notification, 'id'>, isReadForUser: boolean): void {
+  private logReadStatus(
+    apartmentId: string,
+    data: Omit<Notification, 'id'>,
+    isReadForUser: boolean
+  ): void {
     if (apartmentId === 'T2') {
       if (data.type === 'announcement' && typeof data.isRead === 'object' && data.isRead !== null) {
         console.log(`🔍 T2 isRead processing:`, {
           isReadObject: data.isRead,
           apartmentKey: apartmentId,
-          isReadForUser
+          isReadForUser,
         });
       } else {
         console.log(`🔍 T2 simple isRead:`, { isRead: data.isRead, isReadForUser });
@@ -318,12 +339,16 @@ export class NotificationListener {
     }
   }
 
-  private logAddedNotification(apartmentId: string, source: string, notification: Notification): void {
+  private logAddedNotification(
+    apartmentId: string,
+    source: string,
+    notification: Notification
+  ): void {
     if (apartmentId === 'T2') {
       console.log(`🔍 Added notification to T2 ${source} map:`, {
         id: notification.id,
         title: notification.title,
-        isRead: notification.isRead
+        isRead: notification.isRead,
       });
     }
   }
@@ -408,8 +433,8 @@ export class AdminNotificationListener {
 
     this.unsubscribe = onSnapshot(
       announcementsQuery,
-      (snapshot) => this.handleAdminSnapshot(snapshot),
-      (error) => {
+      snapshot => this.handleAdminSnapshot(snapshot),
+      error => {
         console.error('🚫 Admin notification listener error:', error);
         if (this.onError) {
           this.onError(error);

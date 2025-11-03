@@ -1,13 +1,9 @@
 // Centralized Error Logging and Monitoring Service
 // Handles error logging, monitoring, metrics collection, and analytics
-
-import type {
-  ApargoError,
-  ErrorMetrics,
-  ErrorContext,
-} from './types';
-import { DEFAULT_SERVICE_CONFIG, type ServiceConfig } from './types';
 import log from 'loglevel';
+
+import type { ApargoError, ErrorContext, ErrorMetrics } from './types';
+import { DEFAULT_SERVICE_CONFIG, type ServiceConfig } from './types';
 
 // Simple in-memory metrics store (replace with persistent storage in production)
 class MetricsStore {
@@ -23,22 +19,21 @@ class MetricsStore {
 
   update(error: ApargoError): void {
     this.metrics.totalErrors++;
-    
+
     // Update category counts
-    this.metrics.errorsByCategory[error.category] = 
+    this.metrics.errorsByCategory[error.category] =
       (this.metrics.errorsByCategory[error.category] || 0) + 1;
-    
+
     // Update severity counts
-    this.metrics.errorsBySeverity[error.severity] = 
+    this.metrics.errorsBySeverity[error.severity] =
       (this.metrics.errorsBySeverity[error.severity] || 0) + 1;
-    
+
     // Update error code counts
-    this.metrics.errorsByCode[error.code] = 
-      (this.metrics.errorsByCode[error.code] || 0) + 1;
-    
+    this.metrics.errorsByCode[error.code] = (this.metrics.errorsByCode[error.code] || 0) + 1;
+
     // Update impact scores based on severity and user impact
     this.updateImpactScores(error);
-    
+
     this.metrics.lastUpdated = new Date().toISOString();
   }
 
@@ -51,12 +46,13 @@ class MetricsStore {
       high: 0.6,
       critical: 1.0,
     };
-    
+
     // Simple user impact calculation
-    this.metrics.userImpactScore = Math.min(1, 
+    this.metrics.userImpactScore = Math.min(
+      1,
       this.metrics.userImpactScore + severityWeight[error.severity] * 0.1
     );
-    
+
     // Business impact based on error category
     const businessImpactWeights = {
       database: 0.8,
@@ -72,9 +68,10 @@ class MetricsStore {
       user_interface: 0.1,
       unknown: 0.3,
     };
-    
+
     const categoryWeight = businessImpactWeights[error.category] || 0.3;
-    this.metrics.businessImpactScore = Math.min(1,
+    this.metrics.businessImpactScore = Math.min(
+      1,
       this.metrics.businessImpactScore + categoryWeight * 0.1
     );
   }
@@ -117,10 +114,10 @@ class ErrorLogger {
       warn: log.levels.WARN,
       error: log.levels.ERROR,
     };
-    
+
     const level = levelMap[this.config.logLevel] || log.levels.WARN;
     log.setLevel(level);
-    
+
     // Configure loglevel to only log in development unless explicitly enabled
     if (!this.config.enableConsoleLogging) {
       log.setLevel(log.levels.SILENT);
@@ -138,13 +135,13 @@ class ErrorLogger {
 
     // Store in metrics
     this.metricsStore.update(error);
-    
+
     // Buffer for batch processing
     this.errorBuffer.push(error);
-    
+
     // Notify listeners
     this.notifyListeners(error);
-    
+
     // In development, also log with full details
     if (process.env.NODE_ENV === 'development') {
       this.logDevelopmentDetails(error, context);
@@ -324,7 +321,11 @@ export function logError(error: ApargoError, context?: Partial<ErrorContext>): v
   logger.error(error, context);
 }
 
-export function logValidationError(field: string, message: string, context?: Partial<ErrorContext>): void {
+export function logValidationError(
+  field: string,
+  message: string,
+  context?: Partial<ErrorContext>
+): void {
   // This would be a validation error, but we're keeping it simple
   // In a real implementation, you might create a validation error here
   log.warn(`Validation Error - ${field}: ${message}`, context);
@@ -373,7 +374,10 @@ export async function withPerformanceLogging<T>(
 /**
  * Error reporting helpers for external services
  */
-export function reportErrorToExternalService(error: ApargoError, service: 'sentry' | 'rollbar' | 'bugsnag'): void {
+export function reportErrorToExternalService(
+  error: ApargoError,
+  service: 'sentry' | 'rollbar' | 'bugsnag'
+): void {
   // This would integrate with external error tracking services
   // For now, just log the intent
   log.debug(`Would report error ${error.code} to ${service}`, {
@@ -393,9 +397,12 @@ export function getErrorMonitoringHealth(): {
   timestamp: string;
 } {
   const metrics = logger.getMetrics();
-  const healthStatus = metrics.businessImpactScore > 0.8 ? 'unhealthy' 
-    : metrics.businessImpactScore > 0.5 ? 'degraded'
-    : 'healthy';
+  const healthStatus =
+    metrics.businessImpactScore > 0.8
+      ? 'unhealthy'
+      : metrics.businessImpactScore > 0.5
+        ? 'degraded'
+        : 'healthy';
 
   return {
     status: healthStatus,
@@ -408,9 +415,4 @@ export function getErrorMonitoringHealth(): {
 /**
  * Export types for external use
  */
-export type {
-  ApargoError,
-  ErrorMetrics,
-  ServiceConfig,
-  ErrorContext,
-} from './types';
+export type { ApargoError, ErrorMetrics, ServiceConfig, ErrorContext } from './types';

@@ -19,9 +19,17 @@ const firebaseConfig = {
 // In production, we require all values to be present
 const isDevelopment = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
 if (!isDevelopment) {
-  if (!firebaseConfig.apiKey || !firebaseConfig.authDomain || !firebaseConfig.projectId || 
-      !firebaseConfig.storageBucket || !firebaseConfig.messagingSenderId || !firebaseConfig.appId) {
-    console.error('Firebase configuration is missing required values. Please ensure all environment variables are set during build time.');
+  if (
+    !firebaseConfig.apiKey ||
+    !firebaseConfig.authDomain ||
+    !firebaseConfig.projectId ||
+    !firebaseConfig.storageBucket ||
+    !firebaseConfig.messagingSenderId ||
+    !firebaseConfig.appId
+  ) {
+    console.error(
+      'Firebase configuration is missing required values. Please ensure all environment variables are set during build time.'
+    );
     throw new Error('Missing Firebase configuration values in service worker');
   }
 }

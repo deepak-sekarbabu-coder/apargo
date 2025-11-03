@@ -1,6 +1,7 @@
 // Graceful Degradation and Error Recovery System
 // Provides fallback strategies, error boundaries, and automatic recovery mechanisms
-
+import { createError, wrapError } from './factory';
+import { logger } from './logger';
 import type {
   ApargoError,
   ErrorCategory,
@@ -8,8 +9,6 @@ import type {
   ErrorContext,
   RecoveryStrategy,
 } from './types';
-import { createError, wrapError } from './factory';
-import { logger } from './logger';
 
 // Global recovery strategies registry
 const recoveryStrategies: RecoveryStrategy[] = [];
@@ -151,7 +150,7 @@ export class CircuitBreaker {
         throw createError('EXT_SERVICE_UNAVAILABLE', 'Service is temporarily unavailable', {
           category: 'external_service',
           severity: 'high',
-          metadata: { 
+          metadata: {
             circuitBreakerState: this.state,
             failureCount: this.failureCount,
             timeSinceLastFailure: Date.now() - (this.lastFailureTime || 0),
@@ -173,18 +172,20 @@ export class CircuitBreaker {
   private async withTimeout<T>(promise: Promise<T>): Promise<T> {
     return new Promise<T>((resolve, reject) => {
       const timeout = setTimeout(() => {
-        reject(createError('EXT_SERVICE_TIMEOUT', 'Operation timed out', {
-          category: 'external_service',
-          severity: 'medium',
-        }));
+        reject(
+          createError('EXT_SERVICE_TIMEOUT', 'Operation timed out', {
+            category: 'external_service',
+            severity: 'medium',
+          })
+        );
       }, this.options.timeout);
 
       promise
-        .then((result) => {
+        .then(result => {
           clearTimeout(timeout);
           resolve(result);
         })
-        .catch((error) => {
+        .catch(error => {
           clearTimeout(timeout);
           reject(error);
         });
@@ -219,13 +220,19 @@ export class CircuitBreaker {
  */
 const circuitBreakers = new Map<string, CircuitBreaker>();
 
-export function getCircuitBreaker(name: string, options?: Partial<CircuitBreaker['options']>): CircuitBreaker {
+export function getCircuitBreaker(
+  name: string,
+  options?: Partial<CircuitBreaker['options']>
+): CircuitBreaker {
   if (!circuitBreakers.has(name)) {
-    circuitBreakers.set(name, new CircuitBreaker({
-      failureThreshold: options?.failureThreshold || 5,
-      recoveryTimeout: options?.recoveryTimeout || 60000, // 1 minute
-      timeout: options?.timeout || 30000, // 30 seconds
-    }));
+    circuitBreakers.set(
+      name,
+      new CircuitBreaker({
+        failureThreshold: options?.failureThreshold || 5,
+        recoveryTimeout: options?.recoveryTimeout || 60000, // 1 minute
+        timeout: options?.timeout || 30000, // 30 seconds
+      })
+    );
   }
   return circuitBreakers.get(name)!;
 }
@@ -261,9 +268,9 @@ export async function retryWithBackoff<T>(
         ...context,
         feature: context?.feature || 'retry_operation',
         operation: 'retry_with_backoff',
-        metadata: { 
-          attempt, 
-          maxAttempts, 
+        metadata: {
+          attempt,
+          maxAttempts,
           delay: totalDelay,
           lastErrorMessage: lastError.message,
         },
@@ -320,27 +327,22 @@ export async function executeBulk<T, R>(
     maxFailures?: number;
     context?: Partial<ErrorContext>;
   } = {}
-): Promise<{ 
+): Promise<{
   results: R[];
   failures: Array<{ item: T; error: ApargoError }>;
   successCount: number;
   failureCount: number;
 }> {
-  const {
-    concurrency = 5,
-    failFast = false,
-    maxFailures = Infinity,
-    context = {},
-  } = options;
+  const { concurrency = 5, failFast = false, maxFailures = Infinity, context = {} } = options;
 
   const results: R[] = [];
   const failures: Array<{ item: T; error: ApargoError }> = [];
-  
+
   // Process items in chunks to control concurrency
   for (let i = 0; i < items.length; i += concurrency) {
     const chunk = items.slice(i, i + concurrency);
-    
-    const chunkPromises = chunk.map(async (item) => {
+
+    const chunkPromises = chunk.map(async item => {
       try {
         const result = await operation(item);
         return { success: true, result, item };
@@ -356,19 +358,19 @@ export async function executeBulk<T, R>(
     });
 
     const chunkResults = await Promise.all(chunkPromises);
-    
+
     for (const result of chunkResults) {
       if (result.success) {
         results.push(result.result);
       } else {
         failures.push({ item: result.item, error: result.error });
-        
+
         if (failFast || failures.length >= maxFailures) {
           break;
         }
       }
     }
-    
+
     // If we're in fail fast mode or have too many failures, stop processing
     if (failFast && failures.length > 0) {
       break;
@@ -396,14 +398,19 @@ export function getDegradationHealth(): {
   registeredFallbacks: number;
   timestamp: string;
 } {
-  const circuitBreakerStates = Array.from(circuitBreakers.entries()).reduce((acc, [name, cb]) => {
-    acc[name] = cb.getState();
-    return acc;
-  }, {} as Record<string, any>);
+  const circuitBreakerStates = Array.from(circuitBreakers.entries()).reduce(
+    (acc, [name, cb]) => {
+      acc[name] = cb.getState();
+      return acc;
+    },
+    {} as Record<string, any>
+  );
 
-  const unhealthyBreakers = Object.values(circuitBreakerStates).filter(state => state.state === 'open').length;
+  const unhealthyBreakers = Object.values(circuitBreakerStates).filter(
+    state => state.state === 'open'
+  ).length;
   const totalBreakers = Object.keys(circuitBreakerStates).length;
-  
+
   let status: 'healthy' | 'degraded' | 'unhealthy' = 'healthy';
   if (totalBreakers > 0) {
     const unhealthyRatio = unhealthyBreakers / totalBreakers;
@@ -429,10 +436,10 @@ export function getDegradationHealth(): {
 const defaultRecoveryStrategies: RecoveryStrategy[] = [
   // Network connectivity recovery
   {
-    canHandle: (error) => error.category === 'network' && error.code === 'NETWORK_OFFLINE',
+    canHandle: error => error.category === 'network' && error.code === 'NETWORK_OFFLINE',
     recover: async (error, context) => {
       // Wait for network recovery
-      return new Promise((resolve) => {
+      return new Promise(resolve => {
         const checkConnection = () => {
           if (navigator.onLine) {
             resolve(null); // Successfully recovered
@@ -448,25 +455,21 @@ const defaultRecoveryStrategies: RecoveryStrategy[] = [
 
   // Database connection recovery
   {
-    canHandle: (error) => error.category === 'database' && error.code === 'DB_CONNECTION_FAILED',
+    canHandle: error => error.category === 'database' && error.code === 'DB_CONNECTION_FAILED',
     recover: async (error, context) => {
       // For database connection failures, we can try to use cached data
       const cachedData = FallbackProvider.get('cached_' + (context.feature || 'data'));
       if (cachedData) {
-        return createError(
-          'DB_OPERATION_FAILED',
-          'Using cached data due to connection issues',
-          {
-            category: 'database',
-            severity: 'medium',
-            userMessageType: 'warning',
-            metadata: { 
-              usingCachedData: true, 
-              cachedDataType: context.feature,
-            },
-            context,
-          }
-        );
+        return createError('DB_OPERATION_FAILED', 'Using cached data due to connection issues', {
+          category: 'database',
+          severity: 'medium',
+          userMessageType: 'warning',
+          metadata: {
+            usingCachedData: true,
+            cachedDataType: context.feature,
+          },
+          context,
+        });
       }
       return null;
     },
@@ -475,27 +478,23 @@ const defaultRecoveryStrategies: RecoveryStrategy[] = [
 
   // Authentication recovery
   {
-    canHandle: (error) => error.category === 'authentication' && error.code === 'AUTH_EXPIRED',
+    canHandle: error => error.category === 'authentication' && error.code === 'AUTH_EXPIRED',
     recover: async (error, context) => {
       // Try to refresh the authentication token
       try {
         // This would typically call a refresh token endpoint
         // For now, we'll create a redirect to login scenario
-        return createError(
-          'AUTH_EXPIRED',
-          'Your session has expired. Please sign in again.',
-          {
-            category: 'authentication',
-            severity: 'high',
-            userMessageType: 'warning',
-            recoveryAction: {
-              type: 'refresh',
-              label: 'Sign In Again',
-              hint: 'Redirecting to login page',
-            },
-            context,
-          }
-        );
+        return createError('AUTH_EXPIRED', 'Your session has expired. Please sign in again.', {
+          category: 'authentication',
+          severity: 'high',
+          userMessageType: 'warning',
+          recoveryAction: {
+            type: 'refresh',
+            label: 'Sign In Again',
+            hint: 'Redirecting to login page',
+          },
+          context,
+        });
       } catch (refreshError) {
         return wrapError(refreshError as Error, 'AUTH_INVALID_TOKEN', context);
       }
@@ -505,7 +504,7 @@ const defaultRecoveryStrategies: RecoveryStrategy[] = [
 
   // Storage quota exceeded recovery
   {
-    canHandle: (error) => error.category === 'storage' && error.code === 'STORAGE_QUOTA_EXCEEDED',
+    canHandle: error => error.category === 'storage' && error.code === 'STORAGE_QUOTA_EXCEEDED',
     recover: async (error, context) => {
       return createError(
         'STORAGE_QUOTA_EXCEEDED',

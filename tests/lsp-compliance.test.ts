@@ -2,11 +2,10 @@
  * Tests for Liskov Substitution Principle compliance.
  * Demonstrates that subtypes are substitutable for their base types.
  */
-
 import type {
+  AnnouncementNotification,
   Notification,
   PaymentNotification,
-  AnnouncementNotification,
   PollNotification,
   ReminderNotification,
 } from '../src/lib/types';
@@ -129,7 +128,6 @@ describe('Liskov Substitution Principle - Type Safety', () => {
         // LSP: We can safely access payment-specific fields
         expect(notification.amount).toBe(100);
         expect(notification.status).toBe('pending');
-
       }
     });
   });
@@ -222,7 +220,7 @@ describe('Liskov Substitution Principle - Type Safety', () => {
       type SpecificFunction = (input: string) => number;
 
       // LSP: SpecificFunction can be used where GeneralFunction is expected
-      const specificFunc: SpecificFunction = (input) => parseInt(input);
+      const specificFunc: SpecificFunction = input => parseInt(input);
       const generalFunc: GeneralFunction = specificFunc;
 
       expect(generalFunc('42')).toBe(42);
@@ -235,12 +233,16 @@ describe('Liskov Substitution Principle - Type Safety', () => {
       }
 
       interface SpecificEventHandler extends EventHandler {
-        onEvent: (event: { type: 'click'; data: { x: number; y: number } } | { type: 'scroll'; data: { delta: number } }) => void;
+        onEvent: (
+          event:
+            | { type: 'click'; data: { x: number; y: number } }
+            | { type: 'scroll'; data: { delta: number } }
+        ) => void;
       }
 
       // LSP: Specific event handler can be used where general one is expected
       const specificHandler: SpecificEventHandler = {
-        onEvent: (event) => {
+        onEvent: event => {
           if (event.type === 'click') {
             expect(typeof event.data.x).toBe('number');
             expect(typeof event.data.y).toBe('number');

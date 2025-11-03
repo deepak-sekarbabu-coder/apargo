@@ -2,7 +2,10 @@
 
 import * as React from 'react';
 
-import * as firestore from '@/lib/firestore';
+import { addCategory, deleteCategory, updateCategory } from '@/lib/firestore/categories';
+import { addPayment, updatePayment } from '@/lib/firestore/payments';
+import { addPoll } from '@/lib/firestore/polls';
+import { addUser, deleteUser, updateUser } from '@/lib/firestore/users';
 import { uploadImage } from '@/lib/storage';
 import type { Category, Payment, PollOption, User } from '@/lib/types';
 
@@ -27,7 +30,7 @@ export function useDataHandlers({
 
   const handleUpdateUser = React.useCallback(
     async (updatedUser: User) => {
-      await firestore.updateUser(updatedUser.id, updatedUser);
+      await updateUser(updatedUser.id, updatedUser);
       // updateAuthUser is not needed here; removed for clarity
       // If the user's apartment changed, we need to refetch data, which the useEffect will handle.
       // Otherwise, just update the state locally.
@@ -42,7 +45,7 @@ export function useDataHandlers({
 
   const handleUpdateCategory = React.useCallback(
     async (updatedCategory: Category) => {
-      await firestore.updateCategory(updatedCategory.id, updatedCategory);
+      await updateCategory(updatedCategory.id, updatedCategory);
       setCategories(currentCategories =>
         currentCategories.map(c => (c.id === updatedCategory.id ? updatedCategory : c))
       );
@@ -52,7 +55,7 @@ export function useDataHandlers({
 
   const handleAddCategory = React.useCallback(
     async (newCategoryData: Omit<Category, 'id'>) => {
-      const newCategory = await firestore.addCategory(newCategoryData);
+      const newCategory = await addCategory(newCategoryData);
       setCategories(prev => [...prev, newCategory]);
     },
     [setCategories]
@@ -60,7 +63,7 @@ export function useDataHandlers({
 
   const handleDeleteCategory = React.useCallback(
     async (categoryId: string) => {
-      await firestore.deleteCategory(categoryId);
+      await deleteCategory(categoryId);
       setCategories(prev => prev.filter(c => c.id !== categoryId));
       toast({
         title: 'Category Deleted',
@@ -72,7 +75,7 @@ export function useDataHandlers({
 
   const handleAddUser = React.useCallback(
     async (newUserData: Omit<User, 'id'>) => {
-      const newUser = await firestore.addUser(newUserData);
+      const newUser = await addUser(newUserData);
       if (newUser.apartment === user?.apartment || role === 'admin') {
         setUsers(prev => [...prev, newUser]);
       }
@@ -82,7 +85,7 @@ export function useDataHandlers({
 
   const handleUpdateUserFromAdmin = React.useCallback(
     async (updatedUser: User) => {
-      await firestore.updateUser(updatedUser.id, updatedUser);
+      await updateUser(updatedUser.id, updatedUser);
       setUsers(currentUsers => currentUsers.map(u => (u.id === updatedUser.id ? updatedUser : u)));
     },
     [setUsers]
@@ -98,7 +101,7 @@ export function useDataHandlers({
         });
         return;
       }
-      await firestore.deleteUser(userId);
+      await deleteUser(userId);
       setUsers(prev => prev.filter(u => u.id !== userId));
       toast({
         title: 'User Deleted',
@@ -118,7 +121,7 @@ export function useDataHandlers({
         });
         return;
       }
-      await firestore.deleteUser(userId);
+      await deleteUser(userId);
       setUsers(prev => prev.filter(u => u.id !== userId));
       toast({
         title: 'User Rejected',
@@ -131,7 +134,7 @@ export function useDataHandlers({
 
   const handleAddPoll = React.useCallback(
     async (data: { question: string; options: PollOption[]; expiresAt?: string }) => {
-      await firestore.addPoll({
+      await addPoll({
         question: data.question,
         options: data.options,
         createdBy: user?.id || '',
@@ -153,7 +156,7 @@ export function useDataHandlers({
       if (!payment) return;
       // Set status to approved and approvedBy to admin name
       const approvedBy = user?.name || user?.email || user?.id || 'admin';
-      await firestore.updatePayment(paymentId, { status: 'approved', approvedBy });
+      await updatePayment(paymentId, { status: 'approved', approvedBy });
       setPayments(prev =>
         prev.map(p => (p.id === paymentId ? { ...p, status: 'approved', approvedBy } : p))
       );
@@ -170,7 +173,7 @@ export function useDataHandlers({
       // Find payment
       const payment = payments.find(p => p.id === paymentId);
       if (!payment) return;
-      await firestore.updatePayment(paymentId, { status: 'rejected' });
+      await updatePayment(paymentId, { status: 'rejected' });
       setPayments(prev => prev.map(p => (p.id === paymentId ? { ...p, status: 'rejected' } : p)));
       toast({
         title: 'Payment Rejected',
@@ -242,7 +245,7 @@ export function useDataHandlers({
       }
 
       try {
-        const newPayment = await firestore.addPayment(paymentData);
+        const newPayment = await addPayment(paymentData);
         setPayments(prev => [...prev, newPayment]);
         toast({
           title: 'Payment Added',

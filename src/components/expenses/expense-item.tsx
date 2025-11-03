@@ -12,7 +12,7 @@ import {
   markApartmentAsPaid,
   markApartmentAsUnpaid,
 } from '@/lib/expense-utils';
-import { updateExpense } from '@/lib/firestore';
+import { updateExpense } from '@/lib/firestore/expenses';
 import type { Category, Expense, User } from '@/lib/types';
 
 import { CategoryIcon } from '@/components/icons/category-icon';

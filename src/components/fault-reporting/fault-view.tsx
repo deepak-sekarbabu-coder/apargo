@@ -5,7 +5,8 @@ import { LayoutDashboard, Wrench } from 'lucide-react';
 
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { deleteFault, getFaults, getUsers, updateFault } from '@/lib/firestore';
+import { deleteFault, getFaults, updateFault } from '@/lib/firestore/faults';
+import { getUsers } from '@/lib/firestore/users';
 import type { Fault, FaultSeverity, FaultStatus, User } from '@/lib/types';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

@@ -26,7 +26,9 @@ export const getActiveAnnouncements = async (): Promise<AnnouncementNotification
   return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as AnnouncementNotification);
 };
 
-export const listenToActiveAnnouncements = (callback: (announcements: AnnouncementNotification[]) => void) => {
+export const listenToActiveAnnouncements = (
+  callback: (announcements: AnnouncementNotification[]) => void
+) => {
   const notificationsCol = collection(db, 'notifications');
   const q = query(
     notificationsCol,
@@ -35,7 +37,9 @@ export const listenToActiveAnnouncements = (callback: (announcements: Announceme
     orderBy('createdAt', 'desc')
   );
   return onSnapshot(q, snapshot => {
-    const announcements = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as AnnouncementNotification);
+    const announcements = snapshot.docs.map(
+      doc => ({ id: doc.id, ...doc.data() }) as AnnouncementNotification
+    );
     callback(announcements);
   });
 };

@@ -42,7 +42,7 @@ jest.mock('firebase/firestore', () => {
   };
 
   // Define getDoc separately to avoid duplicate property name issue
-  const getDoc = jest.fn(async (docRef) => ({
+  const getDoc = jest.fn(async docRef => ({
     exists: true,
     data: () => ({}),
     id: 'mock-doc-id',
@@ -58,24 +58,24 @@ jest.mock('firebase/firestore', () => {
     updateDoc: jest.fn(),
     deleteDoc: jest.fn(),
     getDoc, // Use the separately defined getDoc
-    getDocs: jest.fn(async (query) => ({
+    getDocs: jest.fn(async query => ({
       docs: [
         // Return at least one mock document to prevent issues when tests expect data
         {
           id: 'mock-apartment-id',
           data: () => ({
             name: 'Mock Apartment',
-            members: ['user1', 'user2']
-          })
-        }
+            members: ['user1', 'user2'],
+          }),
+        },
       ],
       empty: false,
       forEach: jest.fn(),
     })),
-    query: jest.fn((query) => query),
+    query: jest.fn(query => query),
     where: jest.fn((field, operator, value) => ({ field, operator, value })),
     orderBy: jest.fn((field, direction) => ({ field, direction })),
-    limit: jest.fn((count) => ({ count })),
+    limit: jest.fn(count => ({ count })),
     onSnapshot: jest.fn((reference, callback: (snapshot: any) => void) => {
       // Immediately call the callback with empty data to simulate Firebase subscription
       process.nextTick(() => callback({ docs: [], forEach: jest.fn() }));
@@ -90,7 +90,7 @@ jest.mock('firebase/firestore', () => {
     })),
     arrayUnion: jest.fn((...values) => ({ values, type: 'array-union' })),
     arrayRemove: jest.fn((...values) => ({ values, type: 'array-remove' })),
-    increment: jest.fn((value) => ({ value, type: 'increment' })),
+    increment: jest.fn(value => ({ value, type: 'increment' })),
   };
 });
 

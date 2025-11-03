@@ -4,7 +4,7 @@ import { useAuth } from '@/context/auth-context';
 
 import { useEffect, useState } from 'react';
 
-import { voteOnPoll } from '@/lib/firestore';
+import { voteOnPoll } from '@/lib/firestore/polls';
 import { listenToUnvotedPolls } from '@/lib/poll-utils';
 import { Poll } from '@/lib/types';
 

@@ -39,6 +39,7 @@ I've successfully added the "Add Ledger Entry" button next to the "Add Expense" 
 - **Responsive**: Button text hides on small screens, showing only the icon
 
 ### Button Styling:
+
 - "Add Expense": Uses accent color (orange)
 - "Add Ledger Entry": Uses primary color (blue) to distinguish the two actions
 

@@ -1,20 +1,16 @@
 'use client';
 
 import { useAuth } from '@/context/auth-context';
-import {
-  doc,
-  getDoc,
-  updateDoc,
-} from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { Bell, BellOff } from 'lucide-react';
 
 import { useEffect, useRef, useState } from 'react';
 
 import { db } from '@/lib/firebase';
+import { AdminNotificationListener, NotificationListener } from '@/lib/notification-listener';
 import type { Notification } from '@/lib/types';
 
 import { NotificationItem } from '@/components/notification-item';
-import { AdminNotificationListener, NotificationListener } from '@/lib/notification-listener';
 import { Button, type ButtonProps } from '@/components/ui/button';
 import {
   Dialog,
@@ -90,7 +86,8 @@ export function NotificationsPanel({ className }: NotificationsPanelProps) {
       apartment,
       onNotifications: (notifications: Notification[]) => {
         if (apartment === 'T2') {
-          console.log(`🔍 NotificationsPanel received ${notifications.length} notifications for T2:`,
+          console.log(
+            `🔍 NotificationsPanel received ${notifications.length} notifications for T2:`,
             notifications.map(n => ({ id: n.id, title: n.title, isRead: n.isRead }))
           );
         }
@@ -136,7 +133,7 @@ export function NotificationsPanel({ className }: NotificationsPanelProps) {
       console.log(`🔍 Marking notification as read for ${user.apartment}:`, {
         notificationId,
         notificationType: notification.type,
-        currentIsRead: notification.isRead
+        currentIsRead: notification.isRead,
       });
 
       // For announcements, we need to get the original document to access the isRead map

@@ -97,7 +97,15 @@ function hasCredentials(): boolean {
   );
 }
 
-export const getFirebaseAdminApp = (): App => {
+const getFirebaseAdminApp = (): App => {
+  // Skip during build time - return a mock app to avoid build failures
+  if ((isBuildTime || isStaticGeneration) && !hasCredentials()) {
+    // During build time with no credentials, return a mock app
+    // This prevents build failures, but the app won't work at runtime without credentials
+    console.warn('Firebase Admin not available during build time - using mock app');
+    return {} as App; // Mock app
+  }
+
   // Try to initialize if not already attempted
   const app = initializeFirebaseAdmin();
 
@@ -138,4 +146,14 @@ export const isFirebaseAdminAvailable = (): boolean => {
 // Export initialization error for debugging
 export const getInitializationError = (): string | null => {
   return initializationError;
+};
+
+// Export the main function
+export { getFirebaseAdminApp };
+
+// Default export for compatibility
+export default {
+  getFirebaseAdminApp,
+  isFirebaseAdminAvailable,
+  getInitializationError,
 };

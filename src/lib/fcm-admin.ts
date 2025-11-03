@@ -21,7 +21,12 @@ export interface SendNotificationResult {
   errors: string[];
 }
 
-async function collectFcmTokens(apartmentIds: string[]): Promise<{tokens: string[], tokenToUserMap: Map<string, {id: string, name: string, apartment: string}>}> {
+async function collectFcmTokens(
+  apartmentIds: string[]
+): Promise<{
+  tokens: string[];
+  tokenToUserMap: Map<string, { id: string; name: string; apartment: string }>;
+}> {
   const adminDb = getFirestore(getFirebaseAdminApp());
   const usersSnapshot = await adminDb.collection('users').get();
   const fcmTokens: string[] = [];
@@ -61,8 +66,13 @@ function prepareMessage(notification: FCMNotificationPayload, tokens: string[]) 
 async function processResponse(
   response: any,
   fcmTokens: string[],
-  tokenToUserMap: Map<string, {id: string, name: string, apartment: string}>
-): Promise<{successfulDeliveries: number, failedDeliveries: number, failedTokens: string[], errors: string[]}> {
+  tokenToUserMap: Map<string, { id: string; name: string; apartment: string }>
+): Promise<{
+  successfulDeliveries: number;
+  failedDeliveries: number;
+  failedTokens: string[];
+  errors: string[];
+}> {
   const result = {
     successfulDeliveries: response.successCount,
     failedDeliveries: response.failureCount,
@@ -141,7 +151,11 @@ export async function sendPushNotificationToApartments(
     const messaging = getMessaging(getFirebaseAdminApp());
     const response = await messaging.sendEachForMulticast(message);
 
-    const { successfulDeliveries, failedDeliveries, failedTokens, errors } = await processResponse(response, fcmTokens, tokenToUserMap);
+    const { successfulDeliveries, failedDeliveries, failedTokens, errors } = await processResponse(
+      response,
+      fcmTokens,
+      tokenToUserMap
+    );
     result.successfulDeliveries = successfulDeliveries;
     result.failedDeliveries = failedDeliveries;
     result.failedTokens = failedTokens;

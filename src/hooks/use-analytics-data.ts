@@ -1,6 +1,14 @@
-import { format, subMonths, subDays, isToday, isYesterday, isThisWeek, isThisMonth } from 'date-fns';
+import {
+  format,
+  isThisMonth,
+  isThisWeek,
+  isToday,
+  isYesterday,
+  subDays,
+  subMonths,
+} from 'date-fns';
 
-import { useMemo, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import type { Category, Expense } from '@/lib/types';
 
@@ -92,14 +100,22 @@ export function useAnalyticsData(
 
     const weeklyTotal = thisWeekExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
     const monthlyTotal = thisMonthExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
-    const dailyAverage = expenses.length > 0 ? 
-      expenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0) / Math.max(1, new Set(expenses.map(e => {
-        try {
-          return format(new Date(e.date), 'yyyy-MM-dd');
-        } catch {
-          return '';
-        }
-      })).size) : 0;
+    const dailyAverage =
+      expenses.length > 0
+        ? expenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0) /
+          Math.max(
+            1,
+            new Set(
+              expenses.map(e => {
+                try {
+                  return format(new Date(e.date), 'yyyy-MM-dd');
+                } catch {
+                  return '';
+                }
+              })
+            ).size
+          )
+        : 0;
 
     // Trending analysis
     const recentExpenses = expenses.filter(e => {
@@ -122,8 +138,8 @@ export function useAnalyticsData(
     const recentTotal = recentExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
     const previousTotal = previousExpenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
 
-    return { 
-      categorySpending, 
+    return {
+      categorySpending,
       monthlySpending,
       realTimeMetrics: {
         todayExpenses: todayExpenses.length,
@@ -134,11 +150,12 @@ export function useAnalyticsData(
           recentTotal,
           previousTotal,
           isIncreasing: recentTotal > previousTotal,
-          changePercentage: previousTotal > 0 ? ((recentTotal - previousTotal) / previousTotal) * 100 : 0
-        }
+          changePercentage:
+            previousTotal > 0 ? ((recentTotal - previousTotal) / previousTotal) * 100 : 0,
+        },
       },
       isRealTime,
-      lastUpdated
+      lastUpdated,
     };
   }, [expenses, categories, analyticsMonth, lastUpdated, isRealTime]);
 }

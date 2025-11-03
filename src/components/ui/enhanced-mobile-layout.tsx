@@ -62,13 +62,9 @@ export const MobileHeader = React.forwardRef<HTMLElement, MobileHeaderProps>(
           </button>
         )}
 
-        <div className="flex-1 min-w-0">
-          {title}
-        </div>
+        <div className="flex-1 min-w-0">{title}</div>
 
-        <div className="flex items-center gap-2 flex-shrink-0">
-          {actions}
-        </div>
+        <div className="flex items-center gap-2 flex-shrink-0">{actions}</div>
 
         {children}
       </header>
@@ -162,10 +158,7 @@ export const MobileSheet: React.FC<MobileSheetProps> = ({
         role="dialog"
       >
         <div
-          className={cn(
-            'h-full flex flex-col',
-            side === 'bottom' && 'h-auto'
-          )}
+          className={cn('h-full flex flex-col', side === 'bottom' && 'h-auto')}
           onTouchStart={() => setIsDragging(true)}
           onTouchEnd={() => setIsDragging(false)}
         >
@@ -188,11 +181,7 @@ export const MobileList = React.forwardRef<HTMLDivElement, MobileListProps>(
     return (
       <div
         ref={ref}
-        className={cn(
-          'divide-y divide-border',
-          dense ? 'divide-y-0' : '',
-          className
-        )}
+        className={cn('divide-y divide-border', dense ? 'divide-y-0' : '', className)}
         {...props}
       >
         {React.Children.map(children, (child, index) => (
@@ -247,21 +236,11 @@ export const MobileListItem = React.forwardRef<HTMLDivElement, MobileListItemPro
         aria-disabled={disabled}
         {...props}
       >
-        {leadingIcon && (
-          <div className="flex-shrink-0 text-muted-foreground">
-            {leadingIcon}
-          </div>
-        )}
+        {leadingIcon && <div className="flex-shrink-0 text-muted-foreground">{leadingIcon}</div>}
 
-        <div className="flex-1 min-w-0">
-          {children}
-        </div>
+        <div className="flex-1 min-w-0">{children}</div>
 
-        {trailingIcon && (
-          <div className="flex-shrink-0">
-            {trailingIcon}
-          </div>
-        )}
+        {trailingIcon && <div className="flex-shrink-0">{trailingIcon}</div>}
 
         {chevron && !trailingIcon && (
           <div className="flex-shrink-0 text-muted-foreground">

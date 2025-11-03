@@ -36,7 +36,7 @@ export function calculateApartmentBalances(
       paidByApartment,
       owedByApartments = [],
       perApartmentShare,
-      paidByApartments = []
+      paidByApartments = [],
     } = expense;
 
     // Create unpaid apartments map in single operation using pre-computed lookup
@@ -92,18 +92,18 @@ export function calculateMonthlyExpenses(expenses: Expense[], month: number, yea
   let total = 0;
   const targetMonth = month;
   const targetYear = year;
-  
+
   // Single pass with direct calculation
   for (let i = 0; i < expenses.length; i++) {
     const expense = expenses[i];
     const expenseDate = new Date(expense.date);
-    
+
     // Early exit if month/year doesn't match
     if (expenseDate.getMonth() === targetMonth && expenseDate.getFullYear() === targetYear) {
       total += Number(expense.amount) || 0;
     }
   }
-  
+
   return total;
 }
 
@@ -115,16 +115,16 @@ export function calculateMonthlyExpenses(expenses: Expense[], month: number, yea
  */
 export function calculateUnpaidBillsCount(expenses: Expense[]): number {
   let count = 0;
-  
+
   // Single pass through all expenses
   for (let i = 0; i < expenses.length; i++) {
     const expense = expenses[i];
     const owedApartments = expense.owedByApartments || [];
     const paidApartments = expense.paidByApartments || [];
-    
+
     // Create paid apartments set once per expense
     const paidSet = new Set(paidApartments);
-    
+
     // Count unpaid apartments in single loop
     for (let j = 0; j < owedApartments.length; j++) {
       const apartmentId = owedApartments[j];
@@ -133,7 +133,7 @@ export function calculateUnpaidBillsCount(expenses: Expense[]): number {
       }
     }
   }
-  
+
   return count;
 }
 
@@ -146,11 +146,14 @@ export function calculateApartmentBalancesOptimized(
   apartments: Apartment[]
 ): Record<string, ApartmentBalance> {
   // Initialize balance tracking with Maps for O(1) lookups
-  const apartmentBalances = new Map<string, {
-    balance: number;
-    owes: Record<string, number>;
-    owedBy: Record<string, number>;
-  }>();
+  const apartmentBalances = new Map<
+    string,
+    {
+      balance: number;
+      owes: Record<string, number>;
+      owedBy: Record<string, number>;
+    }
+  >();
 
   // Initialize apartments in single loop
   for (let i = 0; i < apartments.length; i++) {
@@ -169,13 +172,13 @@ export function calculateApartmentBalancesOptimized(
       paidByApartment,
       owedByApartments = [],
       perApartmentShare,
-      paidByApartments = []
+      paidByApartments = [],
     } = expense;
 
     // Create unpaid apartments array with minimal operations
     const paidApartmentsSet = new Set(paidByApartments);
     const unpaidApartments: string[] = [];
-    
+
     for (let j = 0; j < owedByApartments.length; j++) {
       const aptId = owedByApartments[j];
       if (aptId !== paidByApartment && !paidApartmentsSet.has(aptId)) {
@@ -191,7 +194,7 @@ export function calculateApartmentBalancesOptimized(
     const payingBalance = apartmentBalances.get(paidByApartment);
     if (payingBalance) {
       payingBalance.balance += totalDebt;
-      
+
       // Track individual debts owed to paying apartment
       for (let j = 0; j < unpaidApartments.length; j++) {
         const aptId = unpaidApartments[j];
