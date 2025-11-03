@@ -1,4 +1,4 @@
-import { deletePoll } from '../../src/lib/firestore';
+import { deletePoll } from '../../src/lib/firestore/polls';
 
 // NOTE: This is a lightweight behavioral test relying on deletePoll throwing errors.
 // In a real environment, Firestore would be mocked; here we focus on function logic guardrails.

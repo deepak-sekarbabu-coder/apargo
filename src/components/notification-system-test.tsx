@@ -385,7 +385,7 @@ export function NotificationSystemTest() {
                         </div>
                         <div className="text-xs text-gray-500">
                           {new Date(notification.createdAt).toLocaleString()} •
-                          {notification.isRead ? ' Read' : ' Unread'}
+                          {typeof notification.isRead === 'boolean' && notification.isRead ? ' Read' : ' Unread'}
                         </div>
                       </div>
                     ))}

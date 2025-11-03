@@ -1,4 +1,4 @@
-import { computeExpenseDeltas } from '../../src/lib/firestore';
+import { computeExpenseDeltas } from '../../src/lib/firestore-utils';
 
 // Minimal stub of Expense type shape used by computeExpenseDeltas
 const makeExpense = (overrides: any) => ({

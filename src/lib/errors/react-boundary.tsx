@@ -67,6 +67,22 @@ export class ApargoErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoun
     }
   }
 
+  // Helper method for recovery actions
+  private getRecoveryActionHandler(recoveryAction: any) {
+    switch (recoveryAction.type) {
+      case 'retry':
+        return this.handleRetry.bind(this);
+      case 'refresh':
+        return this.handleReload.bind(this);
+      case 'wait':
+        return () => {
+          setTimeout(() => (this as any).handleRetry(), 3000);
+        };
+      default:
+        return this.handleRetry.bind(this);
+    }
+  }
+
   handleRetry = () => {
     this.setState(prevState => ({
       hasError: false,
@@ -96,6 +112,8 @@ export class ApargoErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoun
           error={this.state.error}
           retry={this.handleRetry}
           reload={this.handleReload}
+          retryCount={this.state.retryCount}
+          recoveryActionHandler={this.getRecoveryActionHandler.bind(this)}
         />
       );
     }
@@ -111,9 +129,11 @@ interface DefaultErrorDisplayProps {
   error: ApargoError;
   retry: () => void;
   reload: () => void;
+  retryCount: number;
+  recoveryActionHandler: (action: any) => () => void;
 }
 
-function DefaultErrorDisplay({ error, retry, reload }: DefaultErrorDisplayProps) {
+function DefaultErrorDisplay({ error, retry, reload, retryCount, recoveryActionHandler }: DefaultErrorDisplayProps) {
   const getSeverityColor = (userMessageType: UserMessageType): string => {
     switch (userMessageType) {
       case 'error':
@@ -170,7 +190,10 @@ function DefaultErrorDisplay({ error, retry, reload }: DefaultErrorDisplayProps)
           {error.recoveryAction && (
             <div className="mt-3">
               <button
-                onClick={this.getRecoveryActionHandler(error.recoveryAction)}
+                onClick={() => {
+                  const handler = recoveryActionHandler(error.recoveryAction);
+                  handler();
+                }}
                 className="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               >
                 {error.recoveryAction.label}
@@ -188,7 +211,7 @@ function DefaultErrorDisplay({ error, retry, reload }: DefaultErrorDisplayProps)
               className="px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
               Try Again (
-              {this.state.retryCount > 0 ? `${this.state.retryCount} attempts` : 'First try'})
+              {retryCount > 0 ? `${retryCount} attempts` : 'First try'})
             </button>
 
             <button
@@ -203,22 +226,6 @@ function DefaultErrorDisplay({ error, retry, reload }: DefaultErrorDisplayProps)
     </div>
   );
 }
-
-// Helper method for recovery actions
-ApargoErrorBoundary.prototype.getRecoveryActionHandler = function (recoveryAction: any) {
-  switch (recoveryAction.type) {
-    case 'retry':
-      return this.handleRetry;
-    case 'refresh':
-      return this.handleReload;
-    case 'wait':
-      return () => {
-        setTimeout(() => this.handleRetry(), 3000);
-      };
-    default:
-      return this.handleRetry;
-  }
-};
 
 /**
  * Higher-order component for wrapping components with error boundary

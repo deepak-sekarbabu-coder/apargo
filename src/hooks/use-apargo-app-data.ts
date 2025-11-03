@@ -120,13 +120,13 @@ function useDataSubscriptionManager(user: any, queryClient: ReturnType<typeof us
         subscribeToPayments(handlers.onPayments),
         subscribeToBalanceSheets(handlers.onBalanceSheets),
       ])
-        .then(([usersSub, expensesSub, paymentsSub, balanceSheetsSub]) => {
-          unsubscribes.push(
-            () => usersSub.unsubscribe(),
-            () => expensesSub.unsubscribe(),
-            () => paymentsSub.unsubscribe(),
-            () => balanceSheetsSub.unsubscribe()
-          );
+      .then((subs: any[]) => {
+        unsubscribes.push(
+          () => subs[0].unsubscribe(),
+          () => subs[1].unsubscribe(),
+          () => subs[2].unsubscribe(),
+          () => subs[3].unsubscribe()
+        );
         })
         .catch(err => {
           console.error('Error setting up admin subscriptions:', err);

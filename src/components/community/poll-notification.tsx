@@ -7,7 +7,7 @@ import * as React from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { voteOnPoll } from '@/lib/firestore';
+import { voteOnPoll } from '@/lib/firestore/polls';
 import { Poll } from '@/lib/types';
 
 import { Button } from '@/components/ui/button';

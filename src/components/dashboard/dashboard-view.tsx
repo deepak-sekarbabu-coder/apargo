@@ -103,7 +103,7 @@ export function DashboardView({
     ExpensesList,
     onNavigateToExpenses,
     isLoadingApartments = false,
-  } = expenseManagement || {};
+  } = expenseManagement!;
 
   const { payments = [], onAddPayment } = paymentManagement || {};
 
@@ -275,16 +275,18 @@ export function DashboardView({
               )}
             </CardHeader>
             <CardContent>
-              <ExpensesList
-                expenses={expenses}
-                limit={2}
-                users={users}
-                categories={categories}
-                currentUserApartment={currentUserApartment}
-                currentUserRole={currentUserRole}
-                onExpenseUpdate={onExpenseUpdate}
+              {ExpensesList && (
+                <ExpensesList
+                  expenses={expenses}
+                  limit={2}
+                  users={users}
+                  categories={categories}
+                  currentUserApartment={currentUserApartment}
+                  currentUserRole={currentUserRole}
+                  onExpenseUpdate={onExpenseUpdate}
                 onExpenseDelete={onExpenseDelete}
-              />
+                />
+              )}
             </CardContent>
           </Card>
 

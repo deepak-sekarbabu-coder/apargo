@@ -1,3 +1,4 @@
+import { getDoc, doc } from 'firebase/firestore';
 import { type QuerySnapshot, database } from '../database';
 import { computeApprovedExpensePaymentDeltas } from '../payments';
 import type { Apartment, Category, Payment, User } from '../types';
@@ -8,8 +9,8 @@ import { getUsers } from './users';
 
 // Helper function to validate category
 const validateCategory = async (categoryId: string): Promise<Category> => {
-  const categoryDoc = await getDoc(doc(db, 'categories', categoryId));
-  if (!categoryDoc.exists()) {
+  const categoryDoc = await database.collection<Category>('categories').doc(categoryId).get();
+  if (!categoryDoc.exists) {
     throw new Error(`Category ${categoryId} not found`);
   }
 
@@ -91,7 +92,7 @@ export const getPayments = async (apartmentId?: string, monthYear?: string): Pro
 };
 
 export const addPayment = async (payment: Omit<Payment, 'id' | 'createdAt'>): Promise<Payment> => {
-  const paymentsCollection = database.collection<Payment>('payments');
+  const paymentsCollection = database.collection<Omit<Payment, 'id'>>('payments');
   const newPayment = {
     ...payment,
     createdAt: new Date().toISOString(),
@@ -135,7 +136,7 @@ export const updatePayment = async (id: string, payment: Partial<Payment>): Prom
   const paymentDoc = database.collection<Payment>('payments').doc(id);
   // Read old to compute deltas
   const oldSnap = await paymentDoc.get();
-  const oldPayment = oldSnap.exists()
+  const oldPayment = oldSnap.exists
     ? ({ ...(oldSnap.data() as Payment), id } as Payment)
     : undefined;
   await paymentDoc.update(payment);

@@ -1,4 +1,4 @@
-import { voteOnPoll } from '../../src/lib/firestore';
+import { voteOnPoll } from '../../src/lib/firestore/polls';
 
 // Mock poll data
 const poll = {

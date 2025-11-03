@@ -66,6 +66,7 @@ class MetricsStore {
       business_logic: 0.5,
       external_service: 0.3,
       user_interface: 0.1,
+      performance: 0.4,
       unknown: 0.3,
     };
 
@@ -145,6 +146,15 @@ class ErrorLogger {
     // In development, also log with full details
     if (process.env.NODE_ENV === 'development') {
       this.logDevelopmentDetails(error, context);
+    }
+  }
+
+  /**
+  * Log debug information
+  */
+  debug(message: string, context: Partial<ErrorContext> = {}): void {
+    if (this.config.enableConsoleLogging && log.getLevel() <= log.levels.DEBUG) {
+      log.debug(message, context);
     }
   }
 

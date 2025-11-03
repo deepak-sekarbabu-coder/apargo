@@ -3,7 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import type { ApargoError, ErrorCode, ErrorContext, OperationResult } from '@/lib/errors';
-import { createError, createOperationResult, logger, wrapError } from '@/lib/errors';
+import { createAuthError, createError, createOperationResult, createSystemError, logger, wrapError } from '@/lib/errors';
 
 // Type for API handler functions
 type ApiHandler<T = any> = (
@@ -340,16 +340,16 @@ function createValidationError(
 export function createHealthCheckHandler() {
   return createApiHandler(
     async (request, context) => {
-      return createOperationResult({
-        status: 'healthy',
-        timestamp: new Date().toISOString(),
-        version: '1.0.0',
-        environment: process.env.NODE_ENV || 'development',
-        features: {
-          errorHandling: true,
-          logging: true,
-          monitoring: true,
-        },
+      return createOperationResult(true, {
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      version: '1.0.0',
+      environment: process.env.NODE_ENV || 'development',
+      features: {
+      errorHandling: true,
+      logging: true,
+      monitoring: true,
+      },
       });
     },
     {

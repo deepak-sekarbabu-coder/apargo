@@ -57,6 +57,8 @@ export function NotificationItem({ notification, onMarkAsRead }: NotificationIte
     }
   };
 
+  const isRead = typeof notification.isRead === 'boolean' ? notification.isRead : false;
+
   // Defer any locale-dependent formatting until after mount to avoid SSR/CSR mismatches
   const [mounted, setMounted] = React.useState(false);
   React.useEffect(() => setMounted(true), []);
@@ -82,7 +84,7 @@ export function NotificationItem({ notification, onMarkAsRead }: NotificationIte
   return (
     <Card
       className={`mb-2 overflow-hidden transition-all duration-200 hover:shadow-md ${
-        !notification.isRead
+        !isRead
           ? 'border-l-4 border-l-blue-500 bg-blue-50 dark:bg-blue-900/20'
           : 'bg-card/50 hover:bg-card/70 dark:bg-card/30 dark:hover:bg-card/50'
       }`}
@@ -97,17 +99,17 @@ export function NotificationItem({ notification, onMarkAsRead }: NotificationIte
               </h3>
               <div className="flex items-center gap-1 flex-shrink-0">
                 <Badge
-                  variant={!notification.isRead ? 'default' : 'outline'}
-                  className={`text-xs ${
-                    !notification.isRead
-                      ? 'bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-900/70 dark:text-blue-200 dark:hover:bg-blue-900/50'
-                      : ''
-                  }`}
+                variant={!isRead ? 'default' : 'outline'}
+                className={`text-xs ${
+                !isRead
+                ? 'bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-900/70 dark:text-blue-200 dark:hover:bg-blue-900/50'
+                : ''
+                }`}
                 >
                   {getTypeLabel()}
                 </Badge>
-                {!notification.isRead && (
-                  <span className="h-2.5 w-2.5 rounded-full bg-blue-500 dark:bg-blue-400 animate-pulse"></span>
+                {!isRead && (
+                <span className="h-2.5 w-2.5 rounded-full bg-blue-500 dark:bg-blue-400 animate-pulse"></span>
                 )}
               </div>
             </div>
@@ -135,16 +137,16 @@ export function NotificationItem({ notification, onMarkAsRead }: NotificationIte
                 {createdAtLabel}
               </span>
 
-              {!notification.isRead && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-7 gap-1 text-xs px-2"
-                  onClick={handleMarkAsRead}
-                >
-                  <Check className="h-3 w-3" />
-                  <span className="hidden sm:inline">Read</span>
-                </Button>
+              {!isRead && (
+              <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 gap-1 text-xs px-2"
+              onClick={handleMarkAsRead}
+              >
+              <Check className="h-3 w-3" />
+              <span className="hidden sm:inline">Read</span>
+              </Button>
               )}
             </div>
           </div>

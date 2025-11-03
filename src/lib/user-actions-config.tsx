@@ -159,7 +159,7 @@ userActionRegistry.register({
   handler: user => {
     console.warn('Edit handler not implemented');
   },
-  condition: user => user.isApproved,
+  condition: user => !!user.isApproved,
   priority: 80,
   group: 'secondary',
 });
@@ -173,7 +173,7 @@ userActionRegistry.register({
   handler: user => {
     console.warn('Delete handler not implemented');
   },
-  condition: user => user.isApproved,
+  condition: user => !!user.isApproved,
   priority: 70,
   group: 'danger',
   confirm: {
@@ -200,7 +200,7 @@ export const createSuspendAction = (
   variant: 'outline',
   icon: X,
   handler: onSuspend,
-  condition: user => user.isApproved && !user.isSuspended,
+  condition: user => !!user.isApproved && !user.isSuspended,
   priority: 75,
   group: 'secondary',
   confirm: {
@@ -231,7 +231,7 @@ export const createChangeRoleAction = (
       onChangeRole(user, newRole);
     }
   },
-  condition: user => user.isApproved,
+  condition: user => !!user.isApproved,
   priority: 85,
   group: 'secondary',
 });

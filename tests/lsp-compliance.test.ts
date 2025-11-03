@@ -28,14 +28,15 @@ describe('Liskov Substitution Principle - Type Safety', () => {
       };
 
       const announcementNotification: AnnouncementNotification = {
-        id: '2',
-        type: 'announcement',
-        title: 'Building Maintenance',
-        message: 'Elevator maintenance scheduled',
-        createdBy: 'admin1',
-        isActive: true,
-        priority: 'high',
-        isRead: { apt1: true, apt2: false },
+      id: '2',
+      type: 'announcement',
+      title: 'Building Maintenance',
+      message: 'Elevator maintenance scheduled',
+      createdBy: 'admin1',
+      isActive: true,
+      priority: 'high',
+      isRead: { apt1: true, apt2: false },
+      toApartmentId: ['apt1', 'apt2'],
         createdAt: '2024-01-01T00:00:00Z',
       };
 
@@ -95,14 +96,15 @@ describe('Liskov Substitution Principle - Type Safety', () => {
 
       // Announcement notifications require createdBy and isActive
       const announcementNotification: AnnouncementNotification = {
-        id: '2',
-        type: 'announcement',
-        title: 'Announcement',
-        message: 'Important news',
-        createdBy: 'admin1', // Required for announcements
-        isActive: true, // Required for announcements
-        priority: 'high',
-        isRead: { apt1: false },
+      id: '2',
+      type: 'announcement',
+      title: 'Announcement',
+      message: 'Important news',
+      createdBy: 'admin1', // Required for announcements
+      isActive: true, // Required for announcements
+      priority: 'high',
+      isRead: { apt1: false },
+      toApartmentId: ['apt1'],
         createdAt: '2024-01-01T00:00:00Z',
       };
 
@@ -233,21 +235,17 @@ describe('Liskov Substitution Principle - Type Safety', () => {
       }
 
       interface SpecificEventHandler extends EventHandler {
-        onEvent: (
-          event:
-            | { type: 'click'; data: { x: number; y: number } }
-            | { type: 'scroll'; data: { delta: number } }
-        ) => void;
+        onEvent: (event: { type: string; data?: any }) => void;
       }
 
       // LSP: Specific event handler can be used where general one is expected
       const specificHandler: SpecificEventHandler = {
         onEvent: event => {
           if (event.type === 'click') {
-            expect(typeof event.data.x).toBe('number');
-            expect(typeof event.data.y).toBe('number');
+            expect(typeof (event.data as { x: number; y: number }).x).toBe('number');
+            expect(typeof (event.data as { x: number; y: number }).y).toBe('number');
           } else if (event.type === 'scroll') {
-            expect(typeof event.data.delta).toBe('number');
+            expect(typeof (event.data as { delta: number }).delta).toBe('number');
           }
         },
       };

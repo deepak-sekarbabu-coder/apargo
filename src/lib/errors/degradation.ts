@@ -360,10 +360,10 @@ export async function executeBulk<T, R>(
     const chunkResults = await Promise.all(chunkPromises);
 
     for (const result of chunkResults) {
-      if (result.success) {
-        results.push(result.result);
-      } else {
-        failures.push({ item: result.item, error: result.error });
+    if (result.success) {
+    results.push(result.result!);
+    } else {
+        failures.push({ item: result.item, error: result.error! });
 
         if (failFast || failures.length >= maxFailures) {
           break;

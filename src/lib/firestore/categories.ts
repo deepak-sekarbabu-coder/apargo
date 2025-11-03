@@ -9,7 +9,7 @@ export const getCategories = async (): Promise<Category[]> => {
 };
 
 export const addCategory = async (category: Omit<Category, 'id'>): Promise<Category> => {
-  const categoriesCollection = database.collection<Category>('categories');
+  const categoriesCollection = database.collection<Omit<Category, 'id'>>('categories');
   const cleanCategory = removeUndefined(category);
   const docRef = await categoriesCollection.add(cleanCategory);
   return { id: docRef.id, ...cleanCategory } as Category;

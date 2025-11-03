@@ -1,4 +1,4 @@
-import { deletePoll } from '../../src/lib/firestore';
+import { deletePoll } from '../../src/lib/firestore/polls';
 
 // Mock firebase/app before importing firestore.ts
 jest.mock('firebase/app', () => ({

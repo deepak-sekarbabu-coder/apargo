@@ -3,14 +3,14 @@
 import * as React from 'react';
 
 import { deleteAnnouncement, listenToActiveAnnouncements } from '@/lib/firestore/announcements';
-import { Notification } from '@/lib/types';
+import { AnnouncementNotification } from '@/lib/types';
 
 import { AnnouncementCard } from './announcement-card';
 import { AnnouncementsEmpty } from './announcements-empty';
 import { AnnouncementsLoading } from './announcements-loading';
 
 export function ActiveAnnouncements() {
-  const [announcements, setAnnouncements] = React.useState<Notification[]>([]);
+  const [announcements, setAnnouncements] = React.useState<AnnouncementNotification[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [deletingId, setDeletingId] = React.useState<string | null>(null);
 

@@ -217,19 +217,19 @@ export function MainContent({
             categories={categories}
             currentUserApartment={user?.apartment}
             currentUserRole={role}
-            payments={payments}
-            apartmentBalances={apartmentBalances}
-            onExpenseUpdate={onExpenseUpdate}
-            onExpenseDelete={onExpenseDelete}
-            onAddExpense={onExpenseAdd}
-            onAddPayment={onPaymentAdd}
-            ExpensesList={ExpensesListComponent}
-            apartmentsCount={apartmentsCount}
-            unpaidBillsCount={unpaidBillsCount}
-            onNavigateToExpenses={() => {
-              setActiveExpenseTab('expenses');
-              setView('expense-analytics');
+            paymentManagement={{ payments, onAddPayment: onPaymentAdd }}
+            balanceDisplay={{ apartmentBalances }}
+            expenseManagement={{
+              onExpenseUpdate,
+              onExpenseDelete,
+              onAddExpense: onExpenseAdd,
+              ExpensesList: ExpensesListComponent,
+              onNavigateToExpenses: () => {
+                setActiveExpenseTab('expenses');
+                setView('expense-analytics');
+              },
             }}
+            summaryStats={{ apartmentsCount, unpaidBillsCount }}
           />
         );
       }
@@ -303,19 +303,19 @@ export function MainContent({
           categories={categories}
           currentUserApartment={currentUserApartment}
           currentUserRole={role}
-          payments={payments}
-          apartmentBalances={apartmentBalances}
-          onExpenseUpdate={onExpenseUpdate}
-          onExpenseDelete={onExpenseDelete}
-          onAddExpense={onExpenseAdd}
-          onAddPayment={onPaymentAdd}
-          ExpensesList={ExpensesListComponent}
-          apartmentsCount={apartmentsCount}
-          unpaidBillsCount={unpaidBillsCount}
-          onNavigateToExpenses={() => {
-            setActiveExpenseTab('expenses');
-            setView('expense-analytics');
+          paymentManagement={{ payments, onAddPayment: onPaymentAdd }}
+          balanceDisplay={{ apartmentBalances }}
+          expenseManagement={{
+            onExpenseUpdate,
+            onExpenseDelete,
+            onAddExpense: onExpenseAdd,
+            ExpensesList: ExpensesListComponent,
+            onNavigateToExpenses: () => {
+              setActiveExpenseTab('expenses');
+              setView('expense-analytics');
+            },
           }}
+          summaryStats={{ apartmentsCount, unpaidBillsCount }}
         />
       );
   }

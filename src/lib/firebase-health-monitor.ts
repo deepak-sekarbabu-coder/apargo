@@ -278,7 +278,14 @@ export class FirebaseHealthMonitor {
 }
 
 // Diagnostic utilities
-export const diagnostics = {
+export const diagnostics: {
+  isQuicEnabled: () => boolean;
+  getNetworkInfo: () => any;
+  detectProxyOrFirewall: () => Promise<boolean>;
+  collectDiagnosticData: () => Promise<any>;
+  formatReport: (data: any) => string;
+  generateReport: () => Promise<string>;
+} = {
   // Check if QUIC is being used
   isQuicEnabled: (): boolean => {
     if (typeof window === 'undefined') return false;
@@ -324,6 +331,12 @@ export const diagnostics = {
       // Connection blocked or modified
       return true;
     }
+  },
+
+  // Generate full diagnostic report
+  generateReport: async (): Promise<string> => {
+    const data = await diagnostics.collectDiagnosticData();
+    return diagnostics.formatReport(data);
   },
 
   // Collect diagnostic data

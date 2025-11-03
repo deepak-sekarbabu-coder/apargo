@@ -111,9 +111,13 @@ const UserActionButton: React.FC<UserActionButtonProps> = ({ action, user, isMob
   if (action.id === 'edit') {
     return (
       <EditUserDialog user={user} onUpdateUser={action.handler}>
-        <Button variant={action.variant || 'outline'} size={buttonSize} className={buttonClass}>
+        <Button
+          variant={action.variant || 'outline'}
+          size={buttonSize}
+          className={`${buttonClass} rounded-full border font-medium text-xs px-2 py-1 flex items-center justify-center transition-colors duration-150 hover:bg-primary/10 focus:ring-2 focus:ring-primary`}
+        >
           {action.icon &&
-            React.createElement(action.icon, { className: isMobile ? 'h-3 w-3 mr-1' : 'h-4 w-4' })}
+            React.createElement(action.icon, { className: isMobile ? 'h-3 w-3' : 'h-4 w-4' })}
           {isMobile ? action.label : null}
         </Button>
       </EditUserDialog>

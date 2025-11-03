@@ -9,6 +9,7 @@ export type User = {
   fcmToken?: string; // For push notifications
   apartment: string; // Apartment is now required
   isApproved?: boolean; // User approval status (default: false)
+  isSuspended?: boolean; // User suspension status
 };
 
 export type Category = {
@@ -68,6 +69,10 @@ interface BaseNotification {
   title: string;
   message: string;
   createdAt: string; // ISO date string
+  isRead?: boolean | { [apartmentId: string]: boolean }; // Whether the notification has been read by the user (boolean for most, object for announcements)
+  dueDate?: string; // Optional due date for relevant notifications
+  amount?: number; // Optional amount for payment-related notifications
+  currency?: string; // Optional currency for payment-related notifications
 }
 
 // Discriminated union for different notification types
@@ -100,6 +105,7 @@ export interface AnnouncementNotification extends BaseNotification {
   isActive: boolean; // Whether the announcement is still active (required for announcements)
   priority: 'low' | 'medium' | 'high';
   expiresAt?: string; // ISO date string
+  toApartmentId: string | string[]; // Apartments to send the announcement to
   isRead: { [apartmentId: string]: boolean }; // Object mapping for announcements (required)
   isDismissed?: boolean;
   dueDate?: string;

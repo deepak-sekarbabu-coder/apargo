@@ -3,7 +3,7 @@
 import { format } from 'date-fns';
 import { Megaphone } from 'lucide-react';
 
-import { Notification } from '@/lib/types';
+import { AnnouncementNotification } from '@/lib/types';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -12,7 +12,7 @@ import { getPriorityColor, getPriorityIconColor } from './announcement-utils';
 import { DeleteAnnouncementDialog } from './delete-announcement-dialog';
 
 interface AnnouncementCardProps {
-  announcement: Notification;
+  announcement: AnnouncementNotification;
   onDelete: (id: string) => Promise<void>;
   isDeleting: boolean;
 }

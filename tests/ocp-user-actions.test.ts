@@ -130,7 +130,7 @@ describe('Open/Closed Principle - User Actions Configuration', () => {
         variant: 'outline' as const,
         icon: () => null, // Simplified for testing
         handler: jest.fn(),
-        condition: (user: User) => user.isApproved && user.email !== undefined,
+        condition: (user: User) => !!user.isApproved && user.email !== undefined,
         priority: 60,
         group: 'secondary' as const,
         confirm: {
@@ -165,7 +165,7 @@ describe('Open/Closed Principle - User Actions Configuration', () => {
           // Would navigate to activity log page
           console.log(`Viewing activity for ${user.name}`);
         },
-        condition: (user: User) => user.isApproved,
+        condition: (user: User) => !!user.isApproved,
         priority: 50,
         group: 'secondary' as const,
       };

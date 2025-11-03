@@ -10,25 +10,31 @@ import { ActiveAnnouncements } from '@/components/admin/active-announcements';
 // Mock data
 const mockAnnouncements: Notification[] = [
   {
-    id: 'ann1',
-    title: 'Community Meeting This Friday',
-    message:
-      'Please join us for our monthly community meeting this Friday at 7 PM in the common area.',
-    priority: 'high',
-    createdAt: new Date().toISOString(),
-    expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 1 week from now
-    type: 'announcement',
-    isRead: {},
+  id: 'ann1',
+  title: 'Community Meeting This Friday',
+  message:
+  'Please join us for our monthly community meeting this Friday at 7 PM in the common area.',
+  priority: 'high',
+  createdAt: new Date().toISOString(),
+  expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(), // 1 week from now
+  type: 'announcement',
+  isRead: {},
+    createdBy: 'admin1',
+    isActive: true,
+    toApartmentId: ['apt1', 'apt2'],
   },
   {
-    id: 'ann2',
-    title: 'Pool Maintenance Next Week',
-    message: 'The swimming pool will be closed for maintenance from Monday to Wednesday next week.',
-    priority: 'medium',
-    createdAt: new Date().toISOString(),
-    expiresAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(), // 2 weeks from now
-    type: 'announcement',
-    isRead: {},
+  id: 'ann2',
+  title: 'Pool Maintenance Next Week',
+  message: 'The swimming pool will be closed for maintenance from Monday to Wednesday next week.',
+  priority: 'medium',
+  createdAt: new Date().toISOString(),
+  expiresAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(), // 2 weeks from now
+  type: 'announcement',
+  isRead: {},
+    createdBy: 'admin1',
+    isActive: true,
+    toApartmentId: ['apt1', 'apt2'],
   },
 ];
 

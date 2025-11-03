@@ -53,7 +53,7 @@ export const getUserByEmail = async (email: string): Promise<User | null> => {
 };
 
 export const addUser = async (user: Omit<User, 'id'>): Promise<User> => {
-  const usersCollection = database.collection<User>('users');
+  const usersCollection = database.collection<Omit<User, 'id'>>('users');
   const cleanUser = removeUndefined({ ...user, isApproved: false });
   const docRef = await usersCollection.add(cleanUser);
   return { id: docRef.id, ...cleanUser } as User;
@@ -78,6 +78,7 @@ export const deleteUser = async (id: string): Promise<void> => {
 export const subscribeToUsers = async (callback: (users: User[]) => void, apartment?: string) => {
   const filters = [{ field: 'isApproved', operator: '==' as const, value: true }];
   if (apartment) {
+    // @ts-ignore
     filters.push({ field: 'apartment', operator: '==' as const, value: apartment });
   }
   return database.subscribeToCollection<User>(
