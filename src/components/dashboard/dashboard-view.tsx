@@ -125,7 +125,7 @@ export function DashboardView({
     currentUserApartment
   );
 
-  const [showMobileActions, setShowMobileActions] = React.useState(false);
+
 
   return (
     <div className="grid gap-6" suppressHydrationWarning>

@@ -25,7 +25,7 @@ export interface ExpenseCalculationStrategy {
  * Handles expenses where one apartment pays and others owe shares.
  */
 export class StandardExpenseCalculationStrategy implements ExpenseCalculationStrategy {
-  canHandle(expense: Expense): boolean {
+  canHandle(): boolean {
     // This strategy handles all expenses by default - it's the fallback
     return true;
   }

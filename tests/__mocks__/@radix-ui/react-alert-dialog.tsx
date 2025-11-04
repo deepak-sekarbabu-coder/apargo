@@ -21,7 +21,7 @@ export const Content = React.forwardRef<HTMLDivElement, any>(({ className, child
 ));
 export const Title = ({ children }: any) => <h2>{children}</h2>;
 export const Description = ({ children }: any) => <p>{children}</p>;
-export const Action = ({ children }: any) => <button>{children}</button>;
+export const Action = ({ children, ...props }: any) => <button {...props}>{children}</button>;
 export const Cancel = ({ children }: any) => <button>{children}</button>;
 export const createAlertDialogScope = () => {
   return () => {};

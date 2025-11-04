@@ -1,5 +1,5 @@
 // Core Error Types and Interfaces for Unified Error Handling System
-import { type ClassValue, clsx } from 'clsx';
+import * as React from 'react';
 
 /**
  * Error Classification Hierarchy
@@ -108,7 +108,7 @@ export interface ApargoError extends Error {
   // Error Context
   message: string; // User-friendly message
   technicalMessage?: string; // Technical details for developers
-  details?: Record<string, any>; // Additional error context
+  details?: Record<string, unknown>; // Additional error context
 
   // User Feedback
   userMessage: string; // Display message for users
@@ -127,7 +127,7 @@ export interface ApargoError extends Error {
   userId?: string; // Associated user ID (if applicable)
   component?: string; // Component where error occurred
   operation?: string; // Operation that failed
-  metadata?: Record<string, any>; // Additional debug metadata
+  metadata?: Record<string, unknown>; // Additional debug metadata
 
   // Stack Trace and Source
   stackTrace?: string; // Error stack trace
@@ -173,7 +173,7 @@ export interface ErrorContext {
   requestId?: string;
   userAgent?: string;
   timestamp?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 /**
@@ -193,7 +193,7 @@ export interface RecoveryStrategy {
 export interface ErrorBoundaryState {
   hasError: boolean;
   error: ApargoError | null;
-  errorInfo: any;
+  errorInfo: React.ErrorInfo | null;
   retryCount: number;
 }
 
@@ -242,7 +242,7 @@ export interface ValidationResult {
  * Operation Result Interface
  * Standard format for async operations
  */
-export interface OperationResult<T = any> {
+export interface OperationResult<T = unknown> {
   success: boolean;
   data?: T;
   error?: ApargoError;

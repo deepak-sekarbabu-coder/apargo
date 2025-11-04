@@ -80,7 +80,6 @@ interface MobileSheetProps {
   side?: 'left' | 'right' | 'bottom';
   children: React.ReactNode;
   className?: string;
-  enableSwipeClose?: boolean;
 }
 
 export const MobileSheet: React.FC<MobileSheetProps> = ({
@@ -89,11 +88,9 @@ export const MobileSheet: React.FC<MobileSheetProps> = ({
   side = 'left',
   children,
   className,
-  enableSwipeClose = true,
 }) => {
-  const { isTouchDevice } = useDeviceInfo();
   const safeArea = useSafeArea();
-  const [isDragging, setIsDragging] = React.useState(false);
+  const [, setIsDragging] = React.useState(false);
 
   React.useEffect(() => {
     if (isOpen) {
@@ -119,16 +116,7 @@ export const MobileSheet: React.FC<MobileSheetProps> = ({
     bottom: isOpen ? 'translate-y-0' : 'translate-y-full',
   };
 
-  const handleSwipe = (direction: 'left' | 'right' | 'up' | 'down') => {
-    const shouldClose =
-      (side === 'left' && direction === 'left') ||
-      (side === 'right' && direction === 'right') ||
-      (side === 'bottom' && direction === 'down');
 
-    if (shouldClose) {
-      onClose();
-    }
-  };
 
   return (
     <>
@@ -173,11 +161,10 @@ export const MobileSheet: React.FC<MobileSheetProps> = ({
 interface MobileListProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode;
   dense?: boolean;
-  showDividers?: boolean;
 }
 
 export const MobileList = React.forwardRef<HTMLDivElement, MobileListProps>(
-  ({ className, children, dense = false, showDividers = true, ...props }, ref) => {
+  ({ className, children, dense = false, ...props }, ref) => {
     return (
       <div
         ref={ref}
@@ -263,13 +250,9 @@ interface MobileCardGridProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 export const MobileCardGrid = React.forwardRef<HTMLDivElement, MobileCardGridProps>(
-  ({ className, columns = 2, gap = 'md', children, ...props }, ref) => {
-    const { isMobile, isTablet } = useDeviceInfo();
+  ({ className, gap = 'md', children, ...props }, ref) => {
 
-    const columnClasses = {
-      mobile: isMobile ? columns : 2,
-      tablet: isTablet ? Math.max(columns, 3) : columns,
-    };
+
 
     const gapClasses = {
       sm: 'gap-2',
@@ -347,11 +330,11 @@ export function useMobileGestures() {
     isDragging: false,
   });
 
-  const handleTouchStart = (e: React.TouchEvent) => {
+  const handleTouchStart = () => {
     setGestures(prev => ({ ...prev, isDragging: true }));
   };
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
+  const handleTouchEnd = () => {
     setGestures(prev => ({ ...prev, isDragging: false }));
   };
 
@@ -384,7 +367,6 @@ export const MobileModal: React.FC<MobileModalProps> = ({
   size = 'md',
   showCloseButton = true,
 }) => {
-  const { isMobile } = useDeviceInfo();
   const modalRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {

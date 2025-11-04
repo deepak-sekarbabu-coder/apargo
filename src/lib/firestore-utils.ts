@@ -1,6 +1,5 @@
 import { expenseCalculationRegistry } from './expense-calculation-strategies';
-import { db } from './firebase';
-import type { BalanceSheet, Expense } from './types';
+import type { Expense } from './types';
 
 // Helper: derive monthYear (YYYY-MM) from ISO date or now
 export const getMonthYearFromDate = (isoDate?: string) => {

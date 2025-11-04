@@ -113,7 +113,6 @@ export const TouchFeedback: React.FC<TouchFeedbackProps> = ({
 
 // Long press handler hook
 export function useLongPress(callback: () => void, delay: number = 500) {
-  const [isLongPress, setIsLongPress] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { isTouchDevice } = useDeviceInfo();
 
@@ -121,7 +120,6 @@ export function useLongPress(callback: () => void, delay: number = 500) {
     if (!isTouchDevice) return;
 
     timeoutRef.current = setTimeout(() => {
-      setIsLongPress(true);
       callback();
     }, delay);
   }, [callback, delay, isTouchDevice]);
@@ -131,7 +129,6 @@ export function useLongPress(callback: () => void, delay: number = 500) {
       clearTimeout(timeoutRef.current);
       timeoutRef.current = null;
     }
-    setIsLongPress(false);
   }, []);
 
   React.useEffect(() => {
@@ -139,7 +136,6 @@ export function useLongPress(callback: () => void, delay: number = 500) {
   }, [clear]);
 
   return {
-    isLongPress,
     bind: {
       onTouchStart: start,
       onTouchEnd: clear,
@@ -299,7 +295,7 @@ export const EnhancedTouchButton = React.forwardRef<HTMLButtonElement, EnhancedT
     ref
   ) => {
     const { isTouchDevice } = useDeviceInfo();
-    const { isLongPress, bind: longPressBind } = useLongPress(() => {
+    const { bind: longPressBind } = useLongPress(() => {
       if (longPressText) {
         // Could show a toast or haptic feedback
         if ('vibrate' in navigator) {

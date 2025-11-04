@@ -39,7 +39,7 @@ const mockAnnouncements: Notification[] = [
 ];
 
 // Mock the firestore functions
-jest.mock('@/lib/firestore', () => ({
+jest.mock('@/lib/firestore/announcements', () => ({
   listenToActiveAnnouncements: jest.fn(callback => {
     callback(mockAnnouncements);
     return jest.fn(); // unsubscribe function

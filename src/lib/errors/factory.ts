@@ -27,7 +27,7 @@ export function createError(
     userMessageType?: UserMessageType;
     context?: ErrorContext;
     originalError?: Error;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
   } = {}
 ): ApargoError {
   const {
@@ -207,7 +207,6 @@ export function createSystemError(
  */
 export function wrapError(
   originalError: Error,
-  code: ErrorCode = 'GENERIC_UNKNOWN_ERROR',
   context: Partial<ErrorContext> = {}
 ): ApargoError {
   // Check if it's already an ApargoError
@@ -272,7 +271,11 @@ export async function withRetry<T>(
     try {
       return await operation();
     } catch (error) {
-      lastError = wrapError(error as Error, undefined, context);
+      lastError = wrapError(error as Error, context);
+
+      if (attempt === maxRetries + 1) {
+        throw lastError;
+      }
 
       // Don't retry on certain types of errors
       if (isNonRetryableError(lastError.code) || attempt > maxRetries) {

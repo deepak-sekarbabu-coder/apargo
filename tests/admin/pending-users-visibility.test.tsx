@@ -11,6 +11,12 @@ jest.mock('@/hooks/use-toast', () => ({
   useToast: () => ({ toast: jest.fn() }),
 }));
 
+jest.mock('@/context/auth-context', () => ({
+  useAuth: () => ({
+    user: { id: 'admin1', role: 'admin' },
+  }),
+}));
+
 jest.mock('@/components/dialogs/add-user-dialog', () => ({
   AddUserDialog: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
@@ -100,9 +106,9 @@ describe('Pending Users Visibility for Admin', () => {
     expect(screen.getAllByText('Jane Smith')).toHaveLength(4);
 
     // Should also display pending users (this was the bug)
-    // Note: Now shows 5 instances (reduced from previous UI changes)
-    expect(screen.getAllByText('Bob Wilson')).toHaveLength(5);
-    expect(screen.getAllByText('Alice Johnson')).toHaveLength(5);
+    // Note: Now shows 6 instances (updated UI changes)
+    expect(screen.getAllByText('Bob Wilson')).toHaveLength(6);
+    expect(screen.getAllByText('Alice Johnson')).toHaveLength(6);
   });
 
   it('should show approve and reject buttons for pending users', () => {
@@ -147,12 +153,22 @@ describe('Pending Users Visibility for Admin', () => {
     if (approveButtons.length > 0) {
       approveButtons[0].click();
 
-      // Should call onUpdateUser with isApproved: true
-      expect(mockOnUpdateUser).toHaveBeenCalledWith(
-        expect.objectContaining({
-          isApproved: true,
-        })
-      );
+      // Should show confirmation dialog
+      const dialogTitles = screen.getAllByText('Approve User?');
+      expect(dialogTitles.length).toBeGreaterThan(0);
+
+      // Click the confirm button
+      const confirmButtons = screen.getAllByText('Approve User');
+      if (confirmButtons.length > 0) {
+        confirmButtons[0].click();
+
+        // Should call onUpdateUser with isApproved: true
+        expect(mockOnUpdateUser).toHaveBeenCalledWith(
+          expect.objectContaining({
+            isApproved: true,
+          })
+        );
+      }
     }
   });
 
@@ -167,7 +183,7 @@ describe('Pending Users Visibility for Admin', () => {
     rejectButtons[0].click();
 
     // Should show confirmation dialog
-    const dialogTitles = screen.getAllByText('Reject User Application?');
+    const dialogTitles = screen.getAllByText('Reject Application?');
     expect(dialogTitles.length).toBeGreaterThan(0);
 
     // Should show confirmation button

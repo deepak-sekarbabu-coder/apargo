@@ -283,7 +283,6 @@ const VirtualizedPaymentList = ({
   currentUser,
   onApprovePayment,
   onRejectPayment,
-  onDeletePayment,
   columnVisibility,
   isDeleting,
   setDeleteId,
@@ -293,7 +292,6 @@ const VirtualizedPaymentList = ({
   currentUser: User;
   onApprovePayment: (paymentId: string) => Promise<void>;
   onRejectPayment: (paymentId: string) => Promise<void>;
-  onDeletePayment: (paymentId: string) => Promise<void>;
   columnVisibility: VisibilityState;
   isDeleting: boolean;
   setDeleteId: (id: string | null) => void;
@@ -789,7 +787,6 @@ export function PaymentsTable({
             currentUser={currentUser}
             onApprovePayment={onApprovePayment}
             onRejectPayment={onRejectPayment}
-            onDeletePayment={onDeletePayment}
             columnVisibility={columnVisibility}
             isDeleting={isDeleting}
             setDeleteId={setDeleteId}

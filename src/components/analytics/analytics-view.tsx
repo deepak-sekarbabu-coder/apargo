@@ -1,6 +1,6 @@
 'use client';
 
-import { format, isThisMonth, isThisWeek, isToday, isYesterday, subDays } from 'date-fns';
+import { format, isThisWeek, isToday, subDays } from 'date-fns';
 import {
   Activity,
   AlertCircle,
@@ -13,12 +13,8 @@ import {
 import {
   Area,
   AreaChart,
-  Bar,
-  BarChart,
   CartesianGrid,
   Cell,
-  Line,
-  LineChart,
   Pie,
   PieChart,
   Tooltip as RechartsTooltip,
@@ -137,7 +133,6 @@ export function AnalyticsView({
 
   const trendIndicator = calculateTrendIndicator(currentMonthSpending, lastMonthSpending);
   const weeklyVelocity = calculateSpendingVelocity(expenses, 7);
-  const monthlyVelocity = calculateSpendingVelocity(expenses, 30);
 
   // Recent activity tracking
   const todayExpenses = expenses.filter(e => {

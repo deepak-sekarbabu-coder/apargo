@@ -1,4 +1,4 @@
-import { type DocumentSnapshot, type QuerySnapshot, database } from '../database';
+import { type QuerySnapshot, database } from '../database';
 import { removeUndefined } from '../firestore-utils';
 import type { User } from '../types';
 
@@ -78,7 +78,7 @@ export const deleteUser = async (id: string): Promise<void> => {
 export const subscribeToUsers = async (callback: (users: User[]) => void, apartment?: string) => {
   const filters = [{ field: 'isApproved', operator: '==' as const, value: true }];
   if (apartment) {
-    // @ts-ignore
+    // @ts-expect-error Type mismatch in filter array
     filters.push({ field: 'apartment', operator: '==' as const, value: apartment });
   }
   return database.subscribeToCollection<User>(
@@ -107,7 +107,7 @@ export const subscribeToAllUsers = async (
       | 'array-contains'
       | 'in'
       | 'array-contains-any';
-    value: any;
+    value: unknown;
   }> = [];
   if (apartment) {
     filters.push({ field: 'apartment', operator: '==', value: apartment });

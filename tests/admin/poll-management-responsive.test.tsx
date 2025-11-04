@@ -69,7 +69,7 @@ jest.mock('@/context/auth-context', () => ({
 }));
 
 // Mock the firestore functions
-jest.mock('@/lib/firestore', () => ({
+jest.mock('@/lib/firestore/polls', () => ({
   listenToPolls: jest.fn(callback => {
     callback(mockPolls);
     return jest.fn(); // unsubscribe function

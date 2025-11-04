@@ -103,7 +103,7 @@ export function ExpenseItem({
 
     // Optimistic update: immediately update local UI state
     const optimisticPaidApartments = markApartmentAsPaid(expense, apartmentId).paidByApartments;
-    setOptimisticPaidByApartments(optimisticPaidApartments);
+    setOptimisticPaidByApartments(optimisticPaidApartments || null);
 
     const isUserMarkingOwnPayment = isCurrentUserPayment && !isPayer;
 
@@ -153,7 +153,7 @@ export function ExpenseItem({
 
     // Optimistic update: immediately update local UI state
     const optimisticPaidApartments = markApartmentAsUnpaid(expense, apartmentId).paidByApartments;
-    setOptimisticPaidByApartments(optimisticPaidApartments);
+    setOptimisticPaidByApartments(optimisticPaidApartments || null);
 
     const isUserMarkingOwnPayment = isCurrentUserPayment && !isPayer;
 

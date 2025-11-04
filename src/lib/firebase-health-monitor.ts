@@ -15,6 +15,20 @@ export interface ConnectionHealth {
   connectionType: 'websocket' | 'long-polling' | 'unknown';
 }
 
+interface NetworkInfo {
+  type: string;
+  effectiveType: string;
+  downlink: number | string;
+  rtt: number | string;
+}
+
+interface DiagnosticData {
+  health: ConnectionHealth;
+  networkInfo: NetworkInfo;
+  isQuic: boolean;
+  hasProxy: boolean;
+}
+
 export class FirebaseHealthMonitor {
   private static instance: FirebaseHealthMonitor;
   private health: ConnectionHealth = {
@@ -127,7 +141,7 @@ export class FirebaseHealthMonitor {
 
   private handleHealthCheckError(error: unknown): void {
     // Handle permission errors more gracefully
-    const isPermissionError = (error as any)?.code === 'permission-denied';
+    const isPermissionError = (error as { code?: string })?.code === 'permission-denied';
 
     if (isPermissionError) {
       // Silently handle permission errors for unauthenticated users
@@ -172,7 +186,7 @@ export class FirebaseHealthMonitor {
     });
   };
 
-  private handleTestListenerError = (error: any) => {
+  private handleTestListenerError = (error: { code?: string }) => {
     const isPermissionError = error?.code === 'permission-denied';
 
     if (!isPermissionError) {
@@ -182,7 +196,7 @@ export class FirebaseHealthMonitor {
     this.updateHealth({
       isConnected: false,
       errorCount: this.health.errorCount + 1,
-      lastError: error,
+      lastError: error as Error,
     });
 
     // Clean up failed listener
@@ -280,10 +294,10 @@ export class FirebaseHealthMonitor {
 // Diagnostic utilities
 export const diagnostics: {
   isQuicEnabled: () => boolean;
-  getNetworkInfo: () => any;
+  getNetworkInfo: () => NetworkInfo;
   detectProxyOrFirewall: () => Promise<boolean>;
-  collectDiagnosticData: () => Promise<any>;
-  formatReport: (data: any) => string;
+  collectDiagnosticData: () => Promise<DiagnosticData>;
+  formatReport: (data: DiagnosticData) => string;
   generateReport: () => Promise<string>;
 } = {
   // Check if QUIC is being used
@@ -295,20 +309,20 @@ export const diagnostics: {
     return entries.some(
       entry =>
         entry.name.includes('firestore.googleapis.com') &&
-        (entry as any).nextHopProtocol?.includes('h3')
+        (entry as { nextHopProtocol?: string }).nextHopProtocol?.includes('h3')
     );
   },
 
   // Get network information
   getNetworkInfo: () => {
     if (typeof window === 'undefined' || !('navigator' in window)) {
-      return { type: 'unknown', effectiveType: 'unknown' };
+      return { type: 'unknown', effectiveType: 'unknown', downlink: 'unknown', rtt: 'unknown' };
     }
 
     const connection =
-      (navigator as any).connection ||
-      (navigator as any).mozConnection ||
-      (navigator as any).webkitConnection;
+      (navigator as { connection?: { type?: string; effectiveType?: string; downlink?: number; rtt?: number } }).connection ||
+      (navigator as { mozConnection?: { type?: string; effectiveType?: string; downlink?: number; rtt?: number } }).mozConnection ||
+      (navigator as { webkitConnection?: { type?: string; effectiveType?: string; downlink?: number; rtt?: number } }).webkitConnection;
 
     return {
       type: connection?.type || 'unknown',
@@ -327,7 +341,7 @@ export const diagnostics: {
         mode: 'no-cors',
       });
       return false; // Direct connection successful
-    } catch (error) {
+    } catch {
       // Connection blocked or modified
       return true;
     }
@@ -355,18 +369,10 @@ export const diagnostics: {
   },
 
   // Format diagnostic report
-  formatReport: (data: Awaited<ReturnType<typeof diagnostics.collectDiagnosticData>>): string => {
+  formatReport: (data: DiagnosticData): string => {
     const { health, networkInfo, isQuic, hasProxy } = data;
 
-    return `
-    },
-    },
-
-    // Generate diagnostic report
-    generateReport: async (): Promise<string> => {
-        const data = await diagnostics.collectDiagnosticData();
-        return diagnostics.formatReport(data);
-Firebase Connection Diagnostic Report
+    return `Firebase Connection Diagnostic Report
 =====================================
 Connection Status: ${health.isConnected ? 'Connected' : 'Disconnected'}
 Last Successful Operation: ${health.lastSuccessfulOperation?.toISOString() || 'Never'}

@@ -152,8 +152,10 @@ export const getInitializationError = (): string | null => {
 export { getFirebaseAdminApp };
 
 // Default export for compatibility
-export default {
+const firebaseAdmin = {
   getFirebaseAdminApp,
   isFirebaseAdminAvailable,
   getInitializationError,
 };
+
+export default firebaseAdmin;

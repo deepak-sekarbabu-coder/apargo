@@ -23,7 +23,7 @@ interface FeatureGridProps {
   isAdmin?: boolean;
 }
 
-export function FeatureGrid({ onSelect, className, isAdmin }: FeatureGridProps) {
+export function FeatureGrid({ onSelect, isAdmin }: FeatureGridProps) {
   const [isDragging, setIsDragging] = React.useState(false);
   const [dragOffset, setDragOffset] = React.useState({ x: 0, y: 0 });
   const containerRef = React.useRef<HTMLDivElement>(null);

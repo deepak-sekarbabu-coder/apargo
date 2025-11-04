@@ -367,8 +367,7 @@ export function startTimer(label: string): () => void {
 
 export async function withPerformanceLogging<T>(
   operation: () => Promise<T>,
-  label: string,
-  context?: Partial<ErrorContext>
+  label: string
 ): Promise<T> {
   const endTimer = startTimer(label);
   try {

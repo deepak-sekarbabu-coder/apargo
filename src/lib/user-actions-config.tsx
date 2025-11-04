@@ -106,7 +106,8 @@ userActionRegistry.register({
   label: 'Approve',
   variant: 'default',
   icon: Check,
-  handler: user => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  handler: (_user: User) => {
     // This will be overridden by the parent component
     console.warn('Approve handler not implemented');
   },
@@ -117,7 +118,7 @@ userActionRegistry.register({
     title: 'Approve User?',
     description: (user: User) => (
       <>
-        This will approve <strong>{user.name || 'this user'}</strong>'s application and grant them
+        This will approve <strong>{user.name || 'this user'}</strong>&apos;s application and grant them
         access to the system.
       </>
     ),
@@ -131,7 +132,8 @@ userActionRegistry.register({
   label: 'Reject',
   variant: 'destructive',
   icon: X,
-  handler: user => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  handler: (_user: User) => {
     console.warn('Reject handler not implemented');
   },
   condition: user => !user.isApproved,
@@ -141,7 +143,7 @@ userActionRegistry.register({
     title: 'Reject Application?',
     description: (user: User) => (
       <>
-        This will permanently reject <strong>{user.name || 'this user'}</strong>'s application and
+        This will permanently reject <strong>{user.name || 'this user'}</strong>&apos;s application and
         remove their data.
       </>
     ),
@@ -156,7 +158,8 @@ userActionRegistry.register({
   label: 'Edit',
   variant: 'outline',
   icon: Pencil,
-  handler: user => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  handler: (_user: User) => {
     console.warn('Edit handler not implemented');
   },
   condition: user => !!user.isApproved,
@@ -170,7 +173,8 @@ userActionRegistry.register({
   label: 'Delete',
   variant: 'ghost',
   icon: Trash2,
-  handler: user => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  handler: (_user: User) => {
     console.warn('Delete handler not implemented');
   },
   condition: user => !!user.isApproved,
@@ -180,7 +184,7 @@ userActionRegistry.register({
     title: 'Delete User?',
     description: (user: User) => (
       <>
-        This will permanently delete <strong>{user.name || 'this user'}</strong>'s account and all
+        This will permanently delete <strong>{user.name || 'this user'}</strong>&apos;s account and all
         associated data.
       </>
     ),
@@ -207,7 +211,7 @@ export const createSuspendAction = (
     title: 'Suspend User?',
     description: (user: User) => (
       <>
-        This will temporarily suspend <strong>{user.name || 'this user'}</strong>'s access to the
+        This will temporarily suspend <strong>{user.name || 'this user'}</strong>&apos;s access to the
         system.
       </>
     ),

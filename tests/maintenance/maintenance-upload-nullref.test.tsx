@@ -9,7 +9,7 @@ jest.mock('@/lib/storage', () => ({
   uploadImage: jest.fn().mockResolvedValue('https://example.com/receipt.png'),
 }));
 
-jest.mock('@/lib/firestore', () => ({
+jest.mock('@/lib/firestore/payments', () => ({
   updatePayment: jest.fn().mockResolvedValue(undefined),
   addPayment: jest.fn().mockResolvedValue({ id: 'p1' }),
 }));

@@ -7,6 +7,11 @@ import type { User } from '@/lib/types';
 
 import { EditUserDialog } from '@/components/dialogs/edit-user-dialog';
 
+// Mock firestore functions
+jest.mock('@/lib/firestore/apartments', () => ({
+  getApartments: jest.fn().mockResolvedValue([]),
+}));
+
 const baseUser: User = {
   id: 'u1',
   name: 'Test User',

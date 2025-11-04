@@ -51,7 +51,7 @@ export class ApargoErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoun
       ...this.props.context,
     };
 
-    const apargoError = wrapError(error, undefined, context);
+    const apargoError = wrapError(error, context);
 
     // Update state with error info
     this.setState({
@@ -68,7 +68,7 @@ export class ApargoErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoun
   }
 
   // Helper method for recovery actions
-  private getRecoveryActionHandler(recoveryAction: any) {
+  private getRecoveryActionHandler(recoveryAction: { type: string }) {
     switch (recoveryAction.type) {
       case 'retry':
         return this.handleRetry.bind(this);
@@ -76,7 +76,7 @@ export class ApargoErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoun
         return this.handleReload.bind(this);
       case 'wait':
         return () => {
-          setTimeout(() => (this as any).handleRetry(), 3000);
+          setTimeout(() => this.handleRetry(), 3000);
         };
       default:
         return this.handleRetry.bind(this);
@@ -130,7 +130,7 @@ interface DefaultErrorDisplayProps {
   retry: () => void;
   reload: () => void;
   retryCount: number;
-  recoveryActionHandler: (action: any) => () => void;
+  recoveryActionHandler: (action: { type: string }) => () => void;
 }
 
 function DefaultErrorDisplay({ error, retry, reload, retryCount, recoveryActionHandler }: DefaultErrorDisplayProps) {
@@ -191,7 +191,7 @@ function DefaultErrorDisplay({ error, retry, reload, retryCount, recoveryActionH
             <div className="mt-3">
               <button
                 onClick={() => {
-                  const handler = recoveryActionHandler(error.recoveryAction);
+                  const handler = recoveryActionHandler(error.recoveryAction!);
                   handler();
                 }}
                 className="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -251,7 +251,7 @@ export function withErrorBoundary<P extends object>(
 export function useErrorHandler() {
   return {
     reportError: (error: Error | ApargoError, context?: Partial<ErrorContext>) => {
-      const apargoError = wrapError(error, undefined, context);
+      const apargoError = wrapError(error, context);
       logger.error(apargoError, context);
 
       // In a real implementation, you might also:
@@ -278,7 +278,7 @@ export function useErrorHandler() {
       error?: Error,
       context?: Partial<ErrorContext>
     ) => {
-      const apargoError = wrapError(error || new Error(`Network error: ${statusCode}`), undefined, {
+      const apargoError = wrapError(error || new Error(`Network error: ${statusCode}`), {
         ...context,
         metadata: { url, statusCode },
       });
@@ -331,7 +331,7 @@ export function InlineError({ error, className = '', showDetails = false }: Inli
 /**
  * Utility to wrap async operations with error boundary protection
  */
-export function withErrorProtection<T extends any[], R>(
+export function withErrorProtection<T extends unknown[], R>(
   asyncFn: (...args: T) => Promise<R>,
   errorHandler?: (error: ApargoError) => void
 ) {

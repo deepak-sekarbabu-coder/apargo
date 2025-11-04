@@ -121,7 +121,7 @@ export const registerCustomExpenseStrategies = () => {
  * Here's how you would create a strategy for a specific business rule
  */
 export class CustomBusinessExpenseStrategy implements ExpenseCalculationStrategy {
-  constructor(private businessRules: any) {}
+  constructor(private businessRules: { appliesTo: (expense: Expense) => boolean; calculate: (expense: Expense) => Record<string, { totalIncomeDelta: number; totalExpensesDelta: number }> }) {}
 
   canHandle(expense: Expense): boolean {
     // Custom logic to determine if this strategy applies

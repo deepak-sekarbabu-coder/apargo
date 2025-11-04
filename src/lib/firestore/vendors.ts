@@ -20,7 +20,9 @@ export const getVendors = async (activeOnly = false): Promise<Vendor[]> => {
   let vendorsQuery = query(collection(db, 'vendors'));
   if (activeOnly) vendorsQuery = query(vendorsQuery, where('isActive', '==', true));
   const snapshot = await getDocs(vendorsQuery);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Vendor);
+  const vendors = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Vendor);
+  // Remove duplicates by id in case of any Firestore issues
+  return vendors.filter((v, index, arr) => arr.findIndex(x => x.id === v.id) === index);
 };
 
 export const addVendor = async (
@@ -53,6 +55,8 @@ export const subscribeToVendors = (callback: (vendors: Vendor[]) => void, active
   if (activeOnly) vendorsQuery = query(vendorsQuery, where('isActive', '==', true));
   return onSnapshot(vendorsQuery, (snapshot: QuerySnapshot<DocumentData>) => {
     const vendors = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Vendor);
-    callback(vendors);
+    // Remove duplicates by id in case of any Firestore issues
+    const uniqueVendors = vendors.filter((v, index, arr) => arr.findIndex(x => x.id === v.id) === index);
+    callback(uniqueVendors);
   });
 };

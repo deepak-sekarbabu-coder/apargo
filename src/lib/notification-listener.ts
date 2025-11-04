@@ -282,8 +282,8 @@ export class NotificationListener {
   }
 
   private isNotificationExpired(data: Omit<Notification, 'id'>, now: Date): boolean {
-    if (data.type === 'announcement' && (data as any).expiresAt) {
-      const expiryDate = new Date((data as any).expiresAt);
+    if (data.type === 'announcement' && 'expiresAt' in data && data.expiresAt) {
+      const expiryDate = new Date(data.expiresAt as string);
       return expiryDate < now;
     }
     return false;
@@ -404,9 +404,9 @@ export class AdminNotificationListener {
         const data = doc.data() as Omit<Notification, 'id'>;
 
         // Filter out expired announcements
-        if ((data as any).expiresAt) {
-        const expiryDate = new Date((data as any).expiresAt);
-        if (expiryDate < now) return null;
+        if ('expiresAt' in data && data.expiresAt) {
+          const expiryDate = new Date(data.expiresAt as string);
+          if (expiryDate < now) return null;
         }
 
         return {

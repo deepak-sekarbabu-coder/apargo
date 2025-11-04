@@ -33,26 +33,7 @@ import { usePaymentFilters } from '@/hooks/use-payment-filters';
 
 import { PaymentsTable } from './payments-table';
 
-// Type declarations for jsPDF and autoTable (used with dynamic imports)
-interface AutoTableOptions {
-  head: string[][];
-  body: string[][];
-  startY?: number;
-  styles?: {
-    fontSize?: number;
-    cellPadding?: number;
-  };
-  headStyles?: {
-    fillColor?: number[];
-    textColor?: number;
-    fontSize?: number;
-    fontStyle?: string;
-  };
-  alternateRowStyles?: {
-    fillColor?: number[];
-  };
-  margin?: { top?: number };
-}
+
 
 interface LedgerViewProps {
   payments: Payment[];
@@ -118,9 +99,6 @@ export function LedgerView({ payments, users }: LedgerViewProps) {
 
       const doc = new jsPDF();
 
-      // Extend jsPDF with autoTable for this instance
-      autoTable(doc);
-
       // Add title
       doc.setFontSize(18);
       doc.text('Monthly Balance Sheets', 14, 22);
@@ -165,7 +143,7 @@ export function LedgerView({ payments, users }: LedgerViewProps) {
         });
 
       // Generate table
-      doc.autoTable({
+      autoTable(doc, {
         head: headers,
         body: data,
         startY: 40,

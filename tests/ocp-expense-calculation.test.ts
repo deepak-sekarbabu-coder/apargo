@@ -38,7 +38,7 @@ describe('Open/Closed Principle - Expense Calculation Strategies', () => {
       const expense = createMockExpense();
       const strategy = new StandardExpenseCalculationStrategy();
 
-      expect(strategy.canHandle(expense)).toBe(true);
+      expect(strategy.canHandle()).toBe(true);
 
       const result = strategy.calculateDeltas(expense);
 

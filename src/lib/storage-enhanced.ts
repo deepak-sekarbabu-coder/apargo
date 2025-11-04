@@ -149,11 +149,11 @@ export class StorageService {
 
     if (errorMessage.includes('storage') || errorMessage.includes('bucket')) {
       throw new Error(
-        'Upload failed. Verify Firebase Storage bucket configuration and rules allow authenticated writes.'
+        `Upload failed for ${fileName}. Verify Firebase Storage bucket configuration and rules allow authenticated writes.`
       );
     }
 
-    throw new Error(`Upload failed: ${errorMessage}`);
+    throw new Error(`Upload failed for ${fileName}: ${errorMessage}`);
   }
 
   /**

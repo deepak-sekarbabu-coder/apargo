@@ -3,10 +3,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import type { ApargoError, ErrorCode, ErrorContext, OperationResult } from '@/lib/errors';
+import type { User } from '@/lib/types';
 import { createAuthError, createError, createOperationResult, createSystemError, logger, wrapError } from '@/lib/errors';
 
 // Type for API handler functions
-type ApiHandler<T = any> = (
+type ApiHandler<T = unknown> = (
   request: NextRequest,
   context: ErrorContext
 ) => Promise<OperationResult<T>>;
@@ -18,7 +19,7 @@ interface ApiErrorResponse {
     code: ErrorCode;
     message: string;
     userMessage: string;
-    details?: Record<string, any>;
+    details?: Record<string, unknown>;
     requestId?: string;
     timestamp: string;
   };
@@ -33,7 +34,7 @@ interface ApiErrorResponse {
 }
 
 // Base success response format
-interface ApiSuccessResponse<T = any> {
+interface ApiSuccessResponse<T = unknown> {
   success: true;
   data: T;
   meta?: {
@@ -189,7 +190,7 @@ export function createApiHandler<T>(
       return createSuccessResponse(result.data, requestId);
     } catch (error) {
       // Handle unexpected errors
-      const apargoError = wrapError(error as Error, 'GENERIC_UNKNOWN_ERROR', context);
+      const apargoError = wrapError(error as Error, context);
 
       // Log the error
       logger.error(apargoError, {
@@ -213,7 +214,7 @@ export function createApiHandler<T>(
 export async function verifyAuth(
   request: NextRequest,
   context: ErrorContext
-): Promise<{ user?: any; error?: ApargoError }> {
+): Promise<{ user?: User; error?: ApargoError }> {
   try {
     // Check for session cookie
     const sessionCookie = request.cookies.get('session')?.value;
@@ -235,7 +236,7 @@ export async function verifyAuth(
     // 2. Get the user from Firestore
     // 3. Check permissions if required
 
-    return { user: { id: 'user123', role: 'user' } }; // Mock user for now
+    return { user: { id: 'user123', name: 'Mock User', role: 'user', apartment: 'mock-apartment' } }; // Mock user for now
   } catch (error) {
     if (error instanceof Error && error.message.includes('Firebase')) {
       return {
@@ -258,7 +259,7 @@ export async function verifyAuth(
  * Admin role verification
  */
 export function requireAdmin(
-  user: any,
+  user: User | null,
   context: ErrorContext
 ): { valid: boolean; error?: ApargoError } {
   if (!user) {
@@ -291,7 +292,7 @@ export function requireAdmin(
  * Input validation helper
  */
 export function validateRequiredFields(
-  data: Record<string, any>,
+  data: Record<string, unknown>,
   requiredFields: string[],
   context: ErrorContext
 ): { valid: boolean; error?: ApargoError } {
@@ -321,7 +322,7 @@ export function validateRequiredFields(
 function createValidationError(
   code: ErrorCode,
   message: string,
-  metadata?: Record<string, any>,
+  metadata?: Record<string, unknown>,
   context?: ErrorContext
 ): ApargoError {
   return createError(code, message, {
@@ -339,7 +340,7 @@ function createValidationError(
  */
 export function createHealthCheckHandler() {
   return createApiHandler(
-    async (request, context) => {
+    async () => {
       return createOperationResult(true, {
       status: 'healthy',
       timestamp: new Date().toISOString(),

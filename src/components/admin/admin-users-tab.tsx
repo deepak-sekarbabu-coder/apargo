@@ -242,7 +242,7 @@ export function AdminUsersTab({ users, config }: AdminUsersTabProps) {
         {localUserSearch && (
           <div className="mb-4 text-sm text-muted-foreground">
             {localFilteredUsers.length === 0 ? (
-              <span>No users found matching "{localUserSearch}"</span>
+              <span>No users found matching &quot;{localUserSearch}&quot;</span>
             ) : (
               <span>
                 {localFilteredUsers.length} user{localFilteredUsers.length !== 1 ? 's' : ''} found
@@ -263,7 +263,7 @@ export function AdminUsersTab({ users, config }: AdminUsersTabProps) {
               </h3>
               <p className="mt-2 text-sm text-muted-foreground">
                 {localUserSearch
-                  ? `Try adjusting your search term "${localUserSearch}"`
+                  ? `Try adjusting your search term &quot;${localUserSearch}&quot;`
                   : 'Add users to get started with user management'}
               </p>
             </div>
@@ -338,7 +338,7 @@ export function AdminUsersTab({ users, config }: AdminUsersTabProps) {
                       </h3>
                       <p className="mt-2 text-sm text-muted-foreground">
                         {localUserSearch
-                          ? `Try adjusting your search term "${localUserSearch}"`
+                          ? `Try adjusting your search term &quot;${localUserSearch}&quot;`
                           : 'Add users to get started with user management'}
                       </p>
                     </div>

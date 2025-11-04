@@ -64,7 +64,7 @@ function prepareMessage(notification: FCMNotificationPayload, tokens: string[]) 
 }
 
 async function processResponse(
-  response: any,
+  response: { failureCount: number; responses: Array<{ success: boolean; error?: { code: string; message?: string } }> },
   fcmTokens: string[],
   tokenToUserMap: Map<string, { id: string; name: string; apartment: string }>
 ): Promise<{
@@ -74,14 +74,14 @@ async function processResponse(
   errors: string[];
 }> {
   const result = {
-    successfulDeliveries: response.successCount,
+    successfulDeliveries: fcmTokens.length - response.failureCount,
     failedDeliveries: response.failureCount,
     failedTokens: [] as string[],
     errors: [] as string[],
   };
 
   if (response.failureCount > 0) {
-    response.responses.forEach((resp: any, idx: number) => {
+    response.responses.forEach((resp, idx: number) => {
       if (!resp.success) {
         const failedToken = fcmTokens[idx];
         result.failedTokens.push(failedToken);

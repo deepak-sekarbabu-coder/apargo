@@ -77,7 +77,7 @@ export function ApargoApp({ initialCategories }: ApargoAppProps) {
     activeExpenseTab,
     setActiveExpenseTab,
     textareaRef,
-  } = useApargoAppData(initialCategories);
+  } = useApargoAppData();
 
   // React Query client for cache management
   useQueryClient();

@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as React from 'react';
 
@@ -31,7 +32,7 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   const [isInView, setIsInView] = useState(priority);
   const [currentSrc, setCurrentSrc] = useState('');
   const imgRef = useRef<HTMLImageElement>(null);
-  const { isMobile, devicePixelRatio } = useDeviceInfo();
+  const { devicePixelRatio } = useDeviceInfo();
 
   // Intersection observer for lazy loading
   useEffect(() => {
@@ -62,10 +63,6 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
   useEffect(() => {
     if (!isInView) return;
 
-    const isRetina = devicePixelRatio > 1;
-    const qualityMultiplier = isRetina ? quality * 1.5 : quality;
-
-    // For now, just use the original src
     // In a real implementation, you would generate responsive image URLs
     setCurrentSrc(src);
   }, [src, quality, devicePixelRatio, isInView]);
@@ -80,19 +77,21 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
       {placeholder === 'blur' && !isLoaded && (
         <div className="absolute inset-0 bg-muted animate-pulse">
           {blurDataURL && (
-            <img src={blurDataURL} alt="" className="w-full h-full object-cover filter blur-sm" />
+            <Image src={blurDataURL} alt="" layout="fill" objectFit="cover" className="w-full h-full object-cover filter blur-sm" />
           )}
         </div>
       )}
 
       {/* Main image */}
-      <img
+      <Image
         ref={imgRef}
         src={currentSrc}
         alt={alt}
         loading={priority ? 'eager' : 'lazy'}
         decoding="async"
         onLoad={handleLoad}
+        layout="fill"
+        objectFit="cover"
         className={`transition-opacity duration-300 ${
           isLoaded ? 'opacity-100' : 'opacity-0'
         } ${className}`}
@@ -322,6 +321,12 @@ export function useMemoryEfficientState<T>(initialValue: T) {
   return [value, setMemoryEfficientValue] as const;
 }
 
+interface PerformanceMemory {
+  totalJSHeapSize: number;
+  usedJSHeapSize: number;
+  jsHeapSizeLimit: number;
+}
+
 // Mobile performance monitor
 export function useMobilePerformance() {
   const [metrics, setMetrics] = useState({
@@ -338,7 +343,7 @@ export function useMobilePerformance() {
     // Monitor memory usage
     const checkMemoryUsage = () => {
       if ('memory' in performance) {
-        const memory = (performance as any).memory;
+        const memory = (performance as unknown as { memory: PerformanceMemory }).memory;
         setMetrics(prev => ({
           ...prev,
           memoryUsage: Math.round(memory.usedJSHeapSize / 1024 / 1024), // MB
@@ -427,7 +432,7 @@ export function useMobileEventListener<K extends keyof WindowEventMap>(
 }
 
 // Optimized re-render prevention
-export function useOptimizedCallback<T extends (...args: any[]) => any>(callback: T): T {
+export function useOptimizedCallback<T extends (...args: unknown[]) => unknown>(callback: T): T {
   const callbackRef = useRef(callback);
 
   // Update the ref only if callback changes

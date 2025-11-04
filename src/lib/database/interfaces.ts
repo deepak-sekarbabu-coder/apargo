@@ -2,7 +2,7 @@
 // These interfaces allow us to decouple from specific database implementations
 
 export interface DocumentData {
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface DocumentSnapshot<T = DocumentData> {
@@ -31,7 +31,7 @@ export interface Query<T = DocumentData> {
 export interface WhereFilter {
   field: string;
   operator: '==' | '!=' | '<' | '<=' | '>' | '>=' | 'array-contains' | 'in' | 'array-contains-any';
-  value: any;
+  value: unknown;
 }
 
 export interface QueryBuilder<T = DocumentData> {

@@ -93,7 +93,6 @@ export async function sendPaymentRequests(
   userId?: string
 ): Promise<void> {
   const batch: Promise<unknown>[] = [];
-  const now = new Date().toISOString();
   const dueDate =
     payment.dueDate?.toISOString() || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(); // Default to 7 days from now
 

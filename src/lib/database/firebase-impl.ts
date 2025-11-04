@@ -1,18 +1,19 @@
 import type {
-  CollectionReference,
-  DatabaseService,
-  DocumentData,
-  DocumentReference,
-  DocumentSnapshot,
-  QueryBuilder,
-  QuerySnapshot,
-  Subscription,
-  WhereFilter,
+CollectionReference,
+DatabaseService,
+DocumentData,
+DocumentReference,
+DocumentSnapshot,
+QueryBuilder,
+QuerySnapshot,
+Subscription,
+WhereFilter,
 } from './interfaces';
+import type { WithFieldValue } from 'firebase/firestore';
 
 // Initialization
-let firestoreModule: any;
-let db: any;
+let firestoreModule: typeof import('firebase/firestore') | undefined;
+let db: import('firebase/firestore').Firestore | import('firebase-admin/firestore').Firestore | undefined;
 let isInitialized = false;
 
 // Initialize asynchronously for compatibility
@@ -42,7 +43,7 @@ const initPromise = (async () => {
 
 // Firebase-specific implementations
 class FirebaseDocumentSnapshot<T = DocumentData> implements DocumentSnapshot<T> {
-  constructor(private snapshot: any) {}
+  constructor(private snapshot: import('firebase/firestore').DocumentSnapshot | import('firebase-admin/firestore').DocumentSnapshot) {}
 
   get id(): string {
     return this.snapshot.id;
@@ -50,8 +51,8 @@ class FirebaseDocumentSnapshot<T = DocumentData> implements DocumentSnapshot<T> 
 
   get exists(): boolean {
     return typeof window === 'undefined'
-      ? this.snapshot.exists // Admin SDK
-      : this.snapshot.exists(); // Client SDK
+      ? (this.snapshot as import('firebase-admin/firestore').DocumentSnapshot).exists // Admin SDK
+      : (this.snapshot as import('firebase/firestore').DocumentSnapshot).exists(); // Client SDK
   }
 
   data(): T | undefined {
@@ -64,14 +65,14 @@ class FirebaseDocumentSnapshot<T = DocumentData> implements DocumentSnapshot<T> 
 }
 
 class FirebaseQuerySnapshot<T = DocumentData> implements QuerySnapshot<T> {
-  constructor(private snapshot: any) {}
+  constructor(private snapshot: import('firebase/firestore').QuerySnapshot | import('firebase-admin/firestore').QuerySnapshot) {}
 
   get empty(): boolean {
     return this.snapshot.empty;
   }
 
   get docs(): DocumentSnapshot<T>[] {
-    return this.snapshot.docs.map((doc: any) => new FirebaseDocumentSnapshot<T>(doc));
+    return this.snapshot.docs.map((doc: import('firebase/firestore').QueryDocumentSnapshot | import('firebase-admin/firestore').QueryDocumentSnapshot) => new FirebaseDocumentSnapshot<T>(doc));
   }
 }
 
@@ -91,13 +92,16 @@ class FirebaseDocumentReference<T = DocumentData> implements DocumentReference<T
       if (!isInitialized) {
         await initPromise;
       }
-      const docRef = db.doc(`${this.collectionName}/${this.docId}`);
+      if (!db) throw new Error('Database not initialized');
+      const docRef = (db as import('firebase-admin/firestore').Firestore).doc(`${this.collectionName}/${this.docId}`);
       const snapshot = await docRef.get();
       return new FirebaseDocumentSnapshot<T>(snapshot);
     } else {
       // Client-side: Client SDK
+      if (!firestoreModule) throw new Error('Firestore module not loaded');
+      if (!db) throw new Error('Database not initialized');
       const { doc, getDoc } = firestoreModule;
-      const docRef = doc(db, this.collectionName, this.docId);
+      const docRef = doc(db as import('firebase/firestore').Firestore, this.collectionName, this.docId);
       const snapshot = await getDoc(docRef);
       return new FirebaseDocumentSnapshot<T>(snapshot);
     }
@@ -109,13 +113,16 @@ class FirebaseDocumentReference<T = DocumentData> implements DocumentReference<T
       if (!isInitialized) {
         await initPromise;
       }
-      const docRef = db.doc(`${this.collectionName}/${this.docId}`);
-      await docRef.set(data);
+      if (!db) throw new Error('Database not initialized');
+      const docRef = (db as import('firebase-admin/firestore').Firestore).doc(`${this.collectionName}/${this.docId}`);
+      await docRef.set(data as WithFieldValue<DocumentData>);
     } else {
       // Client-side: Client SDK
+      if (!firestoreModule) throw new Error('Firestore module not loaded');
+      if (!db) throw new Error('Database not initialized');
       const { doc, setDoc } = firestoreModule;
-      const docRef = doc(db, this.collectionName, this.docId);
-      await setDoc(docRef, data);
+      const docRef = doc(db as import('firebase/firestore').Firestore, this.collectionName, this.docId);
+      await setDoc(docRef, data as WithFieldValue<DocumentData>);
     }
   }
 
@@ -125,13 +132,16 @@ class FirebaseDocumentReference<T = DocumentData> implements DocumentReference<T
       if (!isInitialized) {
         await initPromise;
       }
-      const docRef = db.doc(`${this.collectionName}/${this.docId}`);
-      await docRef.update(data);
+      if (!db) throw new Error('Database not initialized');
+      const docRef = (db as import('firebase-admin/firestore').Firestore).doc(`${this.collectionName}/${this.docId}`);
+      await docRef.update(data as WithFieldValue<DocumentData>);
     } else {
       // Client-side: Client SDK
+      if (!firestoreModule) throw new Error('Firestore module not loaded');
+      if (!db) throw new Error('Database not initialized');
       const { doc, updateDoc } = firestoreModule;
-      const docRef = doc(db, this.collectionName, this.docId);
-      await updateDoc(docRef, data);
+      const docRef = doc(db as import('firebase/firestore').Firestore, this.collectionName, this.docId);
+      await updateDoc(docRef, data as WithFieldValue<DocumentData>);
     }
   }
 
@@ -141,12 +151,15 @@ class FirebaseDocumentReference<T = DocumentData> implements DocumentReference<T
       if (!isInitialized) {
         await initPromise;
       }
-      const docRef = db.doc(`${this.collectionName}/${this.docId}`);
+      if (!db) throw new Error('Database not initialized');
+      const docRef = (db as import('firebase-admin/firestore').Firestore).doc(`${this.collectionName}/${this.docId}`);
       await docRef.delete();
     } else {
       // Client-side: Client SDK
+      if (!firestoreModule) throw new Error('Firestore module not loaded');
+      if (!db) throw new Error('Database not initialized');
       const { doc, deleteDoc } = firestoreModule;
-      const docRef = doc(db, this.collectionName, this.docId);
+      const docRef = doc(db as import('firebase/firestore').Firestore, this.collectionName, this.docId);
       await deleteDoc(docRef);
     }
   }
@@ -168,7 +181,8 @@ class FirebaseQueryBuilder<T = DocumentData> implements QueryBuilder<T> {
       if (!isInitialized) {
         await initPromise;
       }
-      let queryRef = db.collection(this.collectionName);
+      if (!db) throw new Error('Database not initialized');
+      let queryRef: import('firebase-admin/firestore').CollectionReference | import('firebase-admin/firestore').Query = (db as import('firebase-admin/firestore').Firestore).collection(this.collectionName);
 
       for (const filter of this.filters) {
         queryRef = queryRef.where(filter.field, filter.operator, filter.value);
@@ -178,8 +192,10 @@ class FirebaseQueryBuilder<T = DocumentData> implements QueryBuilder<T> {
       return new FirebaseQuerySnapshot<T>(snapshot);
     } else {
       // Client-side: Client SDK
+      if (!firestoreModule) throw new Error('Firestore module not loaded');
+      if (!db) throw new Error('Database not initialized');
       const { collection, query, where, getDocs } = firestoreModule;
-      const collectionRef = collection(db, this.collectionName);
+      const collectionRef = collection(db as import('firebase/firestore').Firestore, this.collectionName);
       let q = query(collectionRef);
 
       for (const filter of this.filters) {
@@ -209,14 +225,17 @@ class FirebaseCollectionReference<T = DocumentData> implements CollectionReferen
       if (!isInitialized) {
         await initPromise;
       }
-      const docRef = db.collection(this.collectionName).doc();
-      await docRef.set(data);
+      if (!db) throw new Error('Database not initialized');
+      const docRef = (db as import('firebase-admin/firestore').Firestore).collection(this.collectionName).doc();
+      await docRef.set(data as WithFieldValue<DocumentData>);
       return new FirebaseDocumentReference<T>(this.collectionName, docRef.id);
     } else {
       // Client-side: Client SDK
+      if (!firestoreModule) throw new Error('Firestore module not loaded');
+      if (!db) throw new Error('Database not initialized');
       const { collection, addDoc } = firestoreModule;
-      const collectionRef = collection(db, this.collectionName);
-      const docRef = await addDoc(collectionRef, data);
+      const collectionRef = collection(db as import('firebase/firestore').Firestore, this.collectionName);
+      const docRef = await addDoc(collectionRef, data as WithFieldValue<DocumentData>);
       return new FirebaseDocumentReference<T>(this.collectionName, docRef.id);
     }
   }
@@ -251,15 +270,17 @@ export class FirebaseDatabaseService implements DatabaseService {
       return new FirebaseSubscription(() => {});
     } else {
       // Client-side: Client SDK
+      if (!firestoreModule) throw new Error('Firestore module not loaded');
+      if (!db) throw new Error('Database not initialized');
       const { collection, query, where, onSnapshot } = firestoreModule;
-      const collectionRef = collection(db, collectionName);
+      const collectionRef = collection(db as import('firebase/firestore').Firestore, collectionName);
       let q = query(collectionRef);
 
       for (const filter of filters) {
         q = query(q, where(filter.field, filter.operator, filter.value));
       }
 
-      const unsubscribe = onSnapshot(q, (snapshot: any) => {
+      const unsubscribe = onSnapshot(q, (snapshot: import('firebase/firestore').QuerySnapshot) => {
         const wrappedSnapshot = new FirebaseQuerySnapshot<T>(snapshot);
         callback(wrappedSnapshot);
       });

@@ -102,8 +102,8 @@ function validateNetworkAndExtensions(result: ValidationResult): void {
         };
       }
     ).connection ||
-    (navigator as any).mozConnection ||
-    (navigator as any).webkitConnection;
+    (navigator as { mozConnection?: { effectiveType?: string } }).mozConnection ||
+    (navigator as { webkitConnection?: { effectiveType?: string } }).webkitConnection;
   if (connection) {
     if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
       result.warnings.push('Slow network detected - consider enabling offline persistence');

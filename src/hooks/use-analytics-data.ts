@@ -3,7 +3,6 @@ import {
   isThisMonth,
   isThisWeek,
   isToday,
-  isYesterday,
   subDays,
   subMonths,
 } from 'date-fns';
@@ -18,7 +17,7 @@ export function useAnalyticsData(
   analyticsMonth: string
 ) {
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-  const [isRealTime, setIsRealTime] = useState(true);
+  const [isRealTime] = useState(true);
 
   // Update timestamp when data changes
   useEffect(() => {
@@ -67,11 +66,8 @@ export function useAnalyticsData(
         };
       })
       .reverse();
-    // Enhanced real-time analytics data
-    const currentMonth = format(new Date(), 'yyyy-MM');
     const today = new Date();
     const weekAgo = subDays(today, 7);
-    const monthAgo = subDays(today, 30);
 
     // Real-time metrics
     const todayExpenses = expenses.filter(e => {

@@ -15,6 +15,10 @@ import { subscribeToAllUsers, subscribeToUsers } from '@/lib/firestore/users';
 import { requestNotificationPermission } from '@/lib/push-notifications';
 import type { Apartment, BalanceSheet, Category, Expense, Payment, User } from '@/lib/types';
 
+interface Subscription {
+  unsubscribe: () => void;
+}
+
 // Simplified subscription manager for data streams
 interface DataStreams {
   apartments: Apartment[];
@@ -34,7 +38,7 @@ interface SubscriptionHandlers {
   onBalanceSheets: (balanceSheets: BalanceSheet[]) => void;
 }
 
-function useDataSubscriptionManager(user: any, queryClient: ReturnType<typeof useQueryClient>) {
+function useDataSubscriptionManager(user: User | null, queryClient: ReturnType<typeof useQueryClient>) {
   const [dataStreams, setDataStreams] = useState<DataStreams>({
     apartments: [],
     categories: [],
@@ -120,7 +124,7 @@ function useDataSubscriptionManager(user: any, queryClient: ReturnType<typeof us
         subscribeToPayments(handlers.onPayments),
         subscribeToBalanceSheets(handlers.onBalanceSheets),
       ])
-      .then((subs: any[]) => {
+      .then((subs: Subscription[]) => {
         unsubscribes.push(
           () => subs[0].unsubscribe(),
           () => subs[1].unsubscribe(),
@@ -165,7 +169,7 @@ function useDataSubscriptionManager(user: any, queryClient: ReturnType<typeof us
 }
 
 // Custom hook for FCM notifications
-function useFCMNotifications(user: any) {
+function useFCMNotifications(user: User | null) {
   useEffect(() => {
     if (user && !user.fcmToken) {
       requestNotificationPermission(user.id);
@@ -174,7 +178,7 @@ function useFCMNotifications(user: any) {
 }
 
 // Custom hook for apartment setup dialog
-function useApartmentSetupDialog(user: any) {
+function useApartmentSetupDialog(user: User | null) {
   const [showApartmentDialog, setShowApartmentDialog] = useState(false);
 
   useEffect(() => {
@@ -186,17 +190,11 @@ function useApartmentSetupDialog(user: any) {
   return { showApartmentDialog, setShowApartmentDialog };
 }
 
-export function useApargoAppData(initialCategories: Category[]) {
+export function useApargoAppData() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  // State for data setters (needed by handlers)
-  const [usersState, setUsers] = useState<User[]>([]);
-  const [categoriesState, setCategories] = useState<Category[]>(initialCategories);
-  const [expensesState, setExpenses] = useState<Expense[]>([]);
-  const [apartmentsState, setApartments] = useState<Apartment[]>([]);
-  const [paymentsState, setPayments] = useState<Payment[]>([]);
-  const [balanceSheetsState, setBalanceSheets] = useState<BalanceSheet[]>([]);
+
 
   // Use simplified subscription manager
   const dataStreams = useDataSubscriptionManager(user, queryClient);
@@ -215,6 +213,14 @@ export function useApargoAppData(initialCategories: Category[]) {
   const [userSearch, setUserSearch] = useState('');
   const [activeExpenseTab, setActiveExpenseTab] = useState('analytics');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  // Local state for data (for backward compatibility)
+  const [apartments, setApartments] = useState(dataStreams.apartments);
+  const [categories, setCategories] = useState(dataStreams.categories);
+  const [users, setUsers] = useState(dataStreams.users);
+  const [expenses, setExpenses] = useState(dataStreams.expenses);
+  const [payments, setPayments] = useState(dataStreams.payments);
+  const [balanceSheets, setBalanceSheets] = useState(dataStreams.balanceSheets);
 
   // Sync subscription data with local state for handlers (single effect)
   useEffect(() => {
@@ -235,17 +241,17 @@ export function useApargoAppData(initialCategories: Category[]) {
 
   return {
     user,
-    users: dataStreams.users,
+    users,
     setUsers,
-    categories: dataStreams.categories,
+    categories,
     setCategories,
-    expenses: dataStreams.expenses,
+    expenses,
     setExpenses,
-    apartments: dataStreams.apartments,
+    apartments,
     setApartments,
-    payments: dataStreams.payments,
+    payments,
     setPayments,
-    balanceSheets: dataStreams.balanceSheets,
+    balanceSheets,
     setBalanceSheets,
     isLoadingData,
     setIsLoadingData,

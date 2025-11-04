@@ -1,13 +1,15 @@
 // React hook for offline support
 import { useEffect, useState } from 'react';
 
+import type { Expense, Payment } from './types';
+
 // Enhanced offline support utility
 // Provides offline-first functionality with background sync
 
 export interface OfflineAction {
   id: string;
   type: 'expense' | 'payment';
-  data: any;
+  data: Expense | Payment;
   timestamp: number;
   retryCount: number;
   maxRetries: number;
@@ -73,7 +75,7 @@ class OfflineSupportManager {
     }
   }
 
-  private updateFromServiceWorker(data: any) {
+  private updateFromServiceWorker(data: { totalOfflineItems: number }) {
     if (typeof data.totalOfflineItems === 'number') {
       // Update pending actions count
       this.notifyStatusChange();
@@ -81,7 +83,7 @@ class OfflineSupportManager {
   }
 
   // Public methods for app integration
-  public async addOfflineAction(type: 'expense' | 'payment', data: any): Promise<void> {
+  public async addOfflineAction(type: 'expense' | 'payment', data: Expense | Payment): Promise<void> {
     const action: OfflineAction = {
       id: `${type}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       type,
@@ -195,7 +197,7 @@ class OfflineSupportManager {
     this.notifyStatusChange();
   }
 
-  public async exportOfflineData(): Promise<any> {
+  public async exportOfflineData(): Promise<{ pendingActions: OfflineAction[]; exportTime: string; version: string }> {
     return {
       pendingActions: this.pendingActions,
       exportTime: new Date().toISOString(),
@@ -260,7 +262,7 @@ class OfflineSupportManager {
     this.notifyStatusChange();
   }
 
-  private onSyncFailed(data: any): void {
+  private onSyncFailed(data: unknown): void {
     console.error('Background sync failed:', data);
     this.notifyStatusChange();
   }
@@ -277,7 +279,7 @@ export function useOfflineSupport() {
     return unsubscribe;
   }, []);
 
-  const addOfflineAction = (type: 'expense' | 'payment', data: any) =>
+  const addOfflineAction = (type: 'expense' | 'payment', data: Expense | Payment) =>
     offlineSupport.addOfflineAction(type, data);
 
   const syncNow = () => offlineSupport.syncAllPending();

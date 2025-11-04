@@ -1,6 +1,4 @@
 import {
-  DocumentData,
-  QuerySnapshot,
   addDoc,
   collection,
   deleteDoc,

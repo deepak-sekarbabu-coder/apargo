@@ -1,4 +1,4 @@
-import { getDoc, doc } from 'firebase/firestore';
+// Removed unused imports
 import { type QuerySnapshot, database } from '../database';
 import { computeApprovedExpensePaymentDeltas } from '../payments';
 import type { Apartment, Category, Payment, User } from '../types';
@@ -209,7 +209,7 @@ export const subscribeToPayments = async (
   apartmentId?: string,
   monthYear?: string
 ) => {
-  const paymentsCollection = database.collection<Payment>('payments');
+  // Remove unused variable
   const filters: Array<{
     field: string;
     operator:
@@ -222,7 +222,7 @@ export const subscribeToPayments = async (
       | 'array-contains'
       | 'in'
       | 'array-contains-any';
-    value: any;
+    value: unknown;
   }> = [];
   if (apartmentId) {
     filters.push({ field: 'apartmentId', operator: '==', value: apartmentId });

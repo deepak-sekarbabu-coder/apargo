@@ -1,4 +1,4 @@
-import { type DocumentSnapshot, type QuerySnapshot, type DatabaseService, database } from '../database';
+import { type QuerySnapshot, type DatabaseService, database } from '../database';
 import {
   calculateDeltaChanges,
   computeExpenseDeltas,
@@ -38,7 +38,6 @@ async function updateExistingBalanceSheet(
     openingBalance: opening,
     closingBalance,
   };
-  // @ts-ignore
   return sheetDoc.update(removeUndefined(updated));
 }
 
@@ -172,7 +171,6 @@ export const addExpense = async (expense: Omit<Expense, 'id' | 'date'>): Promise
     paidByApartments: expense.paidByApartments || [],
   };
   const expensesCollection = database.collection<Omit<Expense, 'id'>>('expenses');
-  // @ts-ignore
   const cleanExpense = removeUndefined(newExpense);
   const docRef = await expensesCollection.add(cleanExpense);
   const fullExpense = { id: docRef.id, ...cleanExpense } as Expense;
@@ -188,7 +186,6 @@ export const updateExpense = async (id: string, expense: Partial<Expense>): Prom
   if (!oldSnap.exists) throw new Error('Expense not found');
   const oldExpense = { id: oldSnap.id, ...(oldSnap.data() as Partial<Expense>) } as Expense;
 
-  // @ts-ignore
   const cleanExpense = removeUndefined(expense) as Partial<Expense>;
   await expenseDoc.update(cleanExpense);
 
@@ -292,7 +289,7 @@ export const subscribeToBalanceSheets = async (
       | 'array-contains'
       | 'in'
       | 'array-contains-any';
-    value: any;
+    value: unknown;
   }> = [];
   if (apartmentId) {
     filters.push({ field: 'apartmentId', operator: '==', value: apartmentId });

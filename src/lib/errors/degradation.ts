@@ -4,8 +4,6 @@ import { createError, wrapError } from './factory';
 import { logger } from './logger';
 import type {
   ApargoError,
-  ErrorCategory,
-  ErrorCode,
   ErrorContext,
   RecoveryStrategy,
 } from './types';
@@ -52,9 +50,9 @@ export async function attemptRecovery(
  * Fallback data providers for different error scenarios
  */
 export class FallbackProvider {
-  private static fallbacks: Map<string, () => any> = new Map();
+  private static fallbacks: Map<string, () => unknown> = new Map();
 
-  static register(name: string, provider: () => any): void {
+  static register(name: string, provider: () => unknown): void {
     this.fallbacks.set(name, provider);
   }
 
@@ -62,7 +60,7 @@ export class FallbackProvider {
     const provider = this.fallbacks.get(name);
     if (provider) {
       try {
-        return provider();
+        return provider() as T;
       } catch (error) {
         logger.error(wrapError(error as Error), { feature: 'fallback_provider', operation: name });
       }
@@ -256,7 +254,7 @@ export async function retryWithBackoff<T>(
       lastError = error as Error;
 
       if (attempt === maxAttempts) {
-        throw wrapError(lastError, undefined, context);
+        throw wrapError(lastError, context);
       }
 
       // Calculate delay with exponential backoff and jitter
@@ -264,7 +262,7 @@ export async function retryWithBackoff<T>(
       const jitter = Math.random() * 0.1 * delay;
       const totalDelay = delay + jitter;
 
-      logger.error(wrapError(lastError, 'GENERIC_OPERATION_FAILED', context), {
+      logger.error(wrapError(lastError, context), {
         ...context,
         feature: context?.feature || 'retry_operation',
         operation: 'retry_with_backoff',
@@ -347,7 +345,7 @@ export async function executeBulk<T, R>(
         const result = await operation(item);
         return { success: true, result, item };
       } catch (error) {
-        const apargoError = wrapError(error as Error, undefined, context);
+        const apargoError = wrapError(error as Error, context);
         logger.error(apargoError, {
           ...context,
           feature: context.feature || 'bulk_operation',
@@ -393,17 +391,22 @@ export async function executeBulk<T, R>(
  */
 export function getDegradationHealth(): {
   status: 'healthy' | 'degraded' | 'unhealthy';
-  circuitBreakers: Record<string, any>;
+  circuitBreakers: Record<string, { state: string; failures: number; lastFailure?: string }>;
   registeredStrategies: number;
   registeredFallbacks: number;
   timestamp: string;
 } {
   const circuitBreakerStates = Array.from(circuitBreakers.entries()).reduce(
     (acc, [name, cb]) => {
-      acc[name] = cb.getState();
+      const state = cb.getState();
+      acc[name] = {
+        state: state.state,
+        failures: state.failureCount,
+        lastFailure: state.lastFailureTime?.toString(),
+      };
       return acc;
     },
-    {} as Record<string, any>
+    {} as Record<string, { state: string; failures: number; lastFailure?: string }>
   );
 
   const unhealthyBreakers = Object.values(circuitBreakerStates).filter(
@@ -437,7 +440,7 @@ const defaultRecoveryStrategies: RecoveryStrategy[] = [
   // Network connectivity recovery
   {
     canHandle: error => error.category === 'network' && error.code === 'NETWORK_OFFLINE',
-    recover: async (error, context) => {
+    recover: async () => {
       // Wait for network recovery
       return new Promise(resolve => {
         const checkConnection = () => {
@@ -456,7 +459,7 @@ const defaultRecoveryStrategies: RecoveryStrategy[] = [
   // Database connection recovery
   {
     canHandle: error => error.category === 'database' && error.code === 'DB_CONNECTION_FAILED',
-    recover: async (error, context) => {
+    recover: async (_error, context) => {
       // For database connection failures, we can try to use cached data
       const cachedData = FallbackProvider.get('cached_' + (context.feature || 'data'));
       if (cachedData) {
@@ -496,7 +499,7 @@ const defaultRecoveryStrategies: RecoveryStrategy[] = [
           context,
         });
       } catch (refreshError) {
-        return wrapError(refreshError as Error, 'AUTH_INVALID_TOKEN', context);
+        return wrapError(refreshError as Error, context);
       }
     },
     priority: 80,
