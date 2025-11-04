@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { filterVendors } from '@/components/maintenance/vendor-filter';
 
 const sampleVendors = [

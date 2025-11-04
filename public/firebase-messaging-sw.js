@@ -82,7 +82,7 @@ self.addEventListener('notificationclick', event => {
 });
 
 // Handle service worker installation
-self.addEventListener('install', event => {
+self.addEventListener('install', () => {
   console.log('Firebase messaging service worker installed');
   self.skipWaiting();
 });

@@ -29,7 +29,7 @@ jest.mock('firebase/auth', () => ({ getAuth: jest.fn(() => ({})) }));
 // Mock messaging
 jest.mock('firebase/messaging', () => ({ getMessaging: jest.fn(() => ({})) }));
 
-const { getDoc, deleteDoc } = jest.requireMock('firebase/firestore');
+const { deleteDoc } = jest.requireMock('firebase/firestore');
 
 describe('deletePoll authorization', () => {
   beforeEach(() => {

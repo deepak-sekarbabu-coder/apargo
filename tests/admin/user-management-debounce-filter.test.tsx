@@ -1,4 +1,4 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 
 import React from 'react';
 
@@ -143,7 +143,7 @@ describe('User Management Search Filter Integration', () => {
       // Simulate rapid typing
       const searchTerms = ['j', 'jo', 'joh', 'john'];
 
-      searchTerms.forEach((term, index) => {
+      searchTerms.forEach((term) => {
         fireEvent.change(searchInput, { target: { value: term } });
 
         // Advance time less than debounce delay to simulate rapid typing
@@ -306,7 +306,6 @@ describe('User Management Search Filter Integration', () => {
     });
 
     it('should maintain input value during debounce delay', () => {
-      const setUserSearch = jest.fn();
       const props = { ...defaultProps };
 
       render(<AdminView {...props} />);

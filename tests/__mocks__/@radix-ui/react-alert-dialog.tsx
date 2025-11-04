@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-export const Root = ({ children, open, onOpenChange }: any) => (
+export const Root = ({ children, open }: any) => (
   <div data-open={open} data-testid="radix-alert-dialog-root">
     {children}
   </div>

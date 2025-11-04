@@ -379,7 +379,6 @@ describe('PaymentsTable responsive behavior', () => {
 
     // Check that Jane Smith is still present in the table (not filtered out completely)
     // The test should verify that we still see Jane Smith in the list of users but filtered out from payments
-    const janeSmithElements = screen.queryAllByText('Jane Smith');
     // We might still see Jane Smith in the dropdown menu options, so we can't expect zero elements
     // The important part is that we only see 2 payment cards for A101 apartment
   });

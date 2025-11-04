@@ -6,7 +6,6 @@ import {
   type ExpenseCalculationStrategy,
   ExpenseCalculationStrategyRegistry,
   StandardExpenseCalculationStrategy,
-  registerExpenseCalculationStrategy,
 } from '../src/lib/expense-calculation-strategies';
 import { computeExpenseDeltas } from '../src/lib/firestore-utils';
 import type { Expense } from '../src/lib/types';
@@ -88,7 +87,8 @@ describe('Open/Closed Principle - Expense Calculation Strategies', () => {
           return expense.categoryId === 'custom';
         }
 
-        calculateDeltas(expense: Expense) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        calculateDeltas(_expense: Expense) {
           return {
             monthYear: '2024-01',
             deltas: { custom: { totalIncomeDelta: 42, totalExpensesDelta: 0 } },
@@ -116,7 +116,8 @@ describe('Open/Closed Principle - Expense Calculation Strategies', () => {
           return expense.categoryId === 'custom';
         }
 
-        calculateDeltas(expense: Expense) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        calculateDeltas(_expense: Expense) {
           return {
             monthYear: '2024-01',
             deltas: { custom: { totalIncomeDelta: 42, totalExpensesDelta: 0 } },
@@ -151,7 +152,8 @@ describe('Open/Closed Principle - Expense Calculation Strategies', () => {
           return expense.description?.includes('TEST_STRATEGY');
         }
 
-        calculateDeltas(expense: Expense) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        calculateDeltas(_expense: Expense) {
           return {
             monthYear: '2024-01',
             deltas: { test: { totalIncomeDelta: 999, totalExpensesDelta: 0 } },
@@ -176,12 +178,11 @@ describe('Open/Closed Principle - Expense Calculation Strategies', () => {
     it('should throw error when no strategy can handle expense', () => {
       // Clear all strategies
       const strategies = registry.getAllStrategies();
-      strategies.forEach(strategy => {
+      strategies.forEach(() => {
         // This is a simplified test - in practice, you'd need a way to clear strategies
       });
 
       // Create a registry with no strategies
-      const emptyRegistry = new ExpenseCalculationStrategyRegistry();
       // Remove the default strategy somehow (this is just for testing)
 
       // For now, just test that the current implementation doesn't fail

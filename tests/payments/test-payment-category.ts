@@ -1,5 +1,4 @@
 // Quick regression: category inference and CSV order
-import fs from 'fs';
 
 // mimic a couple of payments as the UI would see
 const payments = [

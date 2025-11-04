@@ -1,5 +1,3 @@
-import * as React from 'react';
-
 export const useIsMobile = jest.fn(() => false);
 export const useDeviceInfo = jest.fn(() => ({
   isMobile: false,

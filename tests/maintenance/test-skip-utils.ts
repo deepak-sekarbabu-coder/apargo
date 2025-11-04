@@ -1,6 +1,5 @@
 // Test file for skip-related utility functions
 import {
-  calculateNextRecurrenceDate,
   createRecurringTaskFromSkipped,
   shouldCreateRecurringTaskOnSkip,
 } from '@/lib/maintenance-utils';

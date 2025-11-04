@@ -5,29 +5,7 @@ const DYNAMIC_CACHE = `apargo-dynamic-${CACHE_VERSION}`;
 const API_CACHE = `apargo-api-${CACHE_VERSION}`;
 const IMAGE_CACHE = `apargo-images-${CACHE_VERSION}`;
 
-// Enhanced cache configuration
-const CACHE_CONFIG = {
-  static: {
-    maxEntries: 50,
-    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-    strategy: 'cache-first',
-  },
-  dynamic: {
-    maxEntries: 100,
-    maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-    strategy: 'stale-while-revalidate',
-  },
-  api: {
-    maxEntries: 50,
-    maxAge: 5 * 60 * 1000, // 5 minutes
-    strategy: 'network-first',
-  },
-  images: {
-    maxEntries: 200,
-    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
-    strategy: 'cache-first',
-  },
-};
+
 
 // Enhanced static assets to cache
 const STATIC_ASSETS = [
@@ -68,7 +46,7 @@ self.addEventListener('install', event => {
         return cache.addAll(STATIC_ASSETS);
       }),
       // Pre-cache critical API endpoints
-      caches.open(API_CACHE).then(cache => {
+      caches.open(API_CACHE).then(() => {
         console.log('🚀 Pre-caching API endpoints');
         return Promise.allSettled(
           API_ENDPOINTS.map(
@@ -150,7 +128,8 @@ async function handleNavigationRequest(request) {
     }
 
     return response;
-  } catch (error) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (_err) {
     // Fallback to cache, then to offline page
     const cachedResponse = await caches.match(request);
     if (cachedResponse) {
@@ -177,7 +156,8 @@ async function handleImageRequest(request) {
       cache.put(request, response.clone());
     }
     return response;
-  } catch (error) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (_err) {
     // Return placeholder image or empty response
     return new Response('', { status: 404 });
   }
@@ -194,7 +174,8 @@ async function handleAPIRequest(request) {
     }
 
     return response;
-  } catch (error) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (_err) {
     // Fallback to cache
     const cachedResponse = await caches.match(request);
     if (cachedResponse) {
@@ -407,7 +388,8 @@ async function getOfflineData() {
     const offlineKey = 'offline-data';
     const response = await cache.match(offlineKey);
     return response ? await response.json() : { expenses: [], payments: [] };
-  } catch (error) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (_err) {
     return { expenses: [], payments: [] };
   }
 }
