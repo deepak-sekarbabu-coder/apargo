@@ -87,7 +87,7 @@ function validateBrowserSupport(result: ValidationResult): void {
 }
 
 function validateNetworkAndExtensions(result: ValidationResult): void {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+   
   const connection =
     (
       navigator as {

@@ -117,11 +117,16 @@ export function ExpenseItem({
 
     try {
       const updatedExpense = markApartmentAsPaid(expense, apartmentId);
-      await updateExpense(expense.id, { paidByApartments: updatedExpense.paidByApartments });
+      // Check if all owing apartments have now paid
+      const allPaid = updatedExpense.owedByApartments?.every(id => updatedExpense.paidByApartments?.includes(id)) ?? false;
+      await updateExpense(expense.id, { paidByApartments: updatedExpense.paidByApartments, paid: allPaid });
+
+      // Update the expense with the new paid status
+      const finalExpense = { ...updatedExpense, paid: allPaid };
 
       // Clear optimistic state and update with confirmed data
       setOptimisticPaidByApartments(null);
-      onExpenseUpdate?.(updatedExpense);
+      onExpenseUpdate?.(finalExpense);
     } catch (error) {
       // Revert optimistic update on error
       setOptimisticPaidByApartments(null);
@@ -167,11 +172,16 @@ export function ExpenseItem({
 
     try {
       const updatedExpense = markApartmentAsUnpaid(expense, apartmentId);
-      await updateExpense(expense.id, { paidByApartments: updatedExpense.paidByApartments });
+      // Check if all owing apartments are still paid after this change
+      const allPaid = updatedExpense.owedByApartments?.every(id => updatedExpense.paidByApartments?.includes(id)) ?? false;
+      await updateExpense(expense.id, { paidByApartments: updatedExpense.paidByApartments, paid: allPaid });
+
+      // Update the expense with the new paid status
+      const finalExpense = { ...updatedExpense, paid: allPaid };
 
       // Clear optimistic state and update with confirmed data
       setOptimisticPaidByApartments(null);
-      onExpenseUpdate?.(updatedExpense);
+      onExpenseUpdate?.(finalExpense);
     } catch (error) {
       // Revert optimistic update on error
       setOptimisticPaidByApartments(null);
@@ -188,32 +198,7 @@ export function ExpenseItem({
     }
   };
 
-  const handleMarkExpenseAsPaid = async () => {
-    setLoadingMap(prev => ({ ...prev, expense: true }));
-
-    // Optimistic update
-    const optimisticExpense = { ...expense, paid: true };
-    onExpenseUpdate?.(optimisticExpense);
-
-    try {
-      await updateExpense(expense.id, { paid: true });
-      toast({
-        title: 'Expense Marked as Paid',
-        description: `"${expense.description}" has been marked as paid.`,
-      });
-    } catch (error) {
-      // Revert optimistic update on error
-      onExpenseUpdate?.(expense);
-      console.error('Failed to mark expense as paid:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to mark expense as paid',
-        variant: 'destructive',
-      });
-    } finally {
-      setLoadingMap(prev => ({ ...prev, expense: false }));
-    }
-  };
+  
 
   return (
     <Card className="w-full">
@@ -311,42 +296,7 @@ export function ExpenseItem({
                 </Dialog>
               </div>
             )}
-            {expense.paidByApartment === currentUserApartment && !expense.paid && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleMarkExpenseAsPaid}
-                disabled={loadingMap['expense']}
-                className="h-7 px-2 text-xs"
-                title="Mark as Paid"
-              >
-                {loadingMap['expense'] ? (
-                  <svg
-                    className="animate-spin h-3 w-3 text-gray-500 dark:text-gray-400"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="8"
-                      cy="8"
-                      r="7"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M15 8a7 7 0 01-7 7V13a5 5 0 005-5h2z"
-                    />
-                  </svg>
-                ) : (
-                  <Check className="h-3 w-3" />
-                )}
-                <span className="ml-1 hidden sm:inline">Mark as Paid</span>
-              </Button>
-            )}
+            
           </div>
         </div>
       </CardHeader>

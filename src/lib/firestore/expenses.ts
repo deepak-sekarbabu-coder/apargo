@@ -170,8 +170,13 @@ export const addExpense = async (expense: Omit<Expense, 'id' | 'date'>): Promise
     date: new Date().toISOString(),
     paidByApartments: expense.paidByApartments || [],
   };
+
+  // Set initial paid status: true if all owing apartments have paid (or none owe for no-split)
+  const allPaid = (newExpense.owedByApartments || []).every(id => (newExpense.paidByApartments || []).includes(id));
+  const expenseWithPaid = { ...newExpense, paid: allPaid };
+
   const expensesCollection = database.collection<Omit<Expense, 'id'>>('expenses');
-  const cleanExpense = removeUndefined(newExpense);
+  const cleanExpense = removeUndefined(expenseWithPaid);
   const docRef = await expensesCollection.add(cleanExpense);
   const fullExpense = { id: docRef.id, ...cleanExpense } as Expense;
   await updateBalanceSheetsForExpense(fullExpense);
