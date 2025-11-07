@@ -40,15 +40,12 @@ The `/api/payment-events` endpoint was hanging due to Firestore query issues. Sp
 1. `src/components/dashboard/payment-status-widget.tsx` - Enhanced error handling
 2. `src/components/ui/error-boundary.tsx` - New error boundary component
 3. `src/components/dashboard/dashboard-view.tsx` - Added error boundary wrapper
-4. `src/lib/firestore.ts` - Updated to use Admin SDK
-5. `firestore.indexes.json` - Added required composite indexes
 
 ### New Files Created:
 
 1. `src/app/api/payment-events/health/route.ts` - Health check endpoint
 2. `src/app/api/payment-events/test/route.ts` - Testing endpoint
 3. `scripts/test-payment-events.js` - Automated testing script
-4. `docs/PAYMENT_STATUS_TROUBLESHOOTING.md` - Troubleshooting guide
 
 ## Current Status
 

@@ -40,7 +40,6 @@ Fixed finger touch scrolling issues on mobile devices in the Apargo application.
 
 - `src/app/globals.css` - Added touch scrolling CSS properties
 - `src/app/layout.tsx` - Updated viewport meta tag
-- `src/components/apargo-app.tsx` - Added scrollable-container class
 - `src/components/ui/scroll-area.tsx` - Enhanced with scroll-touch class
 - `src/components/ui/mobile-navigation.tsx` - Added touch-action for horizontal scrolling
 
