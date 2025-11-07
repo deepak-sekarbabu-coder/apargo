@@ -1,8 +1,12 @@
 // Script to replace environment variables in service worker files during build
 // This is necessary because service workers can't access process.env directly
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Get environment variables
 const envVars = {

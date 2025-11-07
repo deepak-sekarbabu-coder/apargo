@@ -23,6 +23,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "format:staged": "prettier --write",
+    "accessibility-check": "node scripts/accessibility-check.js",
     "insert-apartments": "tsx scripts/insertApartments.ts",
     "insert-categories": "tsx scripts/insertCategories.ts",
     "insert-users": "tsx scripts/insertUsers.ts",

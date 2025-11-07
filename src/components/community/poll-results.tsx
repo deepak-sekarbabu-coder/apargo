@@ -46,9 +46,17 @@ export function PollResults({ poll, apartmentCount, user, onDeletePoll }: PollRe
         {totalVotes} of {apartmentCount} apartments voted
       </div>
       {onDeletePoll && user && (user.id === poll.createdBy || user.role === 'incharge') && (
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <button className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">
+      <>
+          <div id="delete-poll-description" className="sr-only">
+            This action will permanently delete the poll and all its votes. This cannot be undone.
+          </div>
+          <AlertDialog>
+        <AlertDialogTrigger asChild>
+        <button
+        className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+          aria-label={`Delete poll: ${poll.question}`}
+            aria-describedby="delete-poll-description"
+            >
               Delete Poll
             </button>
           </AlertDialogTrigger>
@@ -72,7 +80,8 @@ export function PollResults({ poll, apartmentCount, user, onDeletePoll }: PollRe
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
-        </AlertDialog>
+          </AlertDialog>
+            </>
       )}
     </div>
   );

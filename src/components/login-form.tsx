@@ -9,13 +9,10 @@ import * as z from 'zod';
 import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
+import { AccessibleField, ScreenReaderAnnouncement } from '@/components/ui/accessibility';
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+Form,
+FormField,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
@@ -60,9 +57,10 @@ export function LoginForm() {
       await login(data.email, data.password);
       // Don't manually redirect - let the auth context handle it
     } catch (error) {
+      const errorMessage = (error as Error).message;
       toast({
         title: 'Login Failed',
-        description: (error as Error).message,
+        description: errorMessage,
       });
       setIsLoading(false);
     }
@@ -84,41 +82,55 @@ export function LoginForm() {
 
   return (
     <>
+      <ScreenReaderAnnouncement
+        message={
+          isLoading
+            ? 'Logging in, please wait...'
+            : isGoogleLoading
+              ? 'Signing in with Google, please wait...'
+              : ''
+        }
+        priority="polite"
+      />
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 pt-8 pb-4">
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="name@example.com"
-                    {...field}
-                    type="email"
-                    autoCapitalize="none"
-                    autoComplete="email"
-                    autoCorrect="off"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input type="password" placeholder="••••••••" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 pt-8 pb-4">
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field, fieldState }) => (
+            <AccessibleField
+              id="email"
+              label="Email"
+              error={fieldState.error?.message}
+              required
+              description="Enter your registered email address"
+            >
+              <Input
+                placeholder="name@example.com"
+                {...field}
+                type="email"
+                autoCapitalize="none"
+                autoComplete="email"
+                autoCorrect="off"
+              />
+            </AccessibleField>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field, fieldState }) => (
+            <AccessibleField
+              id="password"
+              label="Password"
+              error={fieldState.error?.message}
+              required
+              description="Enter your account password"
+            >
+              <Input type="password" placeholder="••••••••" {...field} />
+            </AccessibleField>
+          )}
+        />
           <Button type="submit" disabled={isLoading}>
             {isLoading ? (
               <span className="flex items-center gap-2">

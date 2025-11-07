@@ -5,8 +5,12 @@
  * Runs after Next.js build to optimize for deployment
  */
 
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 function cleanupNextBuild() {
   console.log('🧹 Post-build cleanup...');
@@ -57,7 +61,7 @@ function optimizeServerlessBundle() {
 
   // Create a minimal import file for Node.js optimizations
   const importScript = `// Node.js optimizations for serverless
-require('../src/lib/node-optimization');
+import('./src/lib/node-optimization.js');
 console.log('🚀 Serverless optimizations loaded');
 `;
 
@@ -80,8 +84,8 @@ function main() {
   }
 }
 
-if (require.main === module) {
+if (import.meta.url === `file://${process.argv[1]}`) {
   main();
 }
 
-module.exports = { cleanupNextBuild };
+export { cleanupNextBuild };

@@ -20,9 +20,12 @@ export function OutstandingBalance({ expenses, currentUserApartment }: Outstandi
   if (totalOutstanding <= 0) return null;
 
   return (
-    <Card
-      className="border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20"
-      suppressHydrationWarning
+  <Card
+  className="border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20"
+  suppressHydrationWarning
+    role="alert"
+      aria-live="polite"
+      aria-label={`Outstanding balance alert: ${totalOutstanding.toFixed(2)} rupees owed`}
     >
       <CardContent className="p-4">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
