@@ -14,41 +14,41 @@ export function MaintenanceSummaryCards({
   activeVendorsCount,
 }: MaintenanceSummaryCardsProps) {
   return (
-    <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-3">
+    <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 sm:grid-cols-3">
       <Card className="border-l-4 border-l-amber-500 shadow-sm hover:shadow-md transition-shadow">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4 sm:px-6 sm:pt-6">
           <CardTitle className="text-sm font-medium text-muted-foreground">
             Active & Upcoming
           </CardTitle>
           <Hammer className="h-5 w-5 text-amber-500" />
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
           <div className="text-2xl font-bold text-foreground">{upcomingCount}</div>
           <p className="text-xs text-muted-foreground mt-1">Tasks requiring attention</p>
         </CardContent>
       </Card>
 
       <Card className="border-l-4 border-l-green-500 shadow-sm hover:shadow-md transition-shadow">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4 sm:px-6 sm:pt-6">
           <CardTitle className="text-sm font-medium text-muted-foreground">
             Recently Completed
           </CardTitle>
           <CheckCircle2 className="h-5 w-5 text-green-500" />
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
           <div className="text-2xl font-bold text-foreground">{completedCount}</div>
           <p className="text-xs text-muted-foreground mt-1">Tasks finished this month</p>
         </CardContent>
       </Card>
 
       <Card className="border-l-4 border-l-blue-500 shadow-sm hover:shadow-md transition-shadow">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 px-4 pt-4 sm:px-6 sm:pt-6">
           <CardTitle className="text-sm font-medium text-muted-foreground">
             Active Vendors
           </CardTitle>
           <User className="h-5 w-5 text-blue-500" />
         </CardHeader>
-        <CardContent>
+        <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
           <div className="text-2xl font-bold text-foreground">{activeVendorsCount}</div>
           <p className="text-xs text-muted-foreground mt-1">Available for work</p>
         </CardContent>

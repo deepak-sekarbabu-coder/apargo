@@ -202,18 +202,18 @@ export function MaintenanceDashboard({
   }, [refresh, toast]);
 
   return (
-    <div className="space-y-8 p-4 md:p-6">
+    <div className="space-y-4 sm:space-y-8 p-4 md:p-6">
       {/* Error Display */}
       {error && (
         <Alert variant="destructive">
           <AlertTriangle className="h-4 w-4" />
-          <AlertDescription className="flex items-center justify-between">
-            <span>{error}</span>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={clearErrors}>
+          <AlertDescription className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+            <span className="text-sm">{error}</span>
+            <div className="flex gap-2 w-full sm:w-auto">
+              <Button variant="outline" size="sm" onClick={clearErrors} className="flex-1 sm:flex-none">
                 Dismiss
               </Button>
-              <Button variant="outline" size="sm" onClick={handleRefresh} disabled={loading}>
+              <Button variant="outline" size="sm" onClick={handleRefresh} disabled={loading} className="flex-1 sm:flex-none">
                 <RefreshCw className={`h-4 w-4 mr-1 ${loading ? 'animate-spin' : ''}`} />
                 Retry
               </Button>
@@ -223,63 +223,61 @@ export function MaintenanceDashboard({
       )}
 
       {/* Header Section */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
             Maintenance Dashboard
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-sm sm:text-base text-muted-foreground mt-1">
             Manage property maintenance tasks and track progress
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
           <Button
             onClick={handleRefresh}
             disabled={loading}
             size="lg"
-            className="inline-flex items-center gap-2 shadow-md hover:shadow-lg transition-shadow"
+            className="inline-flex items-center gap-2 shadow-md hover:shadow-lg transition-shadow flex-1 sm:flex-none"
           >
             <RefreshCw className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">Refresh</span>
-            <span className="sm:hidden">Refresh</span>
+            <span>Refresh</span>
           </Button>
           <Button
             onClick={handleCreateTask}
-            className="inline-flex items-center gap-2 shadow-md hover:shadow-lg transition-shadow"
+            className="inline-flex items-center gap-2 shadow-md hover:shadow-lg transition-shadow flex-1 sm:flex-none"
             size="lg"
             disabled={loading}
           >
             <Plus className="w-5 h-5" />
-            <span className="hidden sm:inline">New Task</span>
-            <span className="sm:hidden">New</span>
+            <span>New</span>
           </Button>
         </div>
       </div>
 
       {/* Loading State */}
       {loading && tasks.length === 0 && (
-        <div className="space-y-8">
-          <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-3">
+        <div className="space-y-4 sm:space-y-8">
+          <div className="grid gap-3 sm:gap-4 md:gap-6 grid-cols-1 sm:grid-cols-3">
             {[1, 2, 3].map(i => (
               <Card key={i} className="animate-pulse">
-                <CardHeader className="pb-2">
+                <CardHeader className="pb-2 px-4 pt-4 sm:px-6 sm:pt-6">
                   <div className="h-4 bg-muted rounded w-3/4"></div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
                   <div className="h-8 bg-muted rounded w-1/2 mb-2"></div>
                   <div className="h-3 bg-muted rounded w-2/3"></div>
                 </CardContent>
               </Card>
             ))}
           </div>
-          <div className="grid gap-8 lg:grid-cols-2">
+          <div className="grid gap-4 sm:gap-8 lg:grid-cols-2">
             {[1, 2].map(i => (
               <Card key={i} className="animate-pulse">
-                <CardHeader>
+                <CardHeader className="px-4 py-4 sm:px-6 sm:py-6">
                   <div className="h-6 bg-muted rounded w-1/2"></div>
-                  <div className="h-4 bg-muted rounded w-3/4"></div>
+                  <div className="h-4 bg-muted rounded w-3/4 mt-2"></div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
                   <MaintenanceTaskSkeleton count={3} />
                 </CardContent>
               </Card>
@@ -299,7 +297,7 @@ export function MaintenanceDashboard({
           />
 
           {/* Main Content Grid */}
-          <div className="grid gap-8 lg:grid-cols-2">
+          <div className="grid gap-4 sm:gap-8 lg:grid-cols-2">
             {/* Upcoming & Active Tasks Section */}
             <UpcomingTasksSection
               upcomingTasks={upcomingTasks}
