@@ -11,7 +11,7 @@
     "start": "next start",
     "build": "npm run replace-sw-env && next build",
     "export": "next export",
-    "netlify-build": "rimraf .next .netlify && node scripts/netlify-optimize.cjs && npm ci && npm run build",
+    "netlify-build": "rimraf .next .netlify && node scripts/netlify-optimize.cjs && npm run build",
     "postbuild": "node scripts/post-build-cleanup.js",
     "test": "jest --config jest.config.cjs",
     "test:payment-category": "tsx tests/payments/test-payment-category.ts",
