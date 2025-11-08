@@ -304,22 +304,22 @@ export function ExpenseItem({
       <CardContent className="space-y-4">
         {/* Payment Status Overview - Hidden for no-split expenses */}
         {!isNoSplitExpense && (
-          <div className="flex flex-col gap-2 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <span className="text-sm font-medium">
-                {calculation.paidApartments.length} of {expense.owedByApartments?.length || 0} paid
-              </span>
-            </div>
-            <div className="flex justify-start sm:justify-end">
-              <Badge
-                variant={calculation.unpaidApartments.length === 0 ? 'default' : 'secondary'}
-                className="text-xs"
-              >
-                {calculation.unpaidApartments.length === 0 ? 'Fully Paid' : 'Pending'}
-              </Badge>
-            </div>
-          </div>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 p-2 sm:p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+        <div className="flex items-center gap-2">
+        <Users className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+        <span className="text-xs sm:text-sm font-medium">
+        {calculation.paidApartments.length} of {expense.owedByApartments?.length || 0} paid
+        </span>
+        </div>
+        <div className="flex justify-start sm:justify-end">
+        <Badge
+        variant={calculation.unpaidApartments.length === 0 ? 'default' : 'secondary'}
+        className="text-xs"
+        >
+        {calculation.unpaidApartments.length === 0 ? 'Fully Paid' : 'Pending'}
+        </Badge>
+        </div>
+        </div>
         )}
 
         {/* Apartment Payment Status - Hidden for no-split expenses */}
@@ -344,110 +344,110 @@ export function ExpenseItem({
                 const isPaid = calculation.paidApartments.includes(apartmentId);
 
                 return (
-                  <div
-                  key={apartmentId}
-                  className={`flex flex-col gap-2 p-3 rounded-lg border transition-all duration-300 ease-in-out ${
-                  isPaid
-                  ? 'bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-700'
-                  : 'bg-red-100 dark:bg-red-900/30 border-red-300 dark:border-red-700'
-                  }`}
-                  >
-                    {/* Apartment info row */}
-                    <div className="flex items-center gap-2 min-w-0">
-                      <div
-                        className={`h-2 w-2 rounded-full flex-shrink-0 transition-colors duration-300 ease-in-out ${isPaid ? 'bg-green-600 dark:bg-green-500' : 'bg-red-600 dark:bg-red-500'}`}
+                <div
+                key={apartmentId}
+                className={`flex flex-col gap-2 p-2 sm:p-3 rounded-lg border transition-all duration-300 ease-in-out ${
+                isPaid
+                ? 'bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-700'
+                : 'bg-red-100 dark:bg-red-900/30 border-red-300 dark:border-red-700'
+                }`}
+                >
+                {/* Apartment info row */}
+                <div className="flex items-center gap-2 min-w-0">
+                <div
+                className={`h-2 w-2 rounded-full flex-shrink-0 transition-colors duration-300 ease-in-out ${isPaid ? 'bg-green-600 dark:bg-green-500' : 'bg-red-600 dark:bg-red-500'}`}
+                />
+                <span className="text-xs sm:text-sm font-medium break-words flex-1">
+                {formatApartmentWithUsers(apartmentId, isCurrentUser)}
+                </span>
+                </div>
+
+                {/* Amount and action row */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                <span className="text-xs sm:text-sm font-medium">
+                ₹{(Number(expense.perApartmentShare) || 0).toFixed(2)}
+                </span>
+
+                      <div className="flex items-center justify-between gap-1 sm:gap-2 flex-wrap">
+                      {(isOwnerOrTenantOfThisApartment || isPayer) && (
+                      <div className="flex gap-1">
+                      {isPaid ? (
+                      <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleMarkUnpaid(apartmentId)}
+                      disabled={!!loadingMap[apartmentId]}
+                      className="h-6 sm:h-7 px-1.5 sm:px-2 text-xs"
+                      title={
+                      isPayer ? 'Mark as unpaid (Payer can mark all)' : 'Mark as unpaid'
+                      }
+                      >
+                      {loadingMap[apartmentId] ? (
+                      <svg
+                      className="animate-spin h-3 w-3 text-gray-500 dark:text-gray-400"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      >
+                      <circle
+                      className="opacity-25"
+                      cx="8"
+                      cy="8"
+                      r="7"
+                      stroke="currentColor"
+                      strokeWidth="2"
                       />
-                      <span className="text-sm font-medium break-words flex-1">
-                        {formatApartmentWithUsers(apartmentId, isCurrentUser)}
-                      </span>
-                    </div>
-
-                    {/* Amount and action row */}
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-sm font-medium">
-                        ₹{(Number(expense.perApartmentShare) || 0).toFixed(2)}
-                      </span>
-
-                      <div className="flex items-center gap-2">
-                        {(isOwnerOrTenantOfThisApartment || isPayer) && (
-                          <div className="flex gap-1">
-                            {isPaid ? (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleMarkUnpaid(apartmentId)}
-                                disabled={!!loadingMap[apartmentId]}
-                                className="h-7 px-2 text-xs"
-                                title={
-                                  isPayer ? 'Mark as unpaid (Payer can mark all)' : 'Mark as unpaid'
-                                }
-                              >
-                                {loadingMap[apartmentId] ? (
-                                  <svg
-                                    className="animate-spin h-3 w-3 text-gray-500 dark:text-gray-400"
-                                    viewBox="0 0 16 16"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <circle
-                                      className="opacity-25"
-                                      cx="8"
-                                      cy="8"
-                                      r="7"
-                                      stroke="currentColor"
-                                      strokeWidth="2"
-                                    />
-                                    <path
-                                      className="opacity-75"
-                                      fill="currentColor"
-                                      d="M15 8a7 7 0 01-7 7V13a5 5 0 005-5h2z"
-                                    />
-                                  </svg>
-                                ) : (
-                                  <X className="h-3 w-3" />
-                                )}
-                                <span className="ml-1 hidden sm:inline">Unpaid</span>
-                              </Button>
-                            ) : (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleMarkPaid(apartmentId)}
-                                disabled={!!loadingMap[apartmentId]}
-                                className="h-7 px-2 text-xs"
-                                title={
-                                  isPayer ? 'Mark as paid (Payer can mark all)' : 'Mark as paid'
-                                }
-                              >
-                                {loadingMap[apartmentId] ? (
-                                  <svg
-                                    className="animate-spin h-3 w-3 text-gray-500 dark:text-gray-400"
-                                    viewBox="0 0 16 16"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                  >
-                                    <circle
-                                      className="opacity-25"
-                                      cx="8"
-                                      cy="8"
-                                      r="7"
-                                      stroke="currentColor"
-                                      strokeWidth="2"
-                                    />
-                                    <path
-                                      className="opacity-75"
-                                      fill="currentColor"
-                                      d="M15 8a7 7 0 01-7 7V13a5 5 0 005-5h2z"
-                                    />
-                                  </svg>
-                                ) : (
-                                  <Check className="h-3 w-3" />
-                                )}
-                                <span className="ml-1 hidden sm:inline">Paid</span>
-                              </Button>
-                            )}
-                          </div>
-                        )}
+                      <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M15 8a7 7 0 01-7 7V13a5 5 0 005-5h2z"
+                      />
+                      </svg>
+                      ) : (
+                      <X className="h-3 w-3" />
+                      )}
+                      <span className="ml-0.5 sm:ml-1 hidden sm:inline text-xs">Unpaid</span>
+                      </Button>
+                      ) : (
+                      <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleMarkPaid(apartmentId)}
+                      disabled={!!loadingMap[apartmentId]}
+                      className="h-6 sm:h-7 px-1.5 sm:px-2 text-xs"
+                      title={
+                      isPayer ? 'Mark as paid (Payer can mark all)' : 'Mark as paid'
+                      }
+                      >
+                      {loadingMap[apartmentId] ? (
+                      <svg
+                      className="animate-spin h-3 w-3 text-gray-500 dark:text-gray-400"
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      >
+                      <circle
+                      className="opacity-25"
+                      cx="8"
+                      cy="8"
+                      r="7"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      />
+                      <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M15 8a7 7 0 01-7 7V13a5 5 0 005-5h2z"
+                      />
+                      </svg>
+                      ) : (
+                      <Check className="h-3 w-3" />
+                      )}
+                      <span className="ml-0.5 sm:ml-1 hidden sm:inline text-xs">Paid</span>
+                      </Button>
+                      )}
+                      </div>
+                      )}
                         {!isOwnerOrTenantOfThisApartment && !isPayer && (
                           <Badge variant={isPaid ? 'default' : 'destructive'} className="text-xs">
                             {isPaid ? 'Paid' : 'Pending'}
@@ -464,13 +464,13 @@ export function ExpenseItem({
 
         {/* Receipt Dialog */}
         {expense.receipt && (
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="w-full sm:w-auto">
-                <Receipt className="h-4 w-4 mr-2" />
-                View Receipt
-              </Button>
-            </DialogTrigger>
+        <Dialog>
+        <DialogTrigger asChild>
+        <Button variant="outline" size="sm" className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9">
+        <Receipt className="h-3 sm:h-4 w-3 sm:w-4 mr-1 sm:mr-2" />
+        <span className="truncate">View Receipt</span>
+        </Button>
+        </DialogTrigger>
             <DialogContent className="max-w-4xl w-[95vw] receipt-modal-content mobile-dialog-content mx-auto p-2 sm:p-6 overflow-hidden flex flex-col">
               <DialogHeader className="space-y-2 pb-2 sm:pb-4 flex-shrink-0 receipt-modal-header">
                 <DialogTitle className="text-sm sm:text-lg break-words line-clamp-2">

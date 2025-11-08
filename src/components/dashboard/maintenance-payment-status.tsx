@@ -195,99 +195,102 @@ export function MaintenancePaymentStatus({
   }
 
   return (
-    <Card className="border-amber-200 bg-amber-50/40">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-sm md:text-base">
-          <Clock className="h-5 w-5 text-amber-600" />
-          Monthly Maintenance
-        </CardTitle>
-        <CardDescription className="text-xs md:text-sm">
-          {unpaidMonths.length} unpaid {unpaidMonths.length === 1 ? 'month' : 'months'}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-4">
+  <Card className="border-amber-200 bg-amber-50/40">
+  <CardHeader className="pb-3">
+  <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
+  <Clock className="h-4 sm:h-5 w-4 sm:w-5 text-amber-600 flex-shrink-0" />
+  <span className="break-words">Monthly Maintenance</span>
+  </CardTitle>
+  <CardDescription className="text-xs sm:text-sm mt-1">
+  {unpaidMonths.length} unpaid {unpaidMonths.length === 1 ? 'month' : 'months'}
+  </CardDescription>
+  </CardHeader>
+  <CardContent className="space-y-3 sm:space-y-4">
         {unpaidMonths.map(({ monthYear: month, payments: monthPayments, totalOwed: owed, totalPaid: paid }) => {
           const isCurrentMonth = month === monthYear;
           const existingPendingForMonth = monthPayments.find(p => p.status === 'pending');
           const isMonthSelected = selectedMonth === month;
           
           return (
-            <div
-              key={month}
-              className={`p-3 rounded-lg border ${isCurrentMonth ? 'border-amber-300 bg-amber-100/50' : 'border-gray-200 bg-white'}`}
+          <div
+          key={month}
+          className={`p-2 sm:p-3 rounded-lg border ${isCurrentMonth ? 'border-amber-300 bg-amber-100/50' : 'border-gray-200 bg-white'}`}
+          >
+          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-3 mb-2">
+          <div className="min-w-0 flex-1">
+          <div className="font-medium text-xs sm:text-sm flex items-center gap-2 flex-wrap">
+          <span className="break-words">{formatMonth(month)}</span>
+          {isCurrentMonth && (
+          <Badge variant="outline" className="text-xs flex-shrink-0">
+          Current
+          </Badge>
+          )}
+          </div>
+          <div className="text-xs text-muted-foreground mt-1 break-words">
+          Amount Due: <span className="font-medium">₹{owed.toFixed(2)}</span>
+          {paid > 0 && <span className="ml-1 sm:ml-2">(Paid: ₹{paid.toFixed(2)})</span>}
+          </div>
+          </div>
+          <div className="flex-shrink-0">
+          {existingPendingForMonth ? (
+          <Badge variant="secondary" className="text-xs">Pending Approval</Badge>
+          ) : (
+          <Badge variant="destructive" className="text-xs">Not Paid</Badge>
+          )}
+          </div>
+          </div>
+          
+          {isMonthSelected && (
+          <div className="space-y-2 sm:space-y-3 mt-3 pt-3 border-t">
+          <Input ref={fileInputRef} type="file" accept="image/*,application/pdf" className="text-xs sm:text-sm h-9 sm:h-10" />
+          {error && (
+          <div className="flex items-start gap-2 text-red-600 text-xs break-words">
+          <AlertCircle className="h-3 w-3 flex-shrink-0 mt-0.5" /> <span>{error}</span>
+          </div>
+          )}
+          <div className="flex flex-col sm:flex-row gap-2">
+          <Button
+          size="sm"
+          disabled={isUploading}
+          onClick={() => handleUpload(month)}
+          className="flex items-center gap-2 flex-1 text-xs sm:text-sm h-8 sm:h-9"
+          >
+          <UploadCloud className="h-3 sm:h-4 w-3 sm:w-4" />
+          <span className="min-w-0 truncate">
+          {isUploading
+            ? 'Uploading...'
+          : existingPendingForMonth
+            ? 'Re-upload & Mark Paid'
+                  : 'Upload Receipt & Mark Paid'}
+            </span>
+          </Button>
+          <Button
+          size="sm"
+            variant="outline"
+          onClick={() => setSelectedMonth('')}
+            className="text-xs sm:text-sm h-8 sm:h-9"
             >
-              <div className="flex items-start justify-between mb-2">
-                <div>
-                  <div className="font-medium text-sm">
-                    {formatMonth(month)}
-                    {isCurrentMonth && (
-                      <Badge variant="outline" className="ml-2 text-xs">
-                        Current
-                      </Badge>
-                    )}
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1">
-                    Amount Due: <span className="font-medium">₹{owed.toFixed(2)}</span>
-                    {paid > 0 && <span className="ml-2">(Paid: ₹{paid.toFixed(2)})</span>}
-                  </div>
-                </div>
-                <div>
-                  {existingPendingForMonth ? (
-                    <Badge variant="secondary" className="text-xs">Pending Approval</Badge>
-                  ) : (
-                    <Badge variant="destructive" className="text-xs">Not Paid</Badge>
-                  )}
-                </div>
-              </div>
-              
-              {isMonthSelected && (
-                <div className="space-y-2 mt-3 pt-3 border-t">
-                  <Input ref={fileInputRef} type="file" accept="image/*,application/pdf" />
-                  {error && (
-                    <div className="flex items-center text-red-600 text-xs gap-1">
-                      <AlertCircle className="h-3 w-3" /> {error}
-                    </div>
-                  )}
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      disabled={isUploading}
-                      onClick={() => handleUpload(month)}
-                      className="flex items-center gap-2 flex-1"
-                    >
-                      <UploadCloud className="h-4 w-4" />
-                      {isUploading
-                        ? 'Uploading...'
-                        : existingPendingForMonth
-                          ? 'Re-upload & Mark Paid'
-                          : 'Upload Receipt & Mark Paid'}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setSelectedMonth('')}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                </div>
-              )}
-              
-              {!isMonthSelected && (
-                <Button
-                  size="sm"
-                  variant="outline"
-                  onClick={() => {
-                    setSelectedMonth(month);
-                    setError(null);
-                  }}
-                  className="w-full mt-2"
-                >
-                  {existingPendingForMonth ? 'Re-upload Receipt' : 'Upload Receipt'}
+                Cancel
                 </Button>
-              )}
+              </div>
             </div>
-          );
+          )}
+          
+          {!isMonthSelected && (
+          <Button
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            setSelectedMonth(month);
+              setError(null);
+          }}
+            className="w-full mt-2 text-xs sm:text-sm h-8 sm:h-9"
+            >
+                {existingPendingForMonth ? 'Re-upload Receipt' : 'Upload Receipt'}
+                </Button>
+               )}
+             </div>
+           );
         })}
       </CardContent>
     </Card>
