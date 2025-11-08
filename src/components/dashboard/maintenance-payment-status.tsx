@@ -37,30 +37,68 @@ export function MaintenancePaymentStatus({
 }: MaintenancePaymentStatusProps) {
   const monthYear = React.useMemo(() => new Date().toISOString().slice(0, 7), []); // YYYY-MM
 
-  const maintenancePayments = React.useMemo(
+  // Get all maintenance payments for this user's apartment
+  const allMaintenancePayments = React.useMemo(
     () =>
-      payments.filter(
-        p =>
-          p.monthYear === monthYear && p.apartmentId === user?.apartment && isMaintenancePayment(p)
-      ),
-    [payments, monthYear, user?.apartment]
+      payments.filter(p => p.apartmentId === user?.apartment && isMaintenancePayment(p)),
+    [payments, user?.apartment]
   );
 
-  // Calculate total owed based on maintenance payments, with fallback to default
-  // Only use default if totalOwed would be 0, and default is > 0
-  const totalOwedFromPayments = maintenancePayments.reduce((sum, p) => sum + (p.amount || 0), 0);
-  const totalOwed = totalOwedFromPayments > 0 ? totalOwedFromPayments : defaultMonthlyAmount;
-  const totalPaid = maintenancePayments
-    .filter(p => p.status === 'paid' || p.status === 'approved')
-    .reduce((sum, p) => sum + (p.amount || 0), 0);
-  const isPaid = totalPaid >= totalOwed && totalOwed > 0;
+  // Group by month and calculate unpaid months
+  const paymentsByMonth = React.useMemo(() => {
+    const grouped: Record<string, Payment[]> = {};
+    allMaintenancePayments.forEach(p => {
+      if (!grouped[p.monthYear]) {
+        grouped[p.monthYear] = [];
+      }
+      grouped[p.monthYear].push(p);
+    });
+    return grouped;
+  }, [allMaintenancePayments]);
 
-  const existingPending = maintenancePayments.find(p => p.status === 'pending');
+  // Find unpaid months (including current month)
+  const unpaidMonths = React.useMemo(() => {
+    const unpaid: Array<{ monthYear: string; payments: Payment[]; totalOwed: number; totalPaid: number }> = [];
+    
+    // Check current month
+    const currentPayments = paymentsByMonth[monthYear] || [];
+    const currentOwed = currentPayments.reduce((sum, p) => sum + (p.amount || 0), 0) || defaultMonthlyAmount;
+    const currentPaid = currentPayments
+      .filter(p => p.status === 'paid' || p.status === 'approved')
+      .reduce((sum, p) => sum + (p.amount || 0), 0);
+    
+    if (currentPaid < currentOwed) {
+      unpaid.push({ monthYear, payments: currentPayments, totalOwed: currentOwed, totalPaid: currentPaid });
+    }
+
+    // Check previous months (up to 12 months back)
+    const now = new Date();
+    for (let i = 1; i <= 12; i++) {
+      const checkDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const checkMonthYear = checkDate.toISOString().slice(0, 7);
+      const monthPayments = paymentsByMonth[checkMonthYear] || [];
+      
+      if (monthPayments.length > 0) {
+        const owed = monthPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
+        const paid = monthPayments
+          .filter(p => p.status === 'paid' || p.status === 'approved')
+          .reduce((sum, p) => sum + (p.amount || 0), 0);
+        
+        if (paid < owed) {
+          unpaid.push({ monthYear: checkMonthYear, payments: monthPayments, totalOwed: owed, totalPaid: paid });
+        }
+      }
+    }
+    
+    return unpaid.sort((a, b) => b.monthYear.localeCompare(a.monthYear)); // Most recent first
+  }, [paymentsByMonth, monthYear, defaultMonthlyAmount]);
+
   const fileInputRef = React.useRef<HTMLInputElement | null>(null);
   const [isUploading, setIsUploading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [selectedMonth, setSelectedMonth] = React.useState<string>(monthYear);
 
-  const handleUpload = async () => {
+  const handleUpload = async (targetMonth: string) => {
     if (!user?.id || !user.apartment) return;
     const file = fileInputRef.current?.files?.[0];
     if (!file) {
@@ -72,8 +110,14 @@ export function MaintenancePaymentStatus({
     try {
       const path = `receipts/${Date.now()}_${file.name}`;
       const receiptURL = await uploadImage(file, path);
-      if (existingPending) {
-        await updatePayment(existingPending.id, {
+      
+      // Find existing pending payment for this month
+      const monthPayments = paymentsByMonth[targetMonth] || [];
+      const existingPendingForMonth = monthPayments.find(p => p.status === 'pending');
+      const monthOwed = monthPayments.reduce((sum, p) => sum + (p.amount || 0), 0) || defaultMonthlyAmount;
+      
+      if (existingPendingForMonth) {
+        await updatePayment(existingPendingForMonth.id, {
           receiptURL,
           status: 'paid',
           payerId: user.id,
@@ -84,9 +128,9 @@ export function MaintenancePaymentStatus({
           // Admin (system) user can be left blank; use same user as payee for now
           payeeId: user.id,
           apartmentId: user.apartment,
-          amount: totalOwed || 0,
+          amount: monthOwed || 0,
           status: 'paid',
-          monthYear,
+          monthYear: targetMonth,
           receiptURL,
           category: 'income',
           reason: 'Monthly maintenance fee - Maintenance',
@@ -120,70 +164,131 @@ export function MaintenancePaymentStatus({
     }
   };
 
+  // Format month for display
+  const formatMonth = (monthYearStr: string) => {
+    const [year, month] = monthYearStr.split('-');
+    const date = new Date(parseInt(year), parseInt(month) - 1);
+    return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  };
+
+  // If there are no unpaid months, show success message
+  if (unpaidMonths.length === 0) {
+    return (
+      <Card className="border-green-200 bg-green-50/40">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-sm md:text-base">
+            <CheckCircle2 className="h-5 w-5 text-green-600" />
+            Monthly Maintenance
+          </CardTitle>
+          <CardDescription className="text-xs md:text-sm">All payments up to date</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-2">
+            <Badge className="bg-green-600">Paid</Badge>
+            <span className="text-sm text-muted-foreground">
+              Thank you, all your maintenance fees are recorded.
+            </span>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <Card
-      className={isPaid ? 'border-green-200 bg-green-50/40' : 'border-amber-200 bg-amber-50/40'}
-    >
+    <Card className="border-amber-200 bg-amber-50/40">
       <CardHeader>
         <CardTitle className="flex items-center gap-2 text-sm md:text-base">
-          {isPaid ? (
-            <CheckCircle2 className="h-5 w-5 text-green-600" />
-          ) : (
-            <Clock className="h-5 w-5 text-amber-600" />
-          )}
+          <Clock className="h-5 w-5 text-amber-600" />
           Monthly Maintenance
         </CardTitle>
-        <CardDescription className="text-xs md:text-sm">Status for {monthYear}</CardDescription>
+        <CardDescription className="text-xs md:text-sm">
+          {unpaidMonths.length} unpaid {unpaidMonths.length === 1 ? 'month' : 'months'}
+        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-3">
-        <div className="flex items-center gap-2 flex-wrap">
-          {isPaid ? (
-            <Badge className="bg-green-600">Paid</Badge>
-          ) : existingPending ? (
-            <Badge variant="secondary">Pending Approval</Badge>
-          ) : (
-            <Badge variant="destructive">Not Paid</Badge>
-          )}
-          <span className="text-sm text-muted-foreground">
-            {isPaid
-              ? 'Thank you, your maintenance fee is recorded.'
-              : existingPending
-                ? 'Receipt uploaded; awaiting approval.'
-                : 'Please upload your receipt to mark payment.'}
-          </span>
-        </div>
-        <div className="text-xs text-muted-foreground">
-          Amount Due: <span className="font-medium">₹{totalOwed.toFixed(2)}</span>
-        </div>
-        {!isPaid && (
-          <div className="space-y-2">
-            <Input ref={fileInputRef} type="file" accept="image/*,application/pdf" />
-            {error && (
-              <div className="flex items-center text-red-600 text-xs gap-1">
-                <AlertCircle className="h-3 w-3" /> {error}
-              </div>
-            )}
-            <Button
-              size="sm"
-              disabled={isUploading}
-              onClick={handleUpload}
-              className="flex items-center gap-2"
+      <CardContent className="space-y-4">
+        {unpaidMonths.map(({ monthYear: month, payments: monthPayments, totalOwed: owed, totalPaid: paid }) => {
+          const isCurrentMonth = month === monthYear;
+          const existingPendingForMonth = monthPayments.find(p => p.status === 'pending');
+          const isMonthSelected = selectedMonth === month;
+          
+          return (
+            <div
+              key={month}
+              className={`p-3 rounded-lg border ${isCurrentMonth ? 'border-amber-300 bg-amber-100/50' : 'border-gray-200 bg-white'}`}
             >
-              <UploadCloud className="h-4 w-4" />
-              {isUploading
-                ? 'Uploading...'
-                : existingPending
-                  ? 'Re-upload & Mark Paid'
-                  : 'Upload Receipt & Mark Paid'}
-            </Button>
-            {maintenancePayments.length > 0 && (
-              <div className="text-[10px] text-muted-foreground">
-                Existing records: {maintenancePayments.length} (latest status:{' '}
-                {maintenancePayments[0].status})
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <div className="font-medium text-sm">
+                    {formatMonth(month)}
+                    {isCurrentMonth && (
+                      <Badge variant="outline" className="ml-2 text-xs">
+                        Current
+                      </Badge>
+                    )}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Amount Due: <span className="font-medium">₹{owed.toFixed(2)}</span>
+                    {paid > 0 && <span className="ml-2">(Paid: ₹{paid.toFixed(2)})</span>}
+                  </div>
+                </div>
+                <div>
+                  {existingPendingForMonth ? (
+                    <Badge variant="secondary" className="text-xs">Pending Approval</Badge>
+                  ) : (
+                    <Badge variant="destructive" className="text-xs">Not Paid</Badge>
+                  )}
+                </div>
               </div>
-            )}
-          </div>
-        )}
+              
+              {isMonthSelected && (
+                <div className="space-y-2 mt-3 pt-3 border-t">
+                  <Input ref={fileInputRef} type="file" accept="image/*,application/pdf" />
+                  {error && (
+                    <div className="flex items-center text-red-600 text-xs gap-1">
+                      <AlertCircle className="h-3 w-3" /> {error}
+                    </div>
+                  )}
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      disabled={isUploading}
+                      onClick={() => handleUpload(month)}
+                      className="flex items-center gap-2 flex-1"
+                    >
+                      <UploadCloud className="h-4 w-4" />
+                      {isUploading
+                        ? 'Uploading...'
+                        : existingPendingForMonth
+                          ? 'Re-upload & Mark Paid'
+                          : 'Upload Receipt & Mark Paid'}
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setSelectedMonth('')}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
+              {!isMonthSelected && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => {
+                    setSelectedMonth(month);
+                    setError(null);
+                  }}
+                  className="w-full mt-2"
+                >
+                  {existingPendingForMonth ? 'Re-upload Receipt' : 'Upload Receipt'}
+                </Button>
+              )}
+            </div>
+          );
+        })}
       </CardContent>
     </Card>
   );
