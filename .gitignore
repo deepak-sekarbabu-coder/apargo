@@ -17,6 +17,9 @@
 /.next/
 /out/
 
+# temp excluded routes (build-time only)
+.temp-excluded-routes/
+
 # production
 /build
 

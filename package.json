@@ -9,10 +9,11 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "start": "next start",
+    "prebuild": "node scripts/pre-build-exclude-routes.js exclude",
     "build": "npm run replace-sw-env && next build",
+    "postbuild": "node scripts/post-build-cleanup.js && node scripts/pre-build-exclude-routes.js restore",
     "export": "next export",
     "netlify-build": "rimraf .next .netlify && node scripts/netlify-optimize.cjs && npm run build",
-    "postbuild": "node scripts/post-build-cleanup.js",
     "test": "jest --config jest.config.cjs",
     "test:payment-category": "tsx tests/payments/test-payment-category.ts",
     "test:payment-events": "node scripts/test-payment-events.js",

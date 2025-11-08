@@ -8,6 +8,9 @@
   NODE_VERSION = "20"
   NPM_FLAGS = "--legacy-peer-deps"
   
+  # Environment mode (Next.js sets this automatically, but explicit is better)
+  NODE_ENV = "production"
+  
   # Build optimization
   NEXT_PHASE = "phase-production-build"
   
