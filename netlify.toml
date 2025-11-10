@@ -4,9 +4,9 @@
 
 # Build environment configuration
 [build.environment]
-  # Node.js configuration
-  NODE_VERSION = "20"
-  NPM_FLAGS = "--legacy-peer-deps"
+# Node.js configuration
+NODE_VERSION = "20"
+NPM_FLAGS = "--legacy-peer-deps --include=dev"
   
   # Environment mode (Next.js sets this automatically, but explicit is better)
   NODE_ENV = "production"
