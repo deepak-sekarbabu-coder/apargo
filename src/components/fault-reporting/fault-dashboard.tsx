@@ -217,21 +217,21 @@ export function FaultDashboard({
         </CardHeader>
         <CardContent className="px-4 pb-4 sm:px-6 sm:pb-6">
           <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-3">
-            <div className="flex items-center justify-between sm:justify-start space-x-2 p-3 sm:p-0 bg-red-50 sm:bg-transparent rounded-lg sm:rounded-none">
+            <div className="flex items-center justify-between sm:justify-start space-x-2 p-3 sm:p-0 bg-red-50 dark:bg-red-950/30 sm:bg-transparent sm:dark:bg-transparent rounded-lg sm:rounded-none">
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-red-500 rounded-full flex-shrink-0" />
                 <span className="text-sm font-medium">Critical</span>
               </div>
               <Badge variant="secondary" className="ml-auto">{stats.critical}</Badge>
             </div>
-            <div className="flex items-center justify-between sm:justify-start space-x-2 p-3 sm:p-0 bg-yellow-50 sm:bg-transparent rounded-lg sm:rounded-none">
+            <div className="flex items-center justify-between sm:justify-start space-x-2 p-3 sm:p-0 bg-yellow-50 dark:bg-yellow-950/30 sm:bg-transparent sm:dark:bg-transparent rounded-lg sm:rounded-none">
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-yellow-500 rounded-full flex-shrink-0" />
                 <span className="text-sm font-medium">Warning</span>
               </div>
               <Badge variant="secondary" className="ml-auto">{stats.warning}</Badge>
             </div>
-            <div className="flex items-center justify-between sm:justify-start space-x-2 p-3 sm:p-0 bg-green-50 sm:bg-transparent rounded-lg sm:rounded-none">
+            <div className="flex items-center justify-between sm:justify-start space-x-2 p-3 sm:p-0 bg-green-50 dark:bg-green-950/30 sm:bg-transparent sm:dark:bg-transparent rounded-lg sm:rounded-none">
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-green-500 rounded-full flex-shrink-0" />
                 <span className="text-sm font-medium">Low</span>

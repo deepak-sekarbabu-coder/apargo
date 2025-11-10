@@ -246,24 +246,24 @@ export function PaymentEventHistory({
         {/* Summary Cards */}
         {filteredData.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-medium text-blue-900">Total Months</h4>
-              <p className="text-2xl font-bold text-blue-600">{filteredData.length}</p>
-              <p className="text-sm text-blue-700">With payment events</p>
+            <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded-lg">
+              <h4 className="font-medium text-blue-900 dark:text-blue-100">Total Months</h4>
+              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{filteredData.length}</p>
+              <p className="text-sm text-blue-700 dark:text-blue-300">With payment events</p>
             </div>
-            <div className="bg-green-50 p-4 rounded-lg">
-              <h4 className="font-medium text-green-900">Total Paid</h4>
-              <p className="text-2xl font-bold text-green-600">
+            <div className="bg-green-50 dark:bg-green-950/30 p-4 rounded-lg">
+              <h4 className="font-medium text-green-900 dark:text-green-100">Total Paid</h4>
+              <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                 ₹{filteredData.reduce((sum, data) => sum + data.paidAmount, 0)}
               </p>
-              <p className="text-sm text-green-700">Across all months</p>
+              <p className="text-sm text-green-700 dark:text-green-300">Across all months</p>
             </div>
-            <div className="bg-orange-50 p-4 rounded-lg">
-              <h4 className="font-medium text-orange-900">Total Pending</h4>
-              <p className="text-2xl font-bold text-orange-600">
+            <div className="bg-orange-50 dark:bg-orange-950/30 p-4 rounded-lg">
+              <h4 className="font-medium text-orange-900 dark:text-orange-100">Total Pending</h4>
+              <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                 ₹{filteredData.reduce((sum, data) => sum + data.pendingAmount, 0)}
               </p>
-              <p className="text-sm text-orange-700">Outstanding amount</p>
+              <p className="text-sm text-orange-700 dark:text-orange-300">Outstanding amount</p>
             </div>
           </div>
         )}
