@@ -44,7 +44,6 @@
 | **Target Audience** | Residents, property managers and administrators of an apartment complex. The UI is a responsive SPA that works on desktop and mobile browsers.                                                                                                                 |
 | **Key Use‑Cases**   | • Dashboard‑viewing with real-time analytics<br>• Fault reporting (auto‑submit on file upload)<br>• Expense tracking with category breakdown<br>• Payment event management<br>• Real‑time notifications<br>• Admin management of user‑apartment assignments<br>• Community features (announcements, polls)<br>• Maintenance task scheduling<br>• Vendor management |
 
-
 ---
 
 ### 1.1 Latest Features (v1.5.0)
@@ -52,6 +51,7 @@
 This version introduces several major enhancements to the property management platform:
 
 #### 🎯 Real-time Analytics Dashboard
+
 - **Live spending insights** with trend analysis and velocity tracking
 - **Interactive charts** powered by Recharts with category breakdowns
 - **Real-time data freshness indicators** showing data age (fresh/recent/stale)
@@ -59,24 +59,28 @@ This version introduces several major enhancements to the property management pl
 - **Category-wise expense analysis** with visual progress indicators
 
 #### 🏘️ Community Features
+
 - **Announcements system** for property-wide communications
 - **Polls and voting** for community decision-making
 - **Active announcements panel** on the dashboard
 - **Community engagement tracking**
 
 #### 💰 Enhanced Payment Management
+
 - **Payment events tracking** with detailed transaction history
 - **Payment scheduling** for recurring expenses
 - **Category-based payment organization**
 - **Payment analytics** and reporting
 
 #### 🔧 Maintenance & Vendor Management
+
 - **Maintenance task scheduling** with status tracking
 - **Vendor management system** with ratings and reviews
 - **Budget tracking** for maintenance activities
 - **Task completion monitoring** with upcoming, completed, and skipped tasks
 
 #### ⚡ Performance & Developer Experience
+
 - **Turbopack integration** for faster development builds
 - **React Query** for optimized data fetching and caching
 - **Radix UI components** for accessible, high-quality UI primitives
@@ -97,8 +101,23 @@ src/
 │   ├─ (dashboard)/page.tsx   → /dashboard
 │   ├─ (login)/page.tsx       → /login
 │   └─ api/...                → Server‑only API routes (exposed as /api/**)
-├─ components/        – Re‑usable UI components
-├─ lib/               – Firebase wrappers, hooks, constants
+├─ components/        – Re‑usable UI components (organized by feature)
+│   ├─ admin/         – Admin dashboard & tools
+│   ├─ analytics/     – Analytics dashboard & charts
+│   ├─ auth/          – Authentication forms
+│   ├─ community/     – Community features (announcements, polls)
+│   ├─ core/          – Core app shell & providers
+│   ├─ dashboard/     – Dashboard widgets
+│   ├─ maintenance/   – Maintenance & vendor management
+│   ├─ payment-events/– Payment event tracking
+│   ├─ ui/            – Radix UI primitives
+│   └─ ...
+├─ lib/               – Core logic & utilities (organized by feature)
+│   ├─ auth/          – Authentication logic
+│   ├─ core/          – Core constants & types
+│   ├─ firebase/      – Firebase SDK initialization
+│   ├─ firestore/     – Data access layer
+│   └─ ...
 public/
 ├─ sw-optimized.js   – Production service‑worker
 ├─ sw.js              – Fallback service‑worker
@@ -232,10 +251,10 @@ When the `*_EMULATOR_HOST` vars are present, `src/lib/firebase.ts` automatically
 | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | **`next.config.ts`**                                                                                              | • Enables React strict mode & gzip compression.<br>• Adds the bundle‑analyzer (`ANALYZE` env var).<br>• Marks `firebase-admin` as external for serverless builds.<br>• `output: 'standalone'` is **commented** – uncomment for Docker builds.                            |
 | **`tailwind.config.ts`**                                                                                          | • Dark‑mode via `class`.<br>• `content` includes `src/app`, `src/components`, and **static HTML** (`public/**/*.html`).<br>• Exposes design tokens as CSS variables (`--primary`, `--background`, …).                                                                    |
-| **`src/lib/firebase.ts`**                                                                                         | Initializes the Firebase **client** app from the public config; exports ready‑to‑use `auth`, `firestore`, `messaging`.                                                                                                                                                   |
-| **`src/lib/firebase-admin.ts`**                                                                                   | Singleton **Admin** app; reads the service‑account (`apartgo.json`). All Node scripts import `getFirebaseAdminApp()` from here.                                                                                                                                          |
-| **`src/lib/apartment-constants.ts`**                                                                              | Helper that computes `getApartmentCount()` and `getApartmentIds()` from `NEXT_PUBLIC_APP_APARTMENT_COUNT`.                                                                                                                                                               |
-| **`src/lib/useAuth.ts`**                                                                                          | Custom hook that:<br>• Persists the Firebase Auth user in `localStorage`.<br>• Subscribes to `onAuthStateChanged` (mocked in tests).                                                                                                                                     |
+| **`src/lib/firebase/firebase.ts`**                                                                                    | Initializes the Firebase **client** app from the public config; exports ready‑to‑use `auth`, `firestore`, `messaging`.                                                                                                                                                   |
+| **`src/lib/firebase/firebase-admin.ts`**                                                                              | Singleton **Admin** app; reads the service‑account (`apartgo.json`). All Node scripts import `getFirebaseAdminApp()` from here.                                                                                                                                          |
+| **`src/lib/core/apartment-constants.ts`**                                                                             | Helper that computes `getApartmentCount()` and `getApartmentIds()` from `NEXT_PUBLIC_APP_APARTMENT_COUNT`.                                                                                                                                                               |
+| **`src/lib/auth/auth.ts`**                                                                                        | Custom hook that:<br>• Persists the Firebase Auth user in `localStorage`.<br>• Subscribes to `onAuthStateChanged` (mocked in tests).                                                                                                                                     |
 | **`src/components/**`\*\*                                                                                         | Small, focused UI components (Buttons, Cards, Form fields, etc.).                                                                                                                                                                                                        |
 | **`src/components/analytics/analytics-view.tsx`**                                                                 | **Real-time analytics dashboard** with:<br>• Live spending insights and trend analysis<br>• Interactive Recharts visualizations<br>• Category breakdowns with progress indicators<br>• Spending velocity tracking                                                        |
 | **`src/components/admin/admin-view.tsx`**                                                                         | **Admin dashboard** with tabs for:<br>• User management<br>• Category management<br>• Payment events<br>• Community features (announcements, polls)                                                                                                                      |
@@ -496,23 +515,23 @@ _Contrary to a previous comment, lint **is** executed in CI._ It fails the workf
 
 ### 14.1 Unit Tests (Jest)
 
--   **Run all tests:** `pnpm test`
--   **Watch mode:** `pnpm test -- --watch`
--   **Coverage:** `pnpm test -- --coverage` (CI enforces `>80 %` line coverage).
+- **Run all tests:** `pnpm test`
+- **Watch mode:** `pnpm test -- --watch`
+- **Coverage:** `pnpm test -- --coverage` (CI enforces `>80 %` line coverage).
 
 The `jest.setup.ts` file **mocks** Firebase modules so unit tests run without network access. The mock includes the essential methods (`signInWithEmailAndPassword`, `signOut`, `addDoc`, `setDoc`, `getDoc`, …).
 
 ### 14.2 Integration / End‑to‑End Tests
 
--   **Framework:** Playwright (optional, not shipped by default).
--   **Installation:**
+- **Framework:** Playwright (optional, not shipped by default).
+- **Installation:**
 
 ```bash
 pnpm add -D @playwright/test
 pnpm dlx playwright install
 ```
 
--   **Run locally:** `pnpm run test:e2e` (add a script entry if you want).
+- **Run locally:** `pnpm run test:e2e` (add a script entry if you want).
 
 ### 14.3 Emulator‑based testing
 
@@ -522,10 +541,10 @@ When testing code that talks to Firestore/Auth, spin up the emulator (see § 4
 
 ## 15. Linting & CI Enforcement
 
--   **`pnpm run lint`** runs `next lint` (ESLint with the Next.js preset).
--   **Ignored files:** `.eslintignore` excludes generated files (`.next/`, `dist/`, `node_modules/`).
--   **Scripts folder:** All scripts in `scripts/` **are linted** (they are part of the source tree). No explicit exclusion is required – this ensures that maintenance scripts stay clean.
--   **CI behavior:** The GitHub Actions workflow **runs** lint; a lint failure aborts the workflow and blocks merges.
+- **`pnpm run lint`** runs `next lint` (ESLint with the Next.js preset).
+- **Ignored files:** `.eslintignore` excludes generated files (`.next/`, `dist/`, `node_modules/`).
+- **Scripts folder:** All scripts in `scripts/` **are linted** (they are part of the source tree). No explicit exclusion is required – this ensures that maintenance scripts stay clean.
+- **CI behavior:** The GitHub Actions workflow **runs** lint; a lint failure aborts the workflow and blocks merges.
 
 ---
 
@@ -580,26 +599,26 @@ The script reads the service‑account (`apartgo.json`) via `src/lib/firebase-ad
 
 See `CONTRIBUTING.md`. Below is a concise checklist:
 
-1.  **Fork** → **branch** (`git checkout -b feat/awesome‑feature`).
-2.  Follow **TypeScript strict mode** and existing **ESLint** rules (`pnpm run lint`).
-3.  Write **unit tests** for new logic (≥ 80 % coverage).
-4.  Run the full suite locally: `pnpm test`.
-5.  Verify the **post‑build cleanup** works (`pnpm run build`).
-6.  Open a PR against `main`. At least **one approving review** is required and the CI must pass.
-7.  Commit messages must follow **Conventional Commits** (`feat: …`, `fix: …`).
+1. **Fork** → **branch** (`git checkout -b feat/awesome‑feature`).
+2. Follow **TypeScript strict mode** and existing **ESLint** rules (`pnpm run lint`).
+3. Write **unit tests** for new logic (≥ 80 % coverage).
+4. Run the full suite locally: `pnpm test`.
+5. Verify the **post‑build cleanup** works (`pnpm run build`).
+6. Open a PR against `main`. At least **one approving review** is required and the CI must pass.
+7. Commit messages must follow **Conventional Commits** (`feat: …`, `fix: …`).
 
 ---
 
 ## 19. Versioning & Release Process
 
-1.  **Bump version** using pnpm (which updates `package.json` and creates a Git tag):
+1. **Bump version** using pnpm (which updates `package.json` and creates a Git tag):
 
 ```bash
 pnpm version patch   # or minor / major
 git push --follow-tags
 ```
 
-2.  **Generate changelog** (automated via `standard-version` if installed):
+2. **Generate changelog** (automated via `standard-version` if installed):
 
 ```bash
 npx changelog-generator -p    # prepend new entries to CHANGELOG.md
@@ -608,7 +627,7 @@ git commit -m \"docs: update changelog for vX.Y.Z\"
 git push
 ```
 
-3.  **Deploy** – Netlify automatically picks up the new tag and runs the CI pipeline.
+3. **Deploy** – Netlify automatically picks up the new tag and runs the CI pipeline.
 
 > **Since v1.4.2**, the version string is also injected into `NEXT_PUBLIC_SW_VERSION` (via `replace-sw-env.js`) to force a service‑worker cache bust.
 
@@ -616,11 +635,11 @@ git push
 
 ## 20. Best Practices & Accessibility
 
--   **Tailwind purge** – Keep the `content` array up‑to‑date; missing paths cause dead CSS to linger.
--   **WCAG AA contrast** – Use the **axe** Chrome extension or run `pnpm run lint:accessibility` (adds `eslint-plugin-jsx-a11y`).
--   **ARIA** – Every interactive element must have an accessible name (`aria-label` or visible text).
--   **Keyboard navigation** – All dialogs, menus and buttons must be reachable via `Tab`.
--   **Testing** – Run `pnpm run lint && pnpm run test && pnpm run build && pnpm run start` locally; use Lighthouse to verify accessibility scores (`≥ 90`).
+- **Tailwind purge** – Keep the `content` array up‑to‑date; missing paths cause dead CSS to linger.
+- **WCAG AA contrast** – Use the **axe** Chrome extension or run `pnpm run lint:accessibility` (adds `eslint-plugin-jsx-a11y`).
+- **ARIA** – Every interactive element must have an accessible name (`aria-label` or visible text).
+- **Keyboard navigation** – All dialogs, menus and buttons must be reachable via `Tab`.
+- **Testing** – Run `pnpm run lint && pnpm run test && pnpm run build && pnpm run start` locally; use Lighthouse to verify accessibility scores (`≥ 90`).
 
 ---
 
@@ -769,7 +788,7 @@ docker run -p 3000:3000 \\
 
 ---
 
-### 🎉 You’re all set!
+### 🎉 You’re all set
 
 With the updated documentation you should now have:
 
