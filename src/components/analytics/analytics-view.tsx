@@ -18,7 +18,7 @@ import {
   Pie,
   PieChart,
   Tooltip as RechartsTooltip,
-  ResponsiveContainer,
+
   XAxis,
   YAxis,
 } from 'recharts';
@@ -332,37 +332,35 @@ export function AnalyticsView({
                       config={{}}
                       className="h-[250px] sm:h-[300px] lg:h-[350px] w-full min-w-[280px] max-w-full overflow-x-auto"
                     >
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart accessibilityLayer>
-                          <RechartsTooltip
-                            cursor={false}
-                            content={
-                              <ChartTooltipContent
-                                hideLabel
-                                formatter={(value, name) => [`₹${value}`, name]}
-                              />
-                            }
-                          />
-                          <Pie
-                            data={filteredData}
-                            dataKey="total"
-                            nameKey="name"
-                            cx="50%"
-                            cy="50%"
-                            outerRadius={80}
-                            label={({ name, total }) =>
-                              total > 0 ? `${name}: ₹${total.toFixed(0)}` : ''
-                            }
-                          >
-                            {filteredData.map((entry, index) => (
-                              <Cell
-                                key={`cell-${index}`}
-                                fill={entry.fill || 'hsl(var(--primary))'}
-                              />
-                            ))}
-                          </Pie>
-                        </PieChart>
-                      </ResponsiveContainer>
+                      <PieChart accessibilityLayer width={800} height={350}>
+                        <RechartsTooltip
+                          cursor={false}
+                          content={
+                            <ChartTooltipContent
+                              hideLabel
+                              formatter={(value, name) => [`₹${value}`, name]}
+                            />
+                          }
+                        />
+                        <Pie
+                          data={filteredData}
+                          dataKey="total"
+                          nameKey="name"
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={80}
+                          label={({ name, total }) =>
+                            total > 0 ? `${name}: ₹${total.toFixed(0)}` : ''
+                          }
+                        >
+                          {filteredData.map((entry, index) => (
+                            <Cell
+                              key={`cell-${index}`}
+                              fill={entry.fill || 'hsl(var(--primary))'}
+                            />
+                          ))}
+                        </Pie>
+                      </PieChart>
                     </ChartContainer>
 
                     {/* Enhanced Category Cards with Real-time Indicators */}
@@ -472,78 +470,76 @@ export function AnalyticsView({
                       }}
                       className="h-[250px] sm:h-[300px] lg:h-[350px] w-full min-w-[280px] max-w-full overflow-x-auto"
                     >
-                      <ResponsiveContainer width="100%" height="100%">
-                        <AreaChart data={analyticsData.monthlySpending} accessibilityLayer>
-                          <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
-                          <XAxis
-                            dataKey="name"
-                            tickLine={false}
-                            tickMargin={10}
-                            axisLine={false}
-                            fontSize={11}
-                            height={40}
-                            interval={0}
-                            tick={props => {
-                              const { x, y, payload } = props;
-                              const date = new Date(payload.value + '-01');
-                              const month = date.toLocaleString('default', { month: 'short' });
-                              const year = date.getFullYear();
-                              return (
-                                <g transform={`translate(${x},${y})`}>
-                                  <text
-                                    x={0}
-                                    y={0}
-                                    dy={8}
-                                    textAnchor="middle"
-                                    fill="#888"
-                                    fontSize="11"
-                                    suppressHydrationWarning={true}
-                                  >
-                                    {month}
-                                  </text>
-                                  <text
-                                    x={0}
-                                    y={0}
-                                    dy={22}
-                                    textAnchor="middle"
-                                    fill="#bbb"
-                                    fontSize="10"
-                                  >
-                                    {year}
-                                  </text>
-                                </g>
-                              );
-                            }}
-                          />
-                          <YAxis
-                            fontSize={11}
-                            tickLine={false}
-                            axisLine={false}
-                            tickMargin={8}
-                            tickFormatter={value => `₹${value}`}
-                          />
-                          <RechartsTooltip
-                            cursor={false}
-                            content={
-                              <ChartTooltipContent
-                                hideLabel
-                                formatter={(value, name) => [`₹${value}`, name]}
-                                labelFormatter={label => `Month: ${label}`}
-                              />
-                            }
-                          />
-                          <Area
-                            type="monotone"
-                            dataKey="total"
-                            stackId="1"
-                            stroke="hsl(var(--primary))"
-                            fill="hsl(var(--primary))"
-                            fillOpacity={0.3}
-                            strokeWidth={2}
-                            name="Total Spending"
-                          />
-                        </AreaChart>
-                      </ResponsiveContainer>
+                      <AreaChart data={analyticsData.monthlySpending} accessibilityLayer width={800} height={350}>
+                        <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                        <XAxis
+                          dataKey="name"
+                          tickLine={false}
+                          tickMargin={10}
+                          axisLine={false}
+                          fontSize={11}
+                          height={40}
+                          interval={0}
+                          tick={props => {
+                            const { x, y, payload } = props;
+                            const date = new Date(payload.value + '-01');
+                            const month = date.toLocaleString('default', { month: 'short' });
+                            const year = date.getFullYear();
+                            return (
+                              <g transform={`translate(${x},${y})`}>
+                                <text
+                                  x={0}
+                                  y={0}
+                                  dy={8}
+                                  textAnchor="middle"
+                                  fill="#888"
+                                  fontSize="11"
+                                  suppressHydrationWarning={true}
+                                >
+                                  {month}
+                                </text>
+                                <text
+                                  x={0}
+                                  y={0}
+                                  dy={22}
+                                  textAnchor="middle"
+                                  fill="#bbb"
+                                  fontSize="10"
+                                >
+                                  {year}
+                                </text>
+                              </g>
+                            );
+                          }}
+                        />
+                        <YAxis
+                          fontSize={11}
+                          tickLine={false}
+                          axisLine={false}
+                          tickMargin={8}
+                          tickFormatter={value => `₹${value}`}
+                        />
+                        <RechartsTooltip
+                          cursor={false}
+                          content={
+                            <ChartTooltipContent
+                              hideLabel
+                              formatter={(value, name) => [`₹${value}`, name]}
+                              labelFormatter={label => `Month: ${label}`}
+                            />
+                          }
+                        />
+                        <Area
+                          type="monotone"
+                          dataKey="total"
+                          stackId="1"
+                          stroke="hsl(var(--primary))"
+                          fill="hsl(var(--primary))"
+                          fillOpacity={0.3}
+                          strokeWidth={2}
+                          name="Total Spending"
+                        />
+                      </AreaChart>
                     </ChartContainer>
 
                     {/* Real-time Insights Panel */}
