@@ -1,6 +1,6 @@
 # 📚 **Apargo – Property Management Portal**
 
-**Version:** `v1.4.2 – 2025‑10‑30` | [CHANGELOG](./CHANGELOG.md)
+**Version:** `v1.5.0 – 2025‑11‑19` | [CHANGELOG](./CHANGELOG.md)
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/81d761ff-9a71-4099-b92b-52ada05f2198/deploy-status)](https://app.netlify.com/projects/unicornproperties/deploys)
 
@@ -9,6 +9,7 @@
 ## 📖 Table of Contents
 
 1. [Project Overview](#1-project-overview)
+   - [Latest Features (v1.5.0)](#11-latest-features-v150)
 2. [Architecture & Routing Model](#2-architecture--routing-model)
 3. [Environment Variables & Service‑Account Handling](#3-environment-variables--service‑account-handling)
 4. [Local Firebase Emulator](#4-local-firebase-emulator)
@@ -39,9 +40,48 @@
 | Item                | Description                                                                                                                                                                                                                                                    |
 | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Purpose**         | A web‑based property‑management portal that lets residents and administrators view dashboards, file fault reports, track expenses, receive real‑time push notifications, and interact with data stored in Firebase.                                            |
-| **Primary Stack**   | **React** + **Next.js (App Router)**, **TypeScript**, **Tailwind CSS**, **Firebase** (Client + Admin SDK), **Service Workers** for offline support, **Jest** for unit testing, and a set of **Node.js** scripts for deployment, data‑seeding, and maintenance. |
+| **Primary Stack**   | **React 18** + **Next.js 16 (App Router with Turbopack)**, **TypeScript 5**, **Tailwind CSS**, **Firebase 11** (Client + Admin SDK), **Radix UI** components, **TanStack React Query** for data fetching, **Service Workers** for offline support, **Jest** for unit testing, **Recharts** for analytics visualization, and a set of **Node.js** scripts for deployment, data‑seeding, and maintenance. |
 | **Target Audience** | Residents, property managers and administrators of an apartment complex. The UI is a responsive SPA that works on desktop and mobile browsers.                                                                                                                 |
-| **Key Use‑Cases**   | • Dashboard‑viewing<br>• Fault reporting (auto‑submit on file upload)<br>• Expense tracking<br>• Real‑time notifications<br>• Admin management of user‑apartment assignments                                                                                   |
+| **Key Use‑Cases**   | • Dashboard‑viewing with real-time analytics<br>• Fault reporting (auto‑submit on file upload)<br>• Expense tracking with category breakdown<br>• Payment event management<br>• Real‑time notifications<br>• Admin management of user‑apartment assignments<br>• Community features (announcements, polls)<br>• Maintenance task scheduling<br>• Vendor management |
+
+
+---
+
+### 1.1 Latest Features (v1.5.0)
+
+This version introduces several major enhancements to the property management platform:
+
+#### 🎯 Real-time Analytics Dashboard
+- **Live spending insights** with trend analysis and velocity tracking
+- **Interactive charts** powered by Recharts with category breakdowns
+- **Real-time data freshness indicators** showing data age (fresh/recent/stale)
+- **Spending velocity metrics** tracking weekly and monthly patterns
+- **Category-wise expense analysis** with visual progress indicators
+
+#### 🏘️ Community Features
+- **Announcements system** for property-wide communications
+- **Polls and voting** for community decision-making
+- **Active announcements panel** on the dashboard
+- **Community engagement tracking**
+
+#### 💰 Enhanced Payment Management
+- **Payment events tracking** with detailed transaction history
+- **Payment scheduling** for recurring expenses
+- **Category-based payment organization**
+- **Payment analytics** and reporting
+
+#### 🔧 Maintenance & Vendor Management
+- **Maintenance task scheduling** with status tracking
+- **Vendor management system** with ratings and reviews
+- **Budget tracking** for maintenance activities
+- **Task completion monitoring** with upcoming, completed, and skipped tasks
+
+#### ⚡ Performance & Developer Experience
+- **Turbopack integration** for faster development builds
+- **React Query** for optimized data fetching and caching
+- **Radix UI components** for accessible, high-quality UI primitives
+- **pnpm** as the package manager for faster, more efficient installs
+- **Enhanced TypeScript support** with strict mode enabled
 
 ---
 
@@ -86,7 +126,7 @@ git ls-files src/pages | xargs -I{} echo \"⚠️ Legacy file: {} – move to pu
 The **`ANALYZE`** environment variable toggles the built‑in bundle‑analyzer:
 
 ```bash
-ANALYZE=true npm run build
+ANALYZE=true pnpm run build
 ```
 
 - When `ANALYZE` is `true` the analyzer opens in the browser after the build finishes.
@@ -150,7 +190,7 @@ Running the full Firebase suite locally speeds up onboarding and enables offline
 ### 4.1 Prerequisites
 
 ```bash
-npm i -g firebase-tools   # or add firebase-tools as a devDependency
+pnpm add -g firebase-tools   # or add firebase-tools as a devDependency
 ```
 
 ### 4.2 Start the emulators
@@ -177,7 +217,7 @@ NEXT_PUBLIC_FIREBASE_MESSAGING_EMULATOR_HOST=localhost:5001
 Load it before starting the dev server:
 
 ```bash
-export $(cat .env.local.emu | xargs) && npm run dev
+export $(cat .env.local.emu | xargs) && pnpm run dev
 ```
 
 When the `*_EMULATOR_HOST` vars are present, `src/lib/firebase.ts` automatically connects the client SDK to the emulator, and any **admin** scripts (e.g., `scripts/check-database.js`) use `FIREBASE_EMULATOR_HOST`.
@@ -197,8 +237,14 @@ When the `*_EMULATOR_HOST` vars are present, `src/lib/firebase.ts` automatically
 | **`src/lib/apartment-constants.ts`**                                                                              | Helper that computes `getApartmentCount()` and `getApartmentIds()` from `NEXT_PUBLIC_APP_APARTMENT_COUNT`.                                                                                                                                                               |
 | **`src/lib/useAuth.ts`**                                                                                          | Custom hook that:<br>• Persists the Firebase Auth user in `localStorage`.<br>• Subscribes to `onAuthStateChanged` (mocked in tests).                                                                                                                                     |
 | **`src/components/**`\*\*                                                                                         | Small, focused UI components (Buttons, Cards, Form fields, etc.).                                                                                                                                                                                                        |
+| **`src/components/analytics/analytics-view.tsx`**                                                                 | **Real-time analytics dashboard** with:<br>• Live spending insights and trend analysis<br>• Interactive Recharts visualizations<br>• Category breakdowns with progress indicators<br>• Spending velocity tracking                                                        |
+| **`src/components/admin/admin-view.tsx`**                                                                         | **Admin dashboard** with tabs for:<br>• User management<br>• Category management<br>• Payment events<br>• Community features (announcements, polls)                                                                                                                      |
+| **`src/components/maintenance/maintenance-dashboard.tsx`**                                                        | **Maintenance management** with:<br>• Task scheduling and tracking<br>• Budget summaries<br>• Upcoming, completed, and skipped tasks sections                                                                                                                            |
+| **`src/components/maintenance/vendor-list.tsx`**                                                                  | **Vendor management** with ratings, status badges, and contact information.                                                                                                                                                                                              |
+| **`src/components/community/**`\*\*                                                                               | Community features including announcements and polls for resident engagement.                                                                                                                                                                                            |
+| **`src/components/payment-events/**`\*\*                                                                          | Payment event tracking and management components.                                                                                                                                                                                                                        |
 | **`public/sw-optimized.js`**                                                                                      | Production service‑worker with three caching strategies:<br>• **static** – `cacheFirst` (assets that never change).<br>• **api** – `networkFirst` (always try network, fall back to cache).<br>• **pages** – `staleWhileRevalidate` (serve cache, update in background). |
-| **`public/sw.js`**                                                                                                | Fallback service‑worker using a simple **cache‑first** strategy (kept for browsers that can’t load the optimized version).                                                                                                                                               |
+| **`public/sw.js`**                                                                                                | Fallback service‑worker using a simple **cache‑first** strategy (kept for browsers that can't load the optimized version).                                                                                                                                               |
 | **`public/firebase-messaging-sw.js`**                                                                             | Deployed FCM worker (Firebase v11‑compat). It receives the **build‑time‑injected** config from `replace-sw-env.js`.                                                                                                                                                      |
 | **`firebase/firebase-messaging-sw.js`**                                                                           | **Legacy v8 worker** – retained **only for reference** while the team migrates to v11. It can be removed in a future major version.                                                                                                                                      |
 | **`scripts/replace-sw-env.js`**                                                                                   | Reads the public environment variables at build time and injects them into the two SW files (`firebase-messaging-sw.js` and `sw‑optimized.js`).                                                                                                                          |
@@ -208,9 +254,10 @@ When the `*_EMULATOR_HOST` vars are present, `src/lib/firebase.ts` automatically
 | **`scripts/fix-notifications-display.js`**                                                                        | Browser‑side script that normalises the `apartment` / `apartmentId` fields stored in `localStorage` after a schema change.                                                                                                                                               |
 | **`scripts/fix-user-apartments.ts`**                                                                              | Audits and repairs missing `apartment` fields in the `users` collection.                                                                                                                                                                                                 |
 | **`scripts/insertUsers.ts`**, **`insertApartments.ts`**, **`insertCategories.ts`**, **`insertSampleExpenses.ts`** | Seed data helpers used during onboarding or CI.                                                                                                                                                                                                                          |
-| **`scripts/set-custom-claims.ts`**                                                                                | **(New)** Assigns `apartmentId` + `role` custom claims to a Firebase Auth user (see § 17).                                                                                                                                                                               |
+| **`scripts/set-custom-claims.ts`**                                                                                | **(New)** Assigns `apartmentId` + `role` custom claims to a Firebase Auth user (see § 17).                                                                                                                                                                               |
+| **`scripts/test-payment-events.js`**, **`test-payment-scheduler.js`**                                            | Test scripts for payment event workflows and scheduling functionality.                                                                                                                                                                                                   |
 | **`scripts/optimize.js`**, **`netlify-optimize.js`**                                                              | Additional optional optimisation helpers for CI/CD.                                                                                                                                                                                                                      |
-| **`tests/**`\*\*                                                                                                  | Jest unit‑test suites (see § 14).                                                                                                                                                                                                                                        |
+| **`tests/**`\*\*                                                                                                  | Jest unit‑test suites (see § 14).                                                                                                                                                                                                                                        |
 
 ---
 
@@ -258,34 +305,39 @@ firebase deploy --only firestore:rules
 
 ```bash
 # 1️⃣ Prerequisites
-#    - Node.js ≥ 18 (CI uses `node-version: \"20.x\"` – we recommend Node 20 locally)
-#    - npm (or yarn)
+#    - Node.js ≥ 20.9.0 (as specified in package.json engines)
+#    - pnpm (package manager)
 #    - A Firebase project with Firestore, Auth & Cloud Messaging enabled
 #    - `apartgo.json` (service‑account) placed at the repo root (git‑ignored)
 
-# 2️⃣ Install the project
+# 2️⃣ Install pnpm (if not already installed)
+npm install -g pnpm
+# or via Corepack (recommended for Node.js ≥ 16.13)
+corepack enable
+
+# 3️⃣ Install the project
 git clone https://github.com/yourorg/apargo.git
 cd apargo
-npm ci   # clean install, respects lockfile
+pnpm install   # clean install, respects lockfile
 
-# 3️⃣ Install the TypeScript‑runner used by scripts
-npm i -D tsx          # local dev dependency (preferred)
+# 4️⃣ Install the TypeScript‑runner used by scripts
+pnpm add -D tsx          # local dev dependency (preferred)
 # If you prefer a global install:
-# npm i -g tsx
+# pnpm add -g tsx
 
-# 4️⃣ Environment
+# 5️⃣ Environment
 cp .env.example .env.local
 #   Edit .env.local and fill in the public Firebase values + APP_APARTMENT_COUNT
 #   (Optional) If you want to work against the emulator, also copy .env.example .env.local.emu
 
-# 5️⃣ Development server
-npm run dev       # starts Next.js on http://localhost:3000
+# 6️⃣ Development server
+pnpm run dev       # starts Next.js on http://localhost:3000 with Turbopack
 
-# 6️⃣ Production build (includes post‑build cleanup)
-npm run build
+# 7️⃣ Production build (includes post‑build cleanup)
+pnpm run build
 
-# 7️⃣ Serve the production build locally
-npm run start
+# 8️⃣ Serve the production build locally
+pnpm run start
 ```
 
 ### 8.1 Running the Service‑Worker locally
@@ -314,13 +366,13 @@ tsx scripts/<script>.ts
 **Example shortcuts** (already defined in `package.json`):
 
 ```bash
-npm run seed:users          # inserts demo users
-npm run seed:apartments     # generates apartments collection
-npm run seed:categories     # populates expense categories
-npm run seed:expenses       # inserts sample expenses
-npm run fix-apartments      # validates & repairs missing apartment assignments
-npm run clean-fcm           # removes invalid FCM tokens
-npm run deployment-checklist   # runs pre‑deploy sanity checks
+pnpm run insert-users          # inserts demo users
+pnpm run insert-apartments     # generates apartments collection
+pnpm run insert-categories     # populates expense categories
+pnpm run seed:expenses         # inserts sample expenses (if available)
+pnpm run fix-apartments        # validates & repairs missing apartment assignments (if available)
+pnpm run clean-fcm             # removes invalid FCM tokens (if available)
+pnpm run deployment-checklist  # runs pre‑deploy sanity checks (if available)
 ```
 
 > **Why `tsx`?** It uses `esbuild` under the hood, providing near‑instant start‑up and full TypeScript support without a separate compile step.
@@ -346,7 +398,7 @@ When `ANALYZE=true` the bundle analyzer is active **and the post‑build cleanup
 If you need the build artefacts for local debugging, run:
 
 ```bash
-npm run build --ignore-scripts   # bypasses all lifecycle scripts
+pnpm run build --ignore-scripts   # bypasses all lifecycle scripts
 ```
 
 > **Caution:** Skipping the cleanup will increase bundle size and may cause CI‑related timeouts on Netlify.
@@ -420,10 +472,10 @@ Changing the version (e.g., bumping it in `.env.local`) and rebuilding forces a 
 
 | Stage                | Command                                                                         |
 | -------------------- | ------------------------------------------------------------------------------- |
-| **Install**          | `npm ci`                                                                        |
-| **Lint**             | `npm run lint`                                                                  |
-| **Test**             | `npm test` (Jest)                                                               |
-| **Build**            | `npm run build` (production)                                                    |
+| **Install**          | `pnpm install`                                                                  |
+| **Lint**             | `pnpm run lint`                                                                 |
+| **Test**             | `pnpm test` (Jest)                                                              |
+| **Build**            | `pnpm run build` (production)                                                   |
 | **Deploy (Netlify)** | Runs only on `main` after a successful build; uses `NETLIFY_AUTH_TOKEN` secret. |
 
 ### Required secrets (repo Settings → Secrets)
@@ -444,23 +496,23 @@ _Contrary to a previous comment, lint **is** executed in CI._ It fails the workf
 
 ### 14.1 Unit Tests (Jest)
 
-- **Run all tests:** `npm test`
-- **Watch mode:** `npm test -- --watch`
-- **Coverage:** `npm test -- --coverage` (CI enforces `>80 %` line coverage).
+-   **Run all tests:** `pnpm test`
+-   **Watch mode:** `pnpm test -- --watch`
+-   **Coverage:** `pnpm test -- --coverage` (CI enforces `>80 %` line coverage).
 
 The `jest.setup.ts` file **mocks** Firebase modules so unit tests run without network access. The mock includes the essential methods (`signInWithEmailAndPassword`, `signOut`, `addDoc`, `setDoc`, `getDoc`, …).
 
 ### 14.2 Integration / End‑to‑End Tests
 
-- **Framework:** Playwright (optional, not shipped by default).
-- **Installation:**
+-   **Framework:** Playwright (optional, not shipped by default).
+-   **Installation:**
 
 ```bash
-npm i -D @playwright/test
-npx playwright install
+pnpm add -D @playwright/test
+pnpm dlx playwright install
 ```
 
-- **Run locally:** `npm run test:e2e` (add a script entry if you want).
+-   **Run locally:** `pnpm run test:e2e` (add a script entry if you want).
 
 ### 14.3 Emulator‑based testing
 
@@ -470,10 +522,10 @@ When testing code that talks to Firestore/Auth, spin up the emulator (see § 4
 
 ## 15. Linting & CI Enforcement
 
-- **`npm run lint`** runs `next lint` (ESLint with the Next.js preset).
-- **Ignored files:** `.eslintignore` excludes generated files (`.next/`, `dist/`, `node_modules/`).
-- **Scripts folder:** All scripts in `scripts/` **are linted** (they are part of the source tree). No explicit exclusion is required – this ensures that maintenance scripts stay clean.
-- **CI behavior:** The GitHub Actions workflow **runs** lint; a lint failure aborts the workflow and blocks merges.
+-   **`pnpm run lint`** runs `next lint` (ESLint with the Next.js preset).
+-   **Ignored files:** `.eslintignore` excludes generated files (`.next/`, `dist/`, `node_modules/`).
+-   **Scripts folder:** All scripts in `scripts/` **are linted** (they are part of the source tree). No explicit exclusion is required – this ensures that maintenance scripts stay clean.
+-   **CI behavior:** The GitHub Actions workflow **runs** lint; a lint failure aborts the workflow and blocks merges.
 
 ---
 
@@ -481,10 +533,10 @@ When testing code that talks to Firestore/Auth, spin up the emulator (see § 4
 
 | Symptom                                                   | Likely Cause                                                                                           | Fix                                                                                                                         |
 | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
-| **Service worker fails to register**                      | Site served over HTTP, missing `/firebase-messaging-sw.js`, or `replace-sw-env.js` didn’t inject vars. | Serve via HTTPS (Netlify does this automatically). Ensure a successful `npm run build` so the file is copied to the output. |
-| **`process.env` variables are undefined in the SW**       | `replace-sw-env.js` didn’t run (e.g., `ANALYZE` shortcut build).                                       | Run a full build: `npm run build`. In CI the script will abort if required vars are missing.                                |
+| **Service worker fails to register**                      | Site served over HTTP, missing `/firebase-messaging-sw.js`, or `replace-sw-env.js` didn't inject vars. | Serve via HTTPS (Netlify does this automatically). Ensure a successful `pnpm run build` so the file is copied to the output. |
+| **`process.env` variables are undefined in the SW**       | `replace-sw-env.js` didn't run (e.g., `ANALYZE` shortcut build).                                       | Run a full build: `pnpm run build`. In CI the script will abort if required vars are missing.                                |
 | **TypeScript scripts error “Cannot find module …”**       | Running with plain `node`.                                                                             | Use `tsx` (installed locally or globally).                                                                                  |
-| **Lint errors appear in CI but not locally**              | Local IDE may use a cached ESLint version.                                                             | Run `npm run lint` locally; fix any reported errors before pushing.                                                         |
+| **Lint errors appear in CI but not locally**              | Local IDE may use a cached ESLint version.                                                             | Run `pnpm run lint` locally; fix any reported errors before pushing.                                                         |
 | **Firebase Security Rules block reads**                   | User’s custom claim `apartmentId` missing.                                                             | Use the **Custom Claim Assignment** script (see § 17).                                                                      |
 | **Post‑build cleanup not executed**                       | `postbuild` script missing in `package.json`.                                                          | Add `\"postbuild\": \"node scripts/post-build-cleanup.js\"` (see § 10).                                                     |
 | **`onAuthStateChanged` reference in docs**                | The hook still uses it; the mock is provided in `jest.setup.ts`.                                       | No action needed.                                                                                                           |
@@ -492,7 +544,7 @@ When testing code that talks to Firestore/Auth, spin up the emulator (see § 4
 | **`firebase/firebase-messaging-sw.js` present**           | Legacy file kept for reference.                                                                        | See § 5 for rationale; it can be removed in a future major version.                                                         |
 | **`scripts/fix-notifications-display.js` not documented** | Was omitted from the index.                                                                            | Added description in § 5 and § 22.                                                                                          |
 | **Docker build fails**                                    | `output: 'standalone'` is commented out.                                                               | Enable it (uncomment) and use the Dockerfile below.                                                                         |
-| **Need to force a SW cache bust without a full release**  | Changing `NEXT_PUBLIC_SW_VERSION` manually.                                                            | Update the variable in `.env.local` and run `npm run build`.                                                                |
+| **Need to force a SW cache bust without a full release**  | Changing `NEXT_PUBLIC_SW_VERSION` manually.                                                            | Update the variable in `.env.local` and run `pnpm run build`.                                                                |
 
 ---
 
@@ -505,7 +557,7 @@ When testing code that talks to Firestore/Auth, spin up the emulator (see § 4
 | **`netlify.toml` missing**        | The Netlify config isn’t present.                        | Add a minimal `netlify.toml` (see Docker guide for an example).           |
 | **Plugin not configured**         | `@netlify/plugin-nextjs` missing.                        | Add it under `[plugins]` in `netlify.toml`.                               |
 | **Standalone output not enabled** | `output: 'standalone'` is commented out.                 | Uncomment the line in `next.config.ts` if you need a Docker‑ready bundle. |
-| **Missing API route**             | Expected file (`src/app/api/health/route.ts`) not found. | Verify the file exists; run `npm run build` to surface routing errors.    |
+| **Missing API route**             | Expected file (`src/app/api/health/route.ts`) not found. | Verify the file exists; run `pnpm run build` to surface routing errors.    |
 
 ### 17.2 Custom‑Claim Assignment script
 
@@ -528,26 +580,26 @@ The script reads the service‑account (`apartgo.json`) via `src/lib/firebase-ad
 
 See `CONTRIBUTING.md`. Below is a concise checklist:
 
-1. **Fork** → **branch** (`git checkout -b feat/awesome‑feature`).
-2. Follow **TypeScript strict mode** and existing **ESLint** rules (`npm run lint`).
-3. Write **unit tests** for new logic (≥ 80 % coverage).
-4. Run the full suite locally: `npm test`.
-5. Verify the **post‑build cleanup** works (`npm run build`).
-6. Open a PR against `main`. At least **one approving review** is required and the CI must pass.
-7. Commit messages must follow **Conventional Commits** (`feat: …`, `fix: …`).
+1.  **Fork** → **branch** (`git checkout -b feat/awesome‑feature`).
+2.  Follow **TypeScript strict mode** and existing **ESLint** rules (`pnpm run lint`).
+3.  Write **unit tests** for new logic (≥ 80 % coverage).
+4.  Run the full suite locally: `pnpm test`.
+5.  Verify the **post‑build cleanup** works (`pnpm run build`).
+6.  Open a PR against `main`. At least **one approving review** is required and the CI must pass.
+7.  Commit messages must follow **Conventional Commits** (`feat: …`, `fix: …`).
 
 ---
 
 ## 19. Versioning & Release Process
 
-1. **Bump version** using npm (which updates `package.json` and creates a Git tag):
+1.  **Bump version** using pnpm (which updates `package.json` and creates a Git tag):
 
 ```bash
-npm version patch   # or minor / major
+pnpm version patch   # or minor / major
 git push --follow-tags
 ```
 
-2. **Generate changelog** (automated via `standard-version` if installed):
+2.  **Generate changelog** (automated via `standard-version` if installed):
 
 ```bash
 npx changelog-generator -p    # prepend new entries to CHANGELOG.md
@@ -556,7 +608,7 @@ git commit -m \"docs: update changelog for vX.Y.Z\"
 git push
 ```
 
-3. **Deploy** – Netlify automatically picks up the new tag and runs the CI pipeline.
+3.  **Deploy** – Netlify automatically picks up the new tag and runs the CI pipeline.
 
 > **Since v1.4.2**, the version string is also injected into `NEXT_PUBLIC_SW_VERSION` (via `replace-sw-env.js`) to force a service‑worker cache bust.
 
@@ -564,11 +616,11 @@ git push
 
 ## 20. Best Practices & Accessibility
 
-- **Tailwind purge** – Keep the `content` array up‑to‑date; missing paths cause dead CSS to linger.
-- **WCAG AA contrast** – Use the **axe** Chrome extension or run `npm run lint:accessibility` (adds `eslint-plugin-jsx-a11y`).
-- **ARIA** – Every interactive element must have an accessible name (`aria-label` or visible text).
-- **Keyboard navigation** – All dialogs, menus and buttons must be reachable via `Tab`.
-- **Testing** – Run `npm run lint && npm run test && npm run build && npm run start` locally; use Lighthouse to verify accessibility scores (`≥ 90`).
+-   **Tailwind purge** – Keep the `content` array up‑to‑date; missing paths cause dead CSS to linger.
+-   **WCAG AA contrast** – Use the **axe** Chrome extension or run `pnpm run lint:accessibility` (adds `eslint-plugin-jsx-a11y`).
+-   **ARIA** – Every interactive element must have an accessible name (`aria-label` or visible text).
+-   **Keyboard navigation** – All dialogs, menus and buttons must be reachable via `Tab`.
+-   **Testing** – Run `pnpm run lint && pnpm run test && pnpm run build && pnpm run start` locally; use Lighthouse to verify accessibility scores (`≥ 90`).
 
 ---
 
@@ -640,10 +692,13 @@ This tells Next.js to emit a self‑contained build that can run without a separ
 # -------------------------------------------------
 FROM node:20-alpine AS builder
 
+# Install pnpm
+RUN npm install -g pnpm
+
 # Install only production‑ready deps (including dev‑deps for the build)
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
 # Copy source files
 COPY . .
@@ -661,7 +716,7 @@ ARG NEXT_PUBLIC_SW_VERSION
 ARG ANALYZE=false
 
 ENV NODE_ENV=production
-RUN npm run build
+RUN pnpm run build
 
 # -------------------------------------------------
 # 2️⃣ Runtime stage – thin image for serving
@@ -669,22 +724,25 @@ RUN npm run build
 FROM node:20-alpine AS runner
 WORKDIR /app
 
+# Install pnpm
+RUN npm install -g pnpm
+
 # Copy only what is needed from the builder
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
-COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/package.json /app/pnpm-lock.yaml ./
 COPY --from=builder /app/next.config.ts ./
 COPY --from=builder /app/tsconfig.json ./
 
 # Install only production dependencies (skip dev deps)
 ENV NODE_ENV=production
-RUN npm ci --only=production
+RUN pnpm install --prod --frozen-lockfile
 
 EXPOSE 3000
 ENV PORT=3000
 
 # Use the Next.js start script
-CMD [\"npm\", \"run\", \"start\"]
+CMD [\"pnpm\", \"run\", \"start\"]
 ```
 
 ### 23.3 Build & Run
