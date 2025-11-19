@@ -17,7 +17,7 @@ import {
   where,
 } from 'firebase/firestore';
 
-import { db } from '@/lib/firebase';
+import { db } from '@/lib/firebase/firebase';
 
 // Adjust import path as needed
 

@@ -7,7 +7,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 
 import { deleteFault, getFaults, updateFault } from '@/lib/firestore/faults';
 import { getUsers } from '@/lib/firestore/users';
-import type { Fault, FaultSeverity, FaultStatus, User } from '@/lib/types';
+import type { Fault, FaultSeverity, FaultStatus, User } from '@/lib/core/types';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';

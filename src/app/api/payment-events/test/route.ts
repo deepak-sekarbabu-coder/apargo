@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { getFirebaseAdminApp } from '@/lib/firebase-admin';
+import { getFirebaseAdminApp } from '@/lib/firebase/firebase-admin';
 
 // Minimal Firestore doc type for test output
 interface PaymentTestDocMeta {

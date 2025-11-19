@@ -8,8 +8,8 @@ import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 
 import { addFault } from '@/lib/firestore/faults';
-import { uploadImage } from '@/lib/storage';
-import type { FaultSeverity } from '@/lib/types';
+import { uploadImage } from '@/lib/storage/storage';
+import type { FaultSeverity } from '@/lib/core/types';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

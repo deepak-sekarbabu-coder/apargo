@@ -6,7 +6,7 @@ import * as React from 'react';
 
 import Image from 'next/image';
 
-import type { User, View } from '@/lib/types';
+import type { User, View } from '@/lib/core/types';
 
 import { Users } from '@/components/ui/lucide';
 import {

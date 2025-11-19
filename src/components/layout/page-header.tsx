@@ -4,8 +4,8 @@ import { Home, LogOut, PlusCircle, Settings } from 'lucide-react';
 
 import * as React from 'react';
 
-import type { Category, Expense, User } from '@/lib/types';
-import type { View } from '@/lib/types';
+import type { Category, Expense, User } from '@/lib/core/types';
+import type { View } from '@/lib/core/types';
 
 import { AddExpenseDialog } from '@/components/dialogs/add-expense-dialog';
 import { AddPaymentDialog } from '@/components/dialogs/add-payment-dialog';

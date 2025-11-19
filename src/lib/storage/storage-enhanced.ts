@@ -19,15 +19,15 @@ import {
   uploadBytes,
 } from 'firebase/storage';
 
-import { app, db } from './firebase';
-import log from './logger';
+import { app, db } from '../firebase/firebase';
+import log from '../core/logger';
 import {
   FileMetadata,
   FileUploadProgress,
   FileValidationResult,
   StorageConfig,
   StorageStats,
-} from './types';
+} from '../core/types';
 
 // Firebase Storage instance
 const storage = getStorage(app);

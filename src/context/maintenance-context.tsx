@@ -21,7 +21,7 @@ import {
   subscribeToVendors,
   updateVendor,
 } from '@/lib/firestore/vendors';
-import { MaintenanceBudget, MaintenanceTask, Vendor } from '@/lib/types';
+import { MaintenanceBudget, MaintenanceTask, Vendor } from '@/lib/core/types';
 
 interface MaintenanceContextValue {
   tasks: MaintenanceTask[];

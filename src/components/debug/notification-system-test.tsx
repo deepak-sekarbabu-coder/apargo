@@ -5,11 +5,11 @@ import { collection, doc, getDocs, query, setDoc, where } from 'firebase/firesto
 
 import { useEffect, useState } from 'react';
 
-import { db } from '@/lib/firebase';
-import { getFirebaseSetupGuide, validateFirebaseConfig } from '@/lib/firebase-config-validator';
-import { type ConnectionHealth, healthMonitor } from '@/lib/firebase-health-monitor';
-import { NotificationListener } from '@/lib/notification-listener';
-import type { Notification } from '@/lib/types';
+import { db } from '@/lib/firebase/firebase';
+import { getFirebaseSetupGuide, validateFirebaseConfig } from '@/lib/firebase/firebase-config-validator';
+import { type ConnectionHealth, healthMonitor } from '@/lib/firebase/firebase-health-monitor';
+import { NotificationListener } from '@/lib/notifications/notification-listener';
+import type { Notification } from '@/lib/core/types';
 
 import { Button } from '@/components/ui/button';
 import {

@@ -2,8 +2,8 @@ import { useAuth } from '@/context/auth-context';
 
 import { useCallback, useState } from 'react';
 
-import { storageService } from '@/lib/storage-enhanced';
-import { FileMetadata, FileUploadProgress, FileValidationResult } from '@/lib/types';
+import { storageService } from '@/lib/storage/storage-enhanced';
+import { FileMetadata, FileUploadProgress, FileValidationResult } from '@/lib/core/types';
 
 import { useToast } from './use-toast';
 

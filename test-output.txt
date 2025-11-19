@@ -1,0 +1,227 @@
+
+> apargo@1.0.0 test C:\Projects\apargo
+> jest --config jest.config.cjs
+
+PASS tests/maintenance/vendor-list.test.tsx
+PASS tests/lsp-compliance.test.ts
+PASS tests/poll/delete-permissions.test.ts
+PASS tests/maintenance/vendor-highlight-class.test.ts
+PASS tests/maintenance/maintenance-model.test.ts
+PASS tests/fault-pagination.test.js
+PASS tests/expense/expense-splitting.test.js
+FAIL tests/maintenance/maintenance-upload-nullref.test.tsx
+  ΓùÅ Test suite failed to run
+
+    Configuration error:
+
+    Could not locate module @/lib/storage mapped as:
+    C:\Projects\apargo\src\$1.
+
+    Please check your configuration for these entries:
+    {
+      "moduleNameMapper": {
+        "/^@\/(.*)$/": "C:\Projects\apargo\src\$1"
+      },
+      "resolver": undefined
+    }
+
+       6 |
+       7 | // Mock storage & firestore used inside component
+    >  8 | jest.mock('@/lib/storage', () => ({
+         |      ^
+       9 |   uploadImage: jest.fn().mockResolvedValue('https://example.com/receipt.png'),
+      10 | }));
+      11 |
+
+      at createNoMappedModuleFoundError (node_modules/.pnpm/jest-resolve@29.7.0/node_modules/jest-resolve/build/resolver.js:759:17)
+      at Object.<anonymous> (tests/maintenance/maintenance-upload-nullref.test.tsx:8:6)
+
+FAIL tests/expense/optimized-balance-calculation.test.ts
+  ΓùÅ Test suite failed to run
+
+    Configuration error:
+
+    Could not locate module @/lib/balance-calculation mapped as:
+    C:\Projects\apargo\src\$1.
+
+    Please check your configuration for these entries:
+    {
+      "moduleNameMapper": {
+        "/^@\/(.*)$/": "C:\Projects\apargo\src\$1"
+      },
+      "resolver": undefined
+    }
+
+    > 1 | import {
+        | ^
+      2 |   calculateApartmentBalances,
+      3 |   calculateApartmentBalancesOptimized,
+      4 |   calculateUnpaidBillsCount,
+
+      at createNoMappedModuleFoundError (node_modules/.pnpm/jest-resolve@29.7.0/node_modules/jest-resolve/build/resolver.js:759:17)
+      at Object.<anonymous> (tests/expense/optimized-balance-calculation.test.ts:1:1)
+
+FAIL tests/ocp-expense-calculation.test.ts
+  ΓùÅ Test suite failed to run
+
+    Cannot find module '../src/lib/expense-calculation-strategies' from 'tests/ocp-expense-calculation.test.ts'
+
+      3 |  * Verifies that the system can be extended without modifying existing code
+      4 |  */
+    > 5 | import {
+        | ^
+      6 |   type ExpenseCalculationStrategy,
+      7 |   ExpenseCalculationStrategyRegistry,
+      8 |   StandardExpenseCalculationStrategy,
+
+      at Resolver._throwModNotFoundError (node_modules/.pnpm/jest-resolve@29.7.0/node_modules/jest-resolve/build/resolver.js:427:11)
+      at Object.<anonymous> (tests/ocp-expense-calculation.test.ts:5:1)
+
+FAIL tests/ocp-user-actions.test.ts
+  ΓùÅ Test suite failed to run
+
+    Cannot find module '../src/lib/user-actions-config.tsx' from 'tests/ocp-user-actions.test.ts'
+
+      4 |  */
+      5 | import type { User } from '../src/lib/types';
+    > 6 | import {
+        | ^
+      7 |   createChangeRoleAction,
+      8 |   createSuspendAction,
+      9 |   registerUserAction,
+
+      at Resolver._throwModNotFoundError (node_modules/.pnpm/jest-resolve@29.7.0/node_modules/jest-resolve/build/resolver.js:427:11)
+      at Object.<anonymous> (tests/ocp-user-actions.test.ts:6:1)
+
+FAIL tests/ledger-balance-sheet.test.ts
+  ΓùÅ Test suite failed to run
+
+    Cannot find module '../src/lib/balance-utils' from 'tests/ledger-balance-sheet.test.ts'
+
+    > 1 | import { aggregateBalanceSheets, validateBalanceSheetContinuity } from '../src/lib/balance-utils';
+        | ^
+      2 |
+      3 | describe('Balance Sheet Continuity', () => {
+      4 |   test('should maintain continuity between consecutive months', () => {
+
+      at Resolver._throwModNotFoundError (node_modules/.pnpm/jest-resolve@29.7.0/node_modules/jest-resolve/build/resolver.js:427:11)
+      at Object.<anonymous> (tests/ledger-balance-sheet.test.ts:1:1)
+
+PASS tests/login-page-theme-switch.test.tsx (5.321 s)
+PASS tests/dashboard-feature-grid.test.tsx (5.449 s)
+PASS tests/maintenance/vendor-highlight.test.tsx (5.516 s)
+PASS tests/admin/admin-payments-responsive.test.tsx (5.726 s)
+PASS tests/edit-user-dialog-responsive.test.tsx (6.42 s)
+PASS tests/admin/announcement-management-responsive.test.tsx (6.595 s)
+PASS tests/admin/poll-management-responsive.test.tsx (6.713 s)
+PASS tests/expense/expenses-debounce-filter.test.tsx (7.054 s)
+PASS tests/ledger/payments-table-responsive.test.tsx (8.356 s)
+PASS tests/admin/pending-users-visibility.test.tsx (8.459 s)
+PASS tests/admin/user-management-debounce-filter.test.tsx (8.771 s)
+
+Summary of all failing tests
+FAIL tests/maintenance/maintenance-upload-nullref.test.tsx
+  ΓùÅ Test suite failed to run
+
+    Configuration error:
+
+    Could not locate module @/lib/storage mapped as:
+    C:\Projects\apargo\src\$1.
+
+    Please check your configuration for these entries:
+    {
+      "moduleNameMapper": {
+        "/^@\/(.*)$/": "C:\Projects\apargo\src\$1"
+      },
+      "resolver": undefined
+    }
+
+       6 |
+       7 | // Mock storage & firestore used inside component
+    >  8 | jest.mock('@/lib/storage', () => ({
+         |      ^
+       9 |   uploadImage: jest.fn().mockResolvedValue('https://example.com/receipt.png'),
+      10 | }));
+      11 |
+
+      at createNoMappedModuleFoundError (node_modules/.pnpm/jest-resolve@29.7.0/node_modules/jest-resolve/build/resolver.js:759:17)
+      at Object.<anonymous> (tests/maintenance/maintenance-upload-nullref.test.tsx:8:6)
+
+FAIL tests/expense/optimized-balance-calculation.test.ts
+  ΓùÅ Test suite failed to run
+
+    Configuration error:
+
+    Could not locate module @/lib/balance-calculation mapped as:
+    C:\Projects\apargo\src\$1.
+
+    Please check your configuration for these entries:
+    {
+      "moduleNameMapper": {
+        "/^@\/(.*)$/": "C:\Projects\apargo\src\$1"
+      },
+      "resolver": undefined
+    }
+
+    > 1 | import {
+        | ^
+      2 |   calculateApartmentBalances,
+      3 |   calculateApartmentBalancesOptimized,
+      4 |   calculateUnpaidBillsCount,
+
+      at createNoMappedModuleFoundError (node_modules/.pnpm/jest-resolve@29.7.0/node_modules/jest-resolve/build/resolver.js:759:17)
+      at Object.<anonymous> (tests/expense/optimized-balance-calculation.test.ts:1:1)
+
+FAIL tests/ocp-expense-calculation.test.ts
+  ΓùÅ Test suite failed to run
+
+    Cannot find module '../src/lib/expense-calculation-strategies' from 'tests/ocp-expense-calculation.test.ts'
+
+      3 |  * Verifies that the system can be extended without modifying existing code
+      4 |  */
+    > 5 | import {
+        | ^
+      6 |   type ExpenseCalculationStrategy,
+      7 |   ExpenseCalculationStrategyRegistry,
+      8 |   StandardExpenseCalculationStrategy,
+
+      at Resolver._throwModNotFoundError (node_modules/.pnpm/jest-resolve@29.7.0/node_modules/jest-resolve/build/resolver.js:427:11)
+      at Object.<anonymous> (tests/ocp-expense-calculation.test.ts:5:1)
+
+FAIL tests/ocp-user-actions.test.ts
+  ΓùÅ Test suite failed to run
+
+    Cannot find module '../src/lib/user-actions-config.tsx' from 'tests/ocp-user-actions.test.ts'
+
+      4 |  */
+      5 | import type { User } from '../src/lib/types';
+    > 6 | import {
+        | ^
+      7 |   createChangeRoleAction,
+      8 |   createSuspendAction,
+      9 |   registerUserAction,
+
+      at Resolver._throwModNotFoundError (node_modules/.pnpm/jest-resolve@29.7.0/node_modules/jest-resolve/build/resolver.js:427:11)
+      at Object.<anonymous> (tests/ocp-user-actions.test.ts:6:1)
+
+FAIL tests/ledger-balance-sheet.test.ts
+  ΓùÅ Test suite failed to run
+
+    Cannot find module '../src/lib/balance-utils' from 'tests/ledger-balance-sheet.test.ts'
+
+    > 1 | import { aggregateBalanceSheets, validateBalanceSheetContinuity } from '../src/lib/balance-utils';
+        | ^
+      2 |
+      3 | describe('Balance Sheet Continuity', () => {
+      4 |   test('should maintain continuity between consecutive months', () => {
+
+      at Resolver._throwModNotFoundError (node_modules/.pnpm/jest-resolve@29.7.0/node_modules/jest-resolve/build/resolver.js:427:11)
+      at Object.<anonymous> (tests/ledger-balance-sheet.test.ts:1:1)
+
+
+Test Suites: 5 failed, 18 passed, 23 total
+Tests:       71 passed, 71 total
+Snapshots:   0 total
+Time:        12.721 s
+Ran all test suites.
+ΓÇëELIFECYCLEΓÇë Test failed. See above for more details.

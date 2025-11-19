@@ -1,6 +1,6 @@
 // Server-side Firestore utilities using Firebase Admin SDK
 // This file should only be imported in API routes and server components
-import { getFirebaseAdminApp } from './firebase-admin';
+import { getFirebaseAdminApp } from '../firebase/firebase-admin';
 
 // Import types (these don't cause bundling issues)
 type Payment = {

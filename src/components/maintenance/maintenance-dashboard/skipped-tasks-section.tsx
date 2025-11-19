@@ -2,7 +2,7 @@ import { ChevronDown, ChevronUp, SkipForward } from 'lucide-react';
 
 import React from 'react';
 
-import type { MaintenanceTask, Vendor } from '@/lib/types';
+import type { MaintenanceTask, Vendor } from '@/lib/core/types';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

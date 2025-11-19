@@ -2,7 +2,7 @@ import { PlusCircle, Trash2 } from 'lucide-react';
 
 import * as React from 'react';
 
-import { PollOption } from '@/lib/types';
+import { PollOption } from '@/lib/core/types';
 
 import { Button } from '@/components/ui/button';
 import {

@@ -11,9 +11,9 @@ import {
   calculateExpenseAmounts,
   markApartmentAsPaid,
   markApartmentAsUnpaid,
-} from '@/lib/expense-utils';
+} from '@/lib/expense-management/expense-utils';
 import { updateExpense } from '@/lib/firestore/expenses';
-import type { Category, Expense, User } from '@/lib/types';
+import type { Category, Expense, User } from '@/lib/core/types';
 
 import { CategoryIcon } from '@/components/icons/category-icon';
 import { Badge } from '@/components/ui/badge';

@@ -6,8 +6,8 @@ import { addCategory, deleteCategory, updateCategory } from '@/lib/firestore/cat
 import { addPayment, updatePayment } from '@/lib/firestore/payments';
 import { addPoll } from '@/lib/firestore/polls';
 import { addUser, deleteUser, updateUser } from '@/lib/firestore/users';
-import { uploadImage } from '@/lib/storage';
-import type { Category, Payment, PollOption, User } from '@/lib/types';
+import { uploadImage } from '@/lib/storage/storage';
+import type { Category, Payment, PollOption, User } from '@/lib/core/types';
 
 import { useToast } from '@/hooks/use-toast';
 

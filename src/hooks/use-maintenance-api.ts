@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 
-import { MaintenanceTask, Vendor } from '@/lib/types';
+import { MaintenanceTask, Vendor } from '@/lib/core/types';
 
 // Types for API responses
 interface TasksResponse {

@@ -4,7 +4,7 @@
  */
 import type { ExpenseCalculationStrategy } from './expense-calculation-strategies';
 import { registerExpenseCalculationStrategy } from './expense-calculation-strategies';
-import type { Expense } from './types';
+import type { Expense } from '../core/types';
 
 /**
  * Example: Maintenance Fee Expense Strategy

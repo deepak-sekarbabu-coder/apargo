@@ -1,4 +1,4 @@
-import type { Apartment, Expense } from '@/lib/types';
+import type { Apartment, Expense } from '@/lib/core/types';
 
 export interface ApartmentBalance {
   name: string;

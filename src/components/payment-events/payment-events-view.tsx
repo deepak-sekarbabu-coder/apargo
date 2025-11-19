@@ -5,7 +5,7 @@ import { Calendar, CheckCircle, Clock, CreditCard, FileText } from 'lucide-react
 
 import { useCallback, useEffect, useState } from 'react';
 
-import type { Payment, User } from '@/lib/types';
+import type { Payment, User } from '@/lib/core/types';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

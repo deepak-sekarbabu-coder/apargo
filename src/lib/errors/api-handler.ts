@@ -3,7 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import type { ApargoError, ErrorCode, ErrorContext, OperationResult } from '@/lib/errors';
-import type { User } from '@/lib/types';
+import type { User } from '@/lib/core/types';
 import { createAuthError, createError, createOperationResult, createSystemError, logger, wrapError } from '@/lib/errors';
 
 // Type for API handler functions

@@ -2,7 +2,7 @@ import { Pencil, PlusCircle, Trash2 } from 'lucide-react';
 
 import React from 'react';
 
-import type { Category } from '@/lib/types';
+import type { Category } from '@/lib/core/types';
 
 import { AddCategoryDialog } from '@/components/dialogs/add-category-dialog';
 import { EditCategoryDialog } from '@/components/dialogs/edit-category-dialog';

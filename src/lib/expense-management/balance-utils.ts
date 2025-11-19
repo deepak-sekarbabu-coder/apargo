@@ -1,4 +1,4 @@
-import type { Payment } from './types';
+import type { Payment } from '../core/types';
 
 export interface AggregatedSheet {
   monthYear: string;

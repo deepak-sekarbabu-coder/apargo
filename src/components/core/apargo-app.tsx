@@ -9,9 +9,9 @@ import {
   calculateApartmentBalancesOptimized,
   calculateMonthlyExpenses,
   calculateUnpaidBillsCount,
-} from '@/lib/balance-calculation';
-import { requestNotificationPermission } from '@/lib/push-notifications';
-import type { Category, View } from '@/lib/types';
+} from '@/lib/expense-management/balance-calculation';
+import { requestNotificationPermission } from '@/lib/notifications/push-notifications';
+import type { Category, View } from '@/lib/core/types';
 
 import { MainContent } from '@/components/app/main-content';
 import { SelectApartmentDialog } from '@/components/dialogs/select-apartment-dialog';

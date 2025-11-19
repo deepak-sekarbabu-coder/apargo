@@ -2,13 +2,13 @@
  * Tests demonstrating Open/Closed Principle implementation for user actions.
  * Shows that new user actions can be added without modifying existing code.
  */
-import type { User } from '../src/lib/types';
+import type { User } from '../src/lib/core/types';
 import {
   createChangeRoleAction,
   createSuspendAction,
   registerUserAction,
   userActionRegistry,
-} from '../src/lib/user-actions-config.tsx';
+} from '../src/lib/core/user-actions-config.tsx';
 
 describe('Open/Closed Principle - User Actions Configuration', () => {
   const mockUser: User = {

@@ -4,7 +4,7 @@ import { useAuth } from '@/context/auth-context';
 
 import React, { useState } from 'react';
 
-import { MaintenanceTask, Vendor } from '@/lib/types';
+import { MaintenanceTask, Vendor } from '@/lib/core/types';
 
 import { MaintenanceTaskDialog } from '@/components/dialogs/maintenance-task-dialog';
 import { VendorDialog } from '@/components/dialogs/vendor-dialog';

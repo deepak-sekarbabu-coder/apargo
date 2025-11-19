@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { getInitializationError, isFirebaseAdminAvailable } from '@/lib/firebase-admin';
+import { getInitializationError, isFirebaseAdminAvailable } from '@/lib/firebase/firebase-admin';
 
 export async function GET(request: NextRequest) {
   const headers = Object.fromEntries(request.headers.entries());

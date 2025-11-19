@@ -1,7 +1,7 @@
 // React hook for offline support
 import { useEffect, useState } from 'react';
 
-import type { Expense, Payment } from './types';
+import type { Expense, Payment } from '../core/types';
 
 // Enhanced offline support utility
 // Provides offline-first functionality with background sync

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-import type { Payment } from '@/lib/types';
+import type { Payment } from '@/lib/core/types';
 
 export function usePaymentEvents(payments: Payment[] = []) {
   const [monthsToLoad, setMonthsToLoad] = useState(6);

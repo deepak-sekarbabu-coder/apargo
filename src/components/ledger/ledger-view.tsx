@@ -5,8 +5,8 @@ import * as React from 'react';
 import { format } from 'date-fns';
 
 import { addPayment, deletePayment, updatePayment } from '@/lib/firestore/payments';
-import { uploadImage } from '@/lib/storage';
-import type { BalanceSheet, Payment, User } from '@/lib/types';
+import { uploadImage } from '@/lib/storage/storage';
+import type { BalanceSheet, Payment, User } from '@/lib/core/types';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

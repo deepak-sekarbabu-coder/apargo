@@ -15,7 +15,7 @@ import {
 
 import React, { useMemo, useState } from 'react';
 
-import type { Fault, FaultSeverity, FaultStatus, User } from '@/lib/types';
+import type { Fault, FaultSeverity, FaultStatus, User } from '@/lib/core/types';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

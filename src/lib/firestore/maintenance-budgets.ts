@@ -10,9 +10,9 @@ import {
   where,
 } from 'firebase/firestore';
 
-import { db } from '../firebase';
-import { removeUndefined } from '../firestore-utils';
-import type { MaintenanceBudget } from '../types';
+import { db } from '../firebase/firebase';
+import { removeUndefined } from './firestore-utils';
+import type { MaintenanceBudget } from '../core/types';
 
 export const getMaintenanceBudget = async (year: number): Promise<MaintenanceBudget | null> => {
   const budgetsQuery = query(

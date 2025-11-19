@@ -14,7 +14,7 @@ import {
 
 import React, { useMemo } from 'react';
 
-import type { MaintenanceTask, Vendor } from '@/lib/types';
+import type { MaintenanceTask, Vendor } from '@/lib/core/types';
 
 import {
   AlertDialog,

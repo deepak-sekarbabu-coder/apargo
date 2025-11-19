@@ -15,7 +15,7 @@ import React, { useState } from 'react';
 
 import Image from 'next/image';
 
-import type { Fault, FaultSeverity, FaultStatus, User } from '@/lib/types';
+import type { Fault, FaultSeverity, FaultStatus, User } from '@/lib/core/types';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

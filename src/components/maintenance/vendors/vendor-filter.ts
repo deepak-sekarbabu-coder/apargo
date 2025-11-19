@@ -1,4 +1,4 @@
-import { Vendor } from '@/lib/types';
+import { Vendor } from '@/lib/core/types';
 
 export function filterVendors(vendors: Vendor[], search: string, showInactive: boolean): Vendor[] {
   const q = search.toLowerCase();

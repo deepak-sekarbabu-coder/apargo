@@ -8,8 +8,8 @@ import {
   getFirebaseAdminApp,
   getInitializationError,
   isFirebaseAdminAvailable,
-} from '@/lib/firebase-admin';
-import type { User } from '@/lib/types';
+} from '@/lib/firebase/firebase-admin';
+import type { User } from '@/lib/core/types';
 
 // POST /api/payment-events/generate
 // Generate payment events for all configured categories for the current month or specified month

@@ -6,7 +6,7 @@ import * as z from 'zod';
 
 import * as React from 'react';
 
-import type { Category } from '@/lib/types';
+import type { Category } from '@/lib/core/types';
 
 import { CategoryIcon } from '@/components/icons/category-icon';
 import { Button } from '@/components/ui/button';

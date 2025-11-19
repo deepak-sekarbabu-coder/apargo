@@ -4,7 +4,7 @@ import { Trash2 } from 'lucide-react';
 
 import React, { useMemo, useState } from 'react';
 
-import { Vendor } from '@/lib/types';
+import { Vendor } from '@/lib/core/types';
 import { DEBOUNCE_CONFIG, DEBOUNCE_OPTIONS } from '@/lib/utils';
 
 import {

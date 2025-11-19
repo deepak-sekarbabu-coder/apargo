@@ -2,7 +2,7 @@ import { Users, Vote } from 'lucide-react';
 
 import * as React from 'react';
 
-import type { Apartment, PollOption, User } from '@/lib/types';
+import type { Apartment, PollOption, User } from '@/lib/core/types';
 
 import { AddPollDialog } from '@/components/dialogs/add-poll-dialog';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

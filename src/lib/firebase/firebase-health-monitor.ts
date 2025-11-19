@@ -5,7 +5,7 @@
 import { onAuthStateChanged } from 'firebase/auth';
 import { collection, getDocs, limit, onSnapshot, query } from 'firebase/firestore';
 
-import { auth, db } from '@/lib/firebase';
+import { auth, db } from '@/lib/firebase/firebase';
 
 export interface ConnectionHealth {
   isConnected: boolean;

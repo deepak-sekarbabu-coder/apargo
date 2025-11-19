@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 
-import { registerServiceWorker } from '@/lib/push-notifications';
+import { registerServiceWorker } from '@/lib/notifications/push-notifications';
 
 export default function ServiceWorkerRegister() {
   useEffect(() => {

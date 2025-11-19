@@ -1,13 +1,13 @@
 import type {
-CollectionReference,
-DatabaseService,
-DocumentData,
-DocumentReference,
-DocumentSnapshot,
-QueryBuilder,
-QuerySnapshot,
-Subscription,
-WhereFilter,
+  CollectionReference,
+  DatabaseService,
+  DocumentData,
+  DocumentReference,
+  DocumentSnapshot,
+  QueryBuilder,
+  QuerySnapshot,
+  Subscription,
+  WhereFilter,
 } from './interfaces';
 import type { WithFieldValue } from 'firebase/firestore';
 
@@ -22,7 +22,7 @@ const initPromise = (async () => {
     // Server-side: use Firebase Admin SDK
     try {
       const adminFirestore = await import('firebase-admin/firestore');
-      const firebaseAdmin = await import('../firebase-admin');
+      const firebaseAdmin = await import('../firebase/firebase-admin');
       db = adminFirestore.getFirestore(firebaseAdmin.getFirebaseAdminApp());
       isInitialized = true;
     } catch (error) {
@@ -32,7 +32,7 @@ const initPromise = (async () => {
     // Client-side: initialize asynchronously
     try {
       firestoreModule = await import('firebase/firestore');
-      const { db: clientDb } = await import('../firebase');
+      const { db: clientDb } = await import('../firebase/firebase');
       db = clientDb;
       isInitialized = true;
     } catch (error) {
@@ -43,7 +43,7 @@ const initPromise = (async () => {
 
 // Firebase-specific implementations
 class FirebaseDocumentSnapshot<T = DocumentData> implements DocumentSnapshot<T> {
-  constructor(private snapshot: import('firebase/firestore').DocumentSnapshot | import('firebase-admin/firestore').DocumentSnapshot) {}
+  constructor(private snapshot: import('firebase/firestore').DocumentSnapshot | import('firebase-admin/firestore').DocumentSnapshot) { }
 
   get id(): string {
     return this.snapshot.id;
@@ -65,7 +65,7 @@ class FirebaseDocumentSnapshot<T = DocumentData> implements DocumentSnapshot<T> 
 }
 
 class FirebaseQuerySnapshot<T = DocumentData> implements QuerySnapshot<T> {
-  constructor(private snapshot: import('firebase/firestore').QuerySnapshot | import('firebase-admin/firestore').QuerySnapshot) {}
+  constructor(private snapshot: import('firebase/firestore').QuerySnapshot | import('firebase-admin/firestore').QuerySnapshot) { }
 
   get empty(): boolean {
     return this.snapshot.empty;
@@ -80,7 +80,7 @@ class FirebaseDocumentReference<T = DocumentData> implements DocumentReference<T
   constructor(
     private collectionName: string,
     private docId: string
-  ) {}
+  ) { }
 
   get id(): string {
     return this.docId;
@@ -168,7 +168,7 @@ class FirebaseDocumentReference<T = DocumentData> implements DocumentReference<T
 class FirebaseQueryBuilder<T = DocumentData> implements QueryBuilder<T> {
   private filters: WhereFilter[] = [];
 
-  constructor(private collectionName: string) {}
+  constructor(private collectionName: string) { }
 
   where(filter: WhereFilter): QueryBuilder<T> {
     this.filters.push(filter);
@@ -209,7 +209,7 @@ class FirebaseQueryBuilder<T = DocumentData> implements QueryBuilder<T> {
 }
 
 class FirebaseCollectionReference<T = DocumentData> implements CollectionReference<T> {
-  constructor(private collectionName: string) {}
+  constructor(private collectionName: string) { }
 
   doc(id?: string): DocumentReference<T> {
     if (!id) {
@@ -246,7 +246,7 @@ class FirebaseCollectionReference<T = DocumentData> implements CollectionReferen
 }
 
 class FirebaseSubscription implements Subscription {
-  constructor(private unsubscribeFn: () => void) {}
+  constructor(private unsubscribeFn: () => void) { }
 
   unsubscribe(): void {
     this.unsubscribeFn();
@@ -267,7 +267,7 @@ export class FirebaseDatabaseService implements DatabaseService {
       // Server-side: Admin SDK doesn't support real-time subscriptions
       // Return a no-op subscription for SSR compatibility
       console.warn('Real-time subscriptions are not supported on the server-side');
-      return new FirebaseSubscription(() => {});
+      return new FirebaseSubscription(() => { });
     } else {
       // Client-side: Client SDK
       if (!firestoreModule) throw new Error('Firestore module not loaded');

@@ -6,9 +6,9 @@ import {
   type ExpenseCalculationStrategy,
   ExpenseCalculationStrategyRegistry,
   StandardExpenseCalculationStrategy,
-} from '../src/lib/expense-calculation-strategies';
-import { computeExpenseDeltas } from '../src/lib/firestore-utils';
-import type { Expense } from '../src/lib/types';
+} from '../src/lib/expense-management/expense-calculation-strategies';
+import { computeExpenseDeltas } from '../src/lib/firestore/firestore-utils';
+import type { Expense } from '../src/lib/core/types';
 
 // Mock expense data
 const createMockExpense = (overrides: Partial<Expense> = {}): Expense => ({

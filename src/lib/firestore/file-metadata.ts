@@ -15,8 +15,8 @@ import {
   where,
 } from 'firebase/firestore';
 
-import { db } from '../firebase';
-import type { FileMetadata } from '../types';
+import { db } from '../firebase/firebase';
+import type { FileMetadata } from '../core/types';
 
 export const getFileMetadata = async (id: string): Promise<FileMetadata | null> => {
   const fileDoc = doc(db, 'fileMetadata', id);

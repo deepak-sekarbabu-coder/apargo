@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { Poll } from '@/lib/types';
+import { Poll } from '@/lib/core/types';
 
 import {
   AlertDialog,

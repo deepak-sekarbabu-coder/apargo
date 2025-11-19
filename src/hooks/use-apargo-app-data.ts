@@ -12,8 +12,8 @@ import {
 } from '@/lib/firestore/expenses';
 import { subscribeToPayments } from '@/lib/firestore/payments';
 import { subscribeToAllUsers, subscribeToUsers } from '@/lib/firestore/users';
-import { requestNotificationPermission } from '@/lib/push-notifications';
-import type { Apartment, BalanceSheet, Category, Expense, Payment, User } from '@/lib/types';
+import { requestNotificationPermission } from '@/lib/notifications/push-notifications';
+import type { Apartment, BalanceSheet, Category, Expense, Payment, User } from '@/lib/core/types';
 
 interface Subscription {
   unsubscribe: () => void;

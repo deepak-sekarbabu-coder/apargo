@@ -4,7 +4,7 @@ import * as React from 'react';
 
 import dynamic from 'next/dynamic';
 
-import type { ApartmentBalance } from '@/lib/balance-calculation';
+import type { ApartmentBalance } from '@/lib/expense-management/balance-calculation';
 import type {
   Apartment,
   BalanceSheet,
@@ -14,7 +14,7 @@ import type {
   PollOption,
   User,
   View,
-} from '@/lib/types';
+} from '@/lib/core/types';
 
 import { CommunityView } from '@/components/community/community-view';
 import { DashboardView } from '@/components/dashboard/dashboard-view';

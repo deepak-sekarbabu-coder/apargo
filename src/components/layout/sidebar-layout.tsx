@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import type { Category, Expense, User, View } from '@/lib/types';
+import type { Category, Expense, User, View } from '@/lib/core/types';
 
 import { NavigationMenu } from '@/components/layout/navigation-menu';
 import { PageHeader } from '@/components/layout/page-header';

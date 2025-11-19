@@ -2,8 +2,8 @@ import * as React from 'react';
 import { format } from 'date-fns';
 import { Download } from 'lucide-react';
 
-import { aggregateBalanceSheets } from '@/lib/balance-utils';
-import type { Payment } from '@/lib/types';
+import { aggregateBalanceSheets } from '@/lib/expense-management/balance-utils';
+import type { Payment } from '@/lib/core/types';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

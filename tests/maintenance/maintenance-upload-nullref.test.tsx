@@ -5,7 +5,7 @@ import React from 'react';
 import { MaintenancePaymentStatus } from '@/components/dashboard/maintenance-payment-status';
 
 // Mock storage & firestore used inside component
-jest.mock('@/lib/storage', () => ({
+jest.mock('@/lib/storage/storage', () => ({
   uploadImage: jest.fn().mockResolvedValue('https://example.com/receipt.png'),
 }));
 
@@ -54,7 +54,7 @@ describe('MaintenancePaymentStatus upload null ref safety', () => {
     fireEvent.click(button);
     await waitFor(
       () => {
-        const { uploadImage } = require('@/lib/storage');
+        const { uploadImage } = require('@/lib/storage/storage');
         expect(uploadImage).toHaveBeenCalled();
       },
       { timeout: 3000 }

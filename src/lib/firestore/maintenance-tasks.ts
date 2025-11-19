@@ -16,15 +16,15 @@ import {
   where,
 } from 'firebase/firestore';
 
-import { db } from '../firebase';
-import { removeUndefined } from '../firestore-utils';
+import { db } from '../firebase/firebase';
+import { removeUndefined } from './firestore-utils';
 import {
   createRecurringTaskFromCompleted,
   createRecurringTaskFromSkipped,
   shouldCreateRecurringTask,
   shouldCreateRecurringTaskOnSkip,
-} from '../maintenance-utils';
-import type { MaintenanceTask } from '../types';
+} from '../maintenance/maintenance-utils';
+import type { MaintenanceTask } from '../core/types';
 
 const computeTaskStatus = (task: MaintenanceTask): MaintenanceTask => {
   // If already in a terminal state, leave unchanged

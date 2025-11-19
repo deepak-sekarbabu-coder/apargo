@@ -1,4 +1,4 @@
-import type { Expense } from './types';
+import type { Expense } from '../core/types';
 
 export interface ExpenseCalculation {
   originalAmount: number;

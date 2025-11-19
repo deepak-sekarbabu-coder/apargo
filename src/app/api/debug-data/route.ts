@@ -2,7 +2,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 
 import { NextResponse } from 'next/server';
 
-import { getFirebaseAdminApp } from '@/lib/firebase-admin';
+import { getFirebaseAdminApp } from '@/lib/firebase/firebase-admin';
 
 interface UserData {
   id: string;

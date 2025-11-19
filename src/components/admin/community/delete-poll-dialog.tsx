@@ -2,7 +2,7 @@
 
 import { Trash2 } from 'lucide-react';
 
-import { Poll } from '@/lib/types';
+import { Poll } from '@/lib/core/types';
 
 import {
   AlertDialog,

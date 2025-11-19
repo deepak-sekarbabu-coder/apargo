@@ -1,7 +1,7 @@
 import { getFirestore } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
 
-import { getFirebaseAdminApp } from './firebase-admin';
+import { getFirebaseAdminApp } from '../firebase/firebase-admin';
 
 export interface FCMNotificationPayload {
   title: string;

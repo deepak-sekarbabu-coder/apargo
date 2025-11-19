@@ -2,8 +2,8 @@ import { format } from 'date-fns';
 
 import { useEffect, useMemo, useState } from 'react';
 
-import log from '@/lib/logger';
-import type { Expense, User } from '@/lib/types';
+import log from '@/lib/core/logger';
+import type { Expense, User } from '@/lib/core/types';
 
 export function useExpenseFilters(
   expenses: Expense[],

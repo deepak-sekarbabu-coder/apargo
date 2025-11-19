@@ -25,7 +25,7 @@ import {
 
 import * as React from 'react';
 
-import type { Category, Expense } from '@/lib/types';
+import type { Category, Expense } from '@/lib/core/types';
 
 import { CategoryIcon } from '@/components/icons/category-icon';
 import { Badge } from '@/components/ui/badge';

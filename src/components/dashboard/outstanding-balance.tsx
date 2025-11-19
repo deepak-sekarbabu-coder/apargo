@@ -2,8 +2,8 @@
 
 import { AlertTriangle } from 'lucide-react';
 
-import { calculateTotalOutstanding } from '@/lib/expense-utils';
-import type { Expense } from '@/lib/types';
+import { calculateTotalOutstanding } from '@/lib/expense-management/expense-utils';
+import type { Expense } from '@/lib/core/types';
 
 import { Card, CardContent } from '@/components/ui/card';
 

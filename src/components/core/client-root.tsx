@@ -8,7 +8,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import React, { useEffect } from 'react';
 
 // Ensure mobile alert override runs early on client initialization
-import '@/lib/override-alert.client';
+import '@/lib/monitoring/override-alert.client';
 
 import { FirebaseDebugPanel } from '@/components/debug/firebase-debug-panel';
 import { NotificationSystemTest } from '@/components/debug/notification-system-test';

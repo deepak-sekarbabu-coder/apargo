@@ -1,4 +1,4 @@
-import type { Apartment } from '@/lib/types';
+import type { Apartment } from '@/lib/core/types';
 
 import { useApartments as useRQApartments } from './use-queries';
 

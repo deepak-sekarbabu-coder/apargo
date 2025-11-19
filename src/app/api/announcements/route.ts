@@ -4,14 +4,14 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { getApartmentIds } from '@/lib/apartment-constants';
-import { sendPushNotificationToApartments } from '@/lib/fcm-admin';
+import { getApartmentIds } from '@/lib/core/apartment-constants';
+import { sendPushNotificationToApartments } from '@/lib/notifications/fcm-admin';
 import {
   getFirebaseAdminApp,
   getInitializationError,
   isFirebaseAdminAvailable,
-} from '@/lib/firebase-admin';
-import type { User } from '@/lib/types';
+} from '@/lib/firebase/firebase-admin';
+import type { User } from '@/lib/core/types';
 
 // Add a simple GET endpoint for testing
 export async function GET() {

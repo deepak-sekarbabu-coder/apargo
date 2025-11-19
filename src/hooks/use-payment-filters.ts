@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import log from '@/lib/logger';
-import type { Payment } from '@/lib/types';
+import log from '@/lib/core/logger';
+import type { Payment } from '@/lib/core/types';
 
 export function usePaymentFilters(payments: Payment[], filterMonth: string) {
   const { filteredPayments, paymentMonths } = useMemo(() => {

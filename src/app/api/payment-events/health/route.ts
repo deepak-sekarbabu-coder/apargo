@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 
-import { basicAuth } from '@/lib/auth';
-import { isFirebaseAdminAvailable } from '@/lib/firebase-admin';
-import * as firestoreAdmin from '@/lib/firestore-admin';
+import { basicAuth } from '@/lib/auth/auth';
+import { isFirebaseAdminAvailable } from '@/lib/firebase/firebase-admin';
+import * as firestoreAdmin from '@/lib/firestore/firestore-admin';
 
 // GET /api/payment-events/health
 // Health check for payment events functionality

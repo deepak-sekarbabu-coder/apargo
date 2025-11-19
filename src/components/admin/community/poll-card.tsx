@@ -3,7 +3,7 @@
 import { format } from 'date-fns';
 import { BarChart3 } from 'lucide-react';
 
-import { Poll } from '@/lib/types';
+import { Poll } from '@/lib/core/types';
 
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

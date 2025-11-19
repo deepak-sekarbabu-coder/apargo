@@ -1,6 +1,6 @@
 import { PlusCircle } from 'lucide-react';
 
-import type { PollOption } from '@/lib/types';
+import type { PollOption } from '@/lib/core/types';
 
 import { AddPollDialog } from '@/components/dialogs/add-poll-dialog';
 import { Button } from '@/components/ui/button';

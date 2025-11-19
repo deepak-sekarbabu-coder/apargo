@@ -5,7 +5,7 @@ import { Bell, Check, Clock, Megaphone, Vote } from 'lucide-react';
 
 import * as React from 'react';
 
-import type { Notification } from '@/lib/types';
+import type { Notification } from '@/lib/core/types';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

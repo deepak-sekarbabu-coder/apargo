@@ -4,7 +4,7 @@ import { Calendar, CheckCircle, Clock, CreditCard } from 'lucide-react';
 
 import React, { useMemo } from 'react';
 
-import type { Payment } from '@/lib/types';
+import type { Payment } from '@/lib/core/types';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

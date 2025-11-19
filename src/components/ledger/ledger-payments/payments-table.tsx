@@ -16,7 +16,7 @@ import { ArrowUpDown, Check, Download, Eye, PlusCircle, Trash2, X } from 'lucide
 
 import * as React from 'react';
 
-import { Payment, User } from '@/lib/types';
+import { Payment, User } from '@/lib/core/types';
 
 import AddPaymentDialog from '@/components/dialogs/add-payment-dialog';
 import { Badge } from '@/components/ui/badge';

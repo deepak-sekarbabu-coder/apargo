@@ -2,7 +2,7 @@
 
 import { Trash2 } from 'lucide-react';
 
-import { Notification } from '@/lib/types';
+import { Notification } from '@/lib/core/types';
 
 import {
   AlertDialog,

@@ -12,9 +12,9 @@ import {
   where,
 } from 'firebase/firestore';
 
-import { db } from '../firebase';
-import { removeUndefined } from '../firestore-utils';
-import type { Vendor } from '../types';
+import { db } from '../firebase/firebase';
+import { removeUndefined } from './firestore-utils';
+import type { Vendor } from '../core/types';
 
 export const getVendors = async (activeOnly = false): Promise<Vendor[]> => {
   let vendorsQuery = query(collection(db, 'vendors'));

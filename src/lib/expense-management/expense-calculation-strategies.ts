@@ -1,4 +1,4 @@
-import type { Expense } from './types';
+import type { Expense } from '../core/types';
 
 /**
  * Interface for expense delta calculation strategies.

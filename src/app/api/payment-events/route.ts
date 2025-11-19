@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { basicAuth } from '@/lib/auth';
-import * as firestoreAdmin from '@/lib/firestore-admin';
+import { basicAuth } from '@/lib/auth/auth';
+import * as firestoreAdmin from '@/lib/firestore/firestore-admin';
 
 // GET /api/payment-events?monthYear=YYYY-MM&apartmentId=optional
 // Get payment events with optional filtering

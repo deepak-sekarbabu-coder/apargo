@@ -4,8 +4,8 @@ import {
   computeExpenseDeltas,
   getBalanceDocId,
   removeUndefined,
-} from '../firestore-utils';
-import type { BalanceSheet, Expense } from '../types';
+} from './firestore-utils';
+import type { BalanceSheet, Expense } from '../core/types';
 
 const updateBalanceSheets = async (
   deltas: ReturnType<typeof calculateDeltaChanges>

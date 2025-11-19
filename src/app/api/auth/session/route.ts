@@ -7,8 +7,8 @@ import {
   getAuthErrorMessage,
   isAuthUserNotFoundError,
   isInvalidTokenError,
-} from '@/lib/auth-utils';
-import { firebaseManager } from '@/lib/firebase-connection-manager';
+} from '@/lib/auth/auth-utils';
+import { firebaseManager } from '@/lib/firebase/firebase-connection-manager';
 
 async function createSession(request: NextRequest) {
   try {

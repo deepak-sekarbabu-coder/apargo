@@ -4,7 +4,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
-import { getFirebaseAdminApp } from '@/lib/firebase-admin';
+import { getFirebaseAdminApp } from '@/lib/firebase/firebase-admin';
 import { getUserByEmail } from '@/lib/firestore/users';
 
 async function verifySessionCookie(sessionCookie: string) {

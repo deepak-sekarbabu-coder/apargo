@@ -1,7 +1,7 @@
 import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from 'firebase/firestore';
 
-import { db } from '../firebase';
-import type { Fault } from '../types';
+import { db } from '../firebase/firebase';
+import type { Fault } from '../core/types';
 
 export const getFaults = async (): Promise<Fault[]> => {
   const faultsCol = collection(db, 'faults');

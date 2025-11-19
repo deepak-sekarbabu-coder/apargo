@@ -7,7 +7,7 @@ import { Calendar, Download, Filter, History } from 'lucide-react';
 
 import { useState } from 'react';
 
-import type { Payment, User } from '@/lib/types';
+import type { Payment, User } from '@/lib/core/types';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

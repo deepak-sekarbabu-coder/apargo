@@ -5,8 +5,8 @@ import { AlertCircle, CheckCircle2, Clock, UploadCloud } from 'lucide-react';
 import * as React from 'react';
 
 import { addPayment, updatePayment } from '@/lib/firestore/payments';
-import { uploadImage } from '@/lib/storage';
-import type { Payment, User } from '@/lib/types';
+import { uploadImage } from '@/lib/storage/storage';
+import type { Payment, User } from '@/lib/core/types';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

@@ -6,9 +6,9 @@ import { Bell, BellOff } from 'lucide-react';
 
 import { useEffect, useRef, useState } from 'react';
 
-import { db } from '@/lib/firebase';
-import { AdminNotificationListener, NotificationListener } from '@/lib/notification-listener';
-import type { Notification } from '@/lib/types';
+import { db } from '@/lib/firebase/firebase';
+import { AdminNotificationListener, NotificationListener } from '@/lib/notifications/notification-listener';
+import type { Notification } from '@/lib/core/types';
 
 import { NotificationItem } from '@/components/notifications/notification-item';
 import { Button, type ButtonProps } from '@/components/ui/button';

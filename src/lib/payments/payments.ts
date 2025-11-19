@@ -1,4 +1,4 @@
-import type { Payment } from './types';
+import type { Payment } from '../core/types';
 
 // Compute per-document deltas for an approved payment transition.
 // Returns a list of { apartmentId, monthYear, totalIncomeDelta, totalExpensesDelta } entries.

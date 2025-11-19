@@ -1,8 +1,8 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 
-import { shouldClearSession } from '@/lib/auth-utils';
-import log from '@/lib/logger';
+import { shouldClearSession } from '@/lib/auth/auth-utils';
+import log from '@/lib/core/logger';
 
 // Force dynamic rendering to avoid static generation issues with Firebase Admin
 export const dynamic = 'force-dynamic';
@@ -30,7 +30,7 @@ async function getAuthenticatedUser() {
   try {
     // Dynamic imports to avoid top-level Firebase Admin imports
     const { getAuth } = await import('firebase-admin/auth');
-    const { getFirebaseAdminApp } = await import('@/lib/firebase-admin');
+    const { getFirebaseAdminApp } = await import('@/lib/firebase/firebase-admin');
     const { getUserByEmail } = await import('@/lib/firestore/users');
 
     const adminApp = getFirebaseAdminApp();

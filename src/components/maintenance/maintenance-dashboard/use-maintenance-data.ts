@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import type { MaintenanceTask, Vendor } from '@/lib/types';
+import type { MaintenanceTask, Vendor } from '@/lib/core/types';
 
 export function useMaintenanceData(tasks: MaintenanceTask[], vendors: Vendor[]) {
   return useMemo(() => {

@@ -2,8 +2,8 @@ import { PlusCircle, Search, Users, X } from 'lucide-react';
 
 import React, { useState } from 'react';
 
-import type { User } from '@/lib/types';
-import type { AdminUsersTabConfig, UserAction } from '@/lib/user-actions-config.tsx';
+import type { User } from '@/lib/core/types';
+import type { AdminUsersTabConfig, UserAction } from '@/lib/core/user-actions-config.tsx';
 import { DEBOUNCE_CONFIG, DEBOUNCE_OPTIONS } from '@/lib/utils';
 
 import { AddUserDialog } from '@/components/dialogs/add-user-dialog';

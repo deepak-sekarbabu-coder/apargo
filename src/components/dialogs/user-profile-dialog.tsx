@@ -7,7 +7,7 @@ import * as z from 'zod';
 import * as React from 'react';
 
 import { getApartments } from '@/lib/firestore/apartments';
-import type { User } from '@/lib/types';
+import type { User } from '@/lib/core/types';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';

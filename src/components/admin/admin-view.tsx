@@ -1,8 +1,8 @@
 import { Calendar, CreditCard, FileText, Megaphone, Users } from 'lucide-react';
 
-import type { Category, Payment, PollOption, User } from '@/lib/types';
-import { createStandardAdminConfig } from '@/lib/user-actions-config.tsx';
-import type { AdminUsersTabConfig } from '@/lib/user-actions-config.tsx';
+import type { Category, Payment, PollOption, User } from '@/lib/core/types';
+import { createStandardAdminConfig } from '@/lib/core/user-actions-config.tsx';
+import type { AdminUsersTabConfig } from '@/lib/core/user-actions-config.tsx';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 

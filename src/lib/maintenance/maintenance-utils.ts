@@ -1,4 +1,4 @@
-import { MaintenanceTask } from './types';
+import { MaintenanceTask } from '../core/types';
 
 /**
  * Calculate the next scheduled date for a recurring task based on the completion date

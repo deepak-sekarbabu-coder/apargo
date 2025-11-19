@@ -6,7 +6,7 @@ import * as z from 'zod';
 
 import * as React from 'react';
 
-import { Vendor } from '@/lib/types';
+import { Vendor } from '@/lib/core/types';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';

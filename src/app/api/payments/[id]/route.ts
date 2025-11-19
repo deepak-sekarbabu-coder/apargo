@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { basicAuth } from '@/lib/auth';
+import { basicAuth } from '@/lib/auth/auth';
 import { getPayments, updatePayment } from '@/lib/firestore/payments';
-import type { PaymentStatus } from '@/lib/types';
+import type { PaymentStatus } from '@/lib/core/types';
 
 // PUT /api/payments/[id]
 // Update payment status - used for marking payment events as paid

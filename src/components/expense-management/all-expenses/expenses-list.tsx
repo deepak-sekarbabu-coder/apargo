@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 
-import type { Category, Expense, User } from '@/lib/types';
+import type { Category, Expense, User } from '@/lib/core/types';
 
 import { ExpenseItem } from '@/components/expense-management/all-expenses/expense-item';
 

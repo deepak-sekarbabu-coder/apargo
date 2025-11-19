@@ -11,15 +11,15 @@ import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { AccessibleField, ScreenReaderAnnouncement } from '@/components/ui/accessibility';
 import {
-Form,
-FormField,
+  Form,
+  FormField,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Spinner } from '@/components/ui/spinner';
 
 import { useToast } from '@/hooks/use-toast';
 
-import { InstallButton } from './ui/install-button';
+import { InstallButton } from '../ui/install-button';
 
 // Updated import path
 
@@ -93,44 +93,44 @@ export function LoginForm() {
         priority="polite"
       />
       <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 pt-8 pb-4">
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field, fieldState }) => (
-            <AccessibleField
-              id="email"
-              label="Email"
-              error={fieldState.error?.message}
-              required
-              description="Enter your registered email address"
-            >
-              <Input
-                placeholder="name@example.com"
-                {...field}
-                type="email"
-                autoCapitalize="none"
-                autoComplete="email"
-                autoCorrect="off"
-              />
-            </AccessibleField>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field, fieldState }) => (
-            <AccessibleField
-              id="password"
-              label="Password"
-              error={fieldState.error?.message}
-              required
-              description="Enter your account password"
-            >
-              <Input type="password" placeholder="••••••••" {...field} />
-            </AccessibleField>
-          )}
-        />
+        <form onSubmit={form.handleSubmit(onSubmit)} className="grid gap-4 pt-8 pb-4">
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field, fieldState }) => (
+              <AccessibleField
+                id="email"
+                label="Email"
+                error={fieldState.error?.message}
+                required
+                description="Enter your registered email address"
+              >
+                <Input
+                  placeholder="name@example.com"
+                  {...field}
+                  type="email"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                  autoCorrect="off"
+                />
+              </AccessibleField>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field, fieldState }) => (
+              <AccessibleField
+                id="password"
+                label="Password"
+                error={fieldState.error?.message}
+                required
+                description="Enter your account password"
+              >
+                <Input type="password" placeholder="••••••••" {...field} />
+              </AccessibleField>
+            )}
+          />
           <Button type="submit" disabled={isLoading}>
             {isLoading ? (
               <span className="flex items-center gap-2">

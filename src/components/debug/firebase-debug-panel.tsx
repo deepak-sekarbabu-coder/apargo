@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-import { type ConnectionHealth, diagnostics, healthMonitor } from '@/lib/firebase-health-monitor';
+import { type ConnectionHealth, diagnostics, healthMonitor } from '@/lib/firebase/firebase-health-monitor';
 
 import { Button } from '@/components/ui/button';
 import {

@@ -2,7 +2,7 @@ import { PlusCircle } from 'lucide-react';
 
 import React, { useState } from 'react';
 
-import type { Category, Payment, User } from '@/lib/types';
+import type { Category, Payment, User } from '@/lib/core/types';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

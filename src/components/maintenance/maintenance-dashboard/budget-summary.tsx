@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 
-import { MaintenanceBudget } from '@/lib/types';
+import { MaintenanceBudget } from '@/lib/core/types';
 
 interface BudgetSummaryProps {
   budget?: MaintenanceBudget | null;

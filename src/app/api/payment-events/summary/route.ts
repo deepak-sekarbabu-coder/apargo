@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { adminAuth } from '@/lib/auth';
-import * as firestoreAdmin from '@/lib/firestore-admin';
+import { adminAuth } from '@/lib/auth/auth';
+import * as firestoreAdmin from '@/lib/firestore/firestore-admin';
 
 // GET /api/payment-events/summary?monthYear=YYYY-MM
 // Get payment event summary for admin dashboard

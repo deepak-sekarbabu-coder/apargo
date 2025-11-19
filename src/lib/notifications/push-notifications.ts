@@ -1,7 +1,7 @@
 import { getMessaging, getToken } from 'firebase/messaging';
 
-import { app } from './firebase-client';
-import { updateUser } from './firestore/users';
+import { app } from '../firebase/firebase-client';
+import { updateUser } from '../firestore/users';
 
 export const registerServiceWorker = async () => {
   if ('serviceWorker' in navigator) {

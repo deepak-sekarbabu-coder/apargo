@@ -8,8 +8,8 @@ import * as React from 'react';
 
 import Image from 'next/image';
 
-import { uploadImage } from '@/lib/storage';
-import type { Category, Expense, User } from '@/lib/types';
+import { uploadImage } from '@/lib/storage/storage';
+import type { Category, Expense, User } from '@/lib/core/types';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';

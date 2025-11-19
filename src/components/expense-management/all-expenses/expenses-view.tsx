@@ -7,7 +7,7 @@ import { FileDown } from 'lucide-react';
 
 import * as React from 'react';
 
-import type { Apartment, Category, Expense, User } from '@/lib/types';
+import type { Apartment, Category, Expense, User } from '@/lib/core/types';
 
 import { CategoryIcon } from '@/components/icons/category-icon';
 import { Button } from '@/components/ui/button';

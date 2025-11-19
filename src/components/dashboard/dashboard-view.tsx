@@ -4,8 +4,8 @@ import { Bell, CreditCard, Plus, TrendingDown, TrendingUp, Wallet } from 'lucide
 
 import * as React from 'react';
 
-import type { Expense, Payment, User } from '@/lib/types';
-import { Category } from '@/lib/types';
+import type { Expense, Payment, User } from '@/lib/core/types';
+import { Category } from '@/lib/core/types';
 
 import { FeatureGrid } from '@/components/dashboard/feature-grid';
 import { MaintenancePaymentStatus } from '@/components/dashboard/maintenance-payment-status';

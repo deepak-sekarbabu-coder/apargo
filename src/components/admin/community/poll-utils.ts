@@ -1,4 +1,4 @@
-import { Poll } from '@/lib/types';
+import { Poll } from '@/lib/core/types';
 
 export const calculatePollResults = (poll: Poll) => {
   const totalVotes = Object.keys(poll.votes || {}).length;

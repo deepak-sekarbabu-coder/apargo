@@ -5,7 +5,7 @@ import { AlertTriangle, Plus, RefreshCw } from 'lucide-react';
 
 import React, { useCallback, useState } from 'react';
 
-import { MaintenanceTask } from '@/lib/types';
+import { MaintenanceTask } from '@/lib/core/types';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';

@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 
-import log from '@/lib/logger';
-import type { User } from '@/lib/types';
+import log from '@/lib/core/logger';
+import type { User } from '@/lib/core/types';
 
 /**
  * Hook for filtering users by search term (name or email)

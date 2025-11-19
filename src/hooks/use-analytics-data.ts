@@ -9,7 +9,7 @@ import {
 
 import { useEffect, useMemo, useState } from 'react';
 
-import type { Category, Expense } from '@/lib/types';
+import type { Category, Expense } from '@/lib/core/types';
 
 export function useAnalyticsData(
   expenses: Expense[],
