@@ -2,7 +2,7 @@
 
 **Version:** `v1.5.0 – 2025‑11‑19` | [CHANGELOG](./CHANGELOG.md)
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/81d761ff-9a71-4099-b92b-52ada05f2198/deploy-status)](https://app.netlify.com/projects/unicornproperties/deploys)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/61497cb5-ed8f-4662-9682-b6581475f0f0/deploy-status)](https://app.netlify.com/projects/apargo/deploys)
 
 ---
 
