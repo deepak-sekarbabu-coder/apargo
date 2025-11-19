@@ -1,4 +1,4 @@
-import { filterVendors } from '@/components/maintenance/vendor-filter';
+import { filterVendors } from '@/components/maintenance/vendors/vendor-filter';
 
 const sampleVendors = [
   {

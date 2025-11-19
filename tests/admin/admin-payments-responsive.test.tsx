@@ -5,7 +5,7 @@ import React from 'react';
 
 import type { Payment, User } from '@/lib/types';
 
-import { AdminPaymentsTab } from '@/components/admin/admin-payments-tab';
+import { AdminPaymentsTab } from '@/components/admin/payments/admin-payments-tab';
 
 // Mock data
 const mockPayments: Payment[] = [

@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from '@testing-library/react';
 
 import React from 'react';
 
-import { ExpensesView } from '@/components/expenses/expenses-view';
+import { ExpensesView } from '@/components/expense-management/all-expenses/expenses-view';
 
 // Mock toast hook used inside component
 jest.mock('@/hooks/use-toast', () => ({

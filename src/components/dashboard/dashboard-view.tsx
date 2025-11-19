@@ -11,7 +11,7 @@ import { FeatureGrid } from '@/components/dashboard/feature-grid';
 import { MaintenancePaymentStatus } from '@/components/dashboard/maintenance-payment-status';
 import { AddExpenseDialog } from '@/components/dialogs/add-expense-dialog';
 import { AddPaymentDialog } from '@/components/dialogs/add-payment-dialog';
-import type { ExpensesListProps } from '@/components/expenses/expenses-list';
+import type { ExpensesListProps } from '@/components/expense-management/all-expenses/expenses-list';
 import { OutstandingBalance } from '@/components/outstanding-balance';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -142,24 +142,24 @@ export function DashboardView({
 
       {/* Top summary cards - only show if summary stats are provided */}
       {summaryStats && (
-      <div className="grid grid-cols-2 gap-2 sm:gap-4">
-      <Card className="border-blue-100 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
-      <CardContent className="p-3 sm:p-4">
-      <p className="text-xs sm:text-sm text-muted-foreground">Total Apartments</p>
-      <div className="text-xl sm:text-2xl font-bold text-blue-700 dark:text-blue-400 mt-1">
-      {apartmentsCount}
-      </div>
-      </CardContent>
-      </Card>
-      <Card className="border-yellow-100 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20">
-      <CardContent className="p-3 sm:p-4">
-      <p className="text-xs sm:text-sm text-muted-foreground">Unpaid Bills</p>
-      <div className="text-xl sm:text-2xl font-bold text-amber-700 dark:text-amber-400 mt-1">
-      {unpaidBillsCount}
-      </div>
-      </CardContent>
-      </Card>
-      </div>
+        <div className="grid grid-cols-2 gap-2 sm:gap-4">
+          <Card className="border-blue-100 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
+            <CardContent className="p-3 sm:p-4">
+              <p className="text-xs sm:text-sm text-muted-foreground">Total Apartments</p>
+              <div className="text-xl sm:text-2xl font-bold text-blue-700 dark:text-blue-400 mt-1">
+                {apartmentsCount}
+              </div>
+            </CardContent>
+          </Card>
+          <Card className="border-yellow-100 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20">
+            <CardContent className="p-3 sm:p-4">
+              <p className="text-xs sm:text-sm text-muted-foreground">Unpaid Bills</p>
+              <div className="text-xl sm:text-2xl font-bold text-amber-700 dark:text-amber-400 mt-1">
+                {unpaidBillsCount}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {/* Outstanding Balance Alert */}
@@ -176,18 +176,18 @@ export function DashboardView({
 
       {/* Apartment Balances - only show if balance display is enabled */}
       {balanceDisplay && hasBalances && (
-      <Card>
-      <CardHeader className="pb-3">
-      <CardTitle className="text-lg sm:text-xl">Apartment Balances</CardTitle>
-      <CardDescription className="text-xs sm:text-sm">Summary of amounts owed between apartments</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-2 sm:space-y-3">
-      {/* What you are owed */}
-      {owedItems.map(({ apartmentId, apartmentName, formattedAmount }) => (
-      <div
-      key={`owed-${apartmentId}`}
-      className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 p-2 sm:p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"
-      >
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg sm:text-xl">Apartment Balances</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">Summary of amounts owed between apartments</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2 sm:space-y-3">
+            {/* What you are owed */}
+            {owedItems.map(({ apartmentId, apartmentName, formattedAmount }) => (
+              <div
+                key={`owed-${apartmentId}`}
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 p-2 sm:p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"
+              >
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-full bg-green-100 dark:bg-green-800/30">
                     <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
@@ -207,10 +207,10 @@ export function DashboardView({
 
             {/* What you owe */}
             {owesItems.map(({ apartmentId, apartmentName, formattedAmount }) => (
-            <div
-            key={`owes-${apartmentId}`}
-            className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 p-2 sm:p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
-            >
+              <div
+                key={`owes-${apartmentId}`}
+                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 p-2 sm:p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
+              >
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-full bg-red-100 dark:bg-red-800/30">
                     <TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
@@ -230,25 +230,25 @@ export function DashboardView({
 
             {/* Net balance */}
             {netBalance.amount > 0 && (
-            <div
-            className={`mt-3 sm:mt-4 p-3 sm:p-4 rounded-lg ${netBalance.isPositive ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20'}`}
-            >
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
-            <div className="min-w-0 flex-1">
-            <p className="font-medium text-sm sm:text-base">{netBalance.displayText}</p>
-            <p
-            className={`text-xs sm:text-sm mt-1 ${netBalance.isPositive ? 'text-muted-foreground dark:text-green-200' : 'text-muted-foreground dark:text-red-200'}`}
-            >
-            {netBalance.description}
-            </p>
-            </div>
-            <span
-            className={`text-lg sm:text-xl font-bold flex-shrink-0 ${netBalance.isPositive ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}
-            >
-            {netBalance.formattedAmount}
-            </span>
-            </div>
-            </div>
+              <div
+                className={`mt-3 sm:mt-4 p-3 sm:p-4 rounded-lg ${netBalance.isPositive ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20'}`}
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium text-sm sm:text-base">{netBalance.displayText}</p>
+                    <p
+                      className={`text-xs sm:text-sm mt-1 ${netBalance.isPositive ? 'text-muted-foreground dark:text-green-200' : 'text-muted-foreground dark:text-red-200'}`}
+                    >
+                      {netBalance.description}
+                    </p>
+                  </div>
+                  <span
+                    className={`text-lg sm:text-xl font-bold flex-shrink-0 ${netBalance.isPositive ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}
+                  >
+                    {netBalance.formattedAmount}
+                  </span>
+                </div>
+              </div>
             )}
           </CardContent>
         </Card>
@@ -256,23 +256,23 @@ export function DashboardView({
 
       {/* Expense Management Section - only show if expense management is enabled */}
       {expenseManagement && (
-      <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2">
-      <Card>
-      <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 pb-2 sm:pb-3">
-      <div className="min-w-0 flex-1">
-      <CardTitle className="text-base sm:text-lg">Recent Expenses</CardTitle>
-      <CardDescription className="text-xs sm:text-sm">The last 2 expenses added to your apartment.</CardDescription>
-      </div>
-      {onNavigateToExpenses && (
-      <Button
-      variant="outline"
-      size="sm"
-      onClick={onNavigateToExpenses}
-      className="text-xs w-full sm:w-auto"
-      >
-      View All
-      </Button>
-      )}
+        <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2">
+          <Card>
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 pb-2 sm:pb-3">
+              <div className="min-w-0 flex-1">
+                <CardTitle className="text-base sm:text-lg">Recent Expenses</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">The last 2 expenses added to your apartment.</CardDescription>
+              </div>
+              {onNavigateToExpenses && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={onNavigateToExpenses}
+                  className="text-xs w-full sm:w-auto"
+                >
+                  View All
+                </Button>
+              )}
             </CardHeader>
             <CardContent>
               {ExpensesList && (
@@ -284,54 +284,54 @@ export function DashboardView({
                   currentUserApartment={currentUserApartment}
                   currentUserRole={currentUserRole}
                   onExpenseUpdate={onExpenseUpdate}
-                onExpenseDelete={onExpenseDelete}
+                  onExpenseDelete={onExpenseDelete}
                 />
               )}
             </CardContent>
           </Card>
 
           <Card>
-          <CardHeader className="pb-3">
-          <CardTitle className="text-base sm:text-lg">Account Summary</CardTitle>
-          <CardDescription className="text-xs sm:text-sm">Your personal balance status and account overview.</CardDescription>
-          </CardHeader>
-          <CardContent className="grid gap-3 sm:gap-4">
-          <div className="flex items-start gap-3 sm:gap-4 min-w-0">
-          <Bell className="h-5 sm:h-6 w-5 sm:w-6 text-accent flex-shrink-0 mt-0.5" />
-          <div className="grid gap-1 min-w-0 flex-1">
-          <p className="text-xs sm:text-sm font-medium break-words">Welcome to Apargo, {user?.name}!</p>
-          <p className="text-xs sm:text-sm text-muted-foreground">
-          Here is a summary of your account.
-          </p>
-          </div>
-          </div>
-          <Separator />
-          <div className="flex items-start gap-3 sm:gap-4 min-w-0">
-          <Wallet
-          className={`h-5 sm:h-6 w-5 sm:w-6 flex-shrink-0 mt-0.5 ${accountSummary.isSettled ? 'text-green-600 dark:text-green-400' : accountSummary.isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
-          />
-          <div className="grid gap-1 min-w-0 flex-1">
-          <p className="text-xs sm:text-sm font-medium break-words">
-          Your balance is {accountSummary.formattedAmount}
-          </p>
-          <p className="text-xs sm:text-sm text-muted-foreground">{accountSummary.statusText}</p>
-          </div>
-          </div>
-          {showReminder && (
-          <>
-          <Separator />
-          <div className="flex items-start gap-3 sm:gap-4 min-w-0">
-          <TrendingUp className="h-5 sm:h-6 w-5 sm:w-6 text-blue-500 flex-shrink-0 mt-0.5" />
-          <div className="grid gap-1 min-w-0 flex-1">
-          <p className="text-xs sm:text-sm font-medium">Settle Up Reminder</p>
-          <p className="text-xs sm:text-sm text-muted-foreground break-words">
-          Please pay your outstanding balance to keep the records updated.
-          </p>
-          </div>
-          </div>
-          </>
-          )}
-          </CardContent>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base sm:text-lg">Account Summary</CardTitle>
+              <CardDescription className="text-xs sm:text-sm">Your personal balance status and account overview.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-3 sm:gap-4">
+              <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+                <Bell className="h-5 sm:h-6 w-5 sm:w-6 text-accent flex-shrink-0 mt-0.5" />
+                <div className="grid gap-1 min-w-0 flex-1">
+                  <p className="text-xs sm:text-sm font-medium break-words">Welcome to Apargo, {user?.name}!</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    Here is a summary of your account.
+                  </p>
+                </div>
+              </div>
+              <Separator />
+              <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+                <Wallet
+                  className={`h-5 sm:h-6 w-5 sm:w-6 flex-shrink-0 mt-0.5 ${accountSummary.isSettled ? 'text-green-600 dark:text-green-400' : accountSummary.isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+                />
+                <div className="grid gap-1 min-w-0 flex-1">
+                  <p className="text-xs sm:text-sm font-medium break-words">
+                    Your balance is {accountSummary.formattedAmount}
+                  </p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">{accountSummary.statusText}</p>
+                </div>
+              </div>
+              {showReminder && (
+                <>
+                  <Separator />
+                  <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+                    <TrendingUp className="h-5 sm:h-6 w-5 sm:w-6 text-blue-500 flex-shrink-0 mt-0.5" />
+                    <div className="grid gap-1 min-w-0 flex-1">
+                      <p className="text-xs sm:text-sm font-medium">Settle Up Reminder</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground break-words">
+                        Please pay your outstanding balance to keep the records updated.
+                      </p>
+                    </div>
+                  </div>
+                </>
+              )}
+            </CardContent>
           </Card>
         </div>
       )}

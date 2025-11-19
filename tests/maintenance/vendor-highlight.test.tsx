@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 
 import React from 'react';
 
-import { VendorList } from '@/components/maintenance/vendor-list';
+import { VendorList } from '@/components/maintenance/vendors/vendor-list';
 
 const vendors = [
   { id: 'v1', name: 'Plumb Right', serviceType: 'plumbing', isActive: true },

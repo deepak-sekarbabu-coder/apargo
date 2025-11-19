@@ -5,7 +5,7 @@ import React from 'react';
 
 import type { Payment, User } from '@/lib/types';
 
-import { PaymentsTable } from '@/components/ledger/payments-table';
+import { PaymentsTable } from '@/components/ledger/ledger-payments/payments-table';
 
 // Mock the use-mobile hook before importing the component
 jest.mock('@/hooks/use-mobile', () => ({

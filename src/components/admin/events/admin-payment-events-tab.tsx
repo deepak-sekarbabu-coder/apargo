@@ -11,7 +11,7 @@ import { Spinner } from '@/components/ui/spinner';
 
 import { useToast } from '@/hooks/use-toast';
 
-import { PaymentEventHistory } from '../payment-events/payment-event-history';
+import { PaymentEventHistory } from './payment-event-history';
 import { usePaymentEvents } from './use-payment-events';
 
 interface AdminPaymentEventsTabProps {

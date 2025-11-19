@@ -4,7 +4,7 @@ import * as React from 'react';
 
 import type { Category, Expense, User } from '@/lib/types';
 
-import { ExpenseItem } from '@/components/expenses/expense-item';
+import { ExpenseItem } from '@/components/expense-management/all-expenses/expense-item';
 
 export interface ExpensesListProps {
   expenses: Expense[];

@@ -8,11 +8,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { useAdminTabState } from '@/hooks/use-admin-tab-state';
 
-import { AdminCategoriesTab } from './admin-categories-tab';
-import { AdminCommunityTab } from './admin-community-tab';
-import { AdminPaymentEventsTab } from './admin-payment-events-tab';
-import { AdminPaymentsTab } from './admin-payments-tab';
-import { AdminUsersTab } from './admin-users-tab';
+import { AdminCategoriesTab } from './categories/admin-categories-tab';
+import { AdminCommunityTab } from './community/admin-community-tab';
+import { AdminPaymentEventsTab } from './events/admin-payment-events-tab';
+import { AdminPaymentsTab } from './payments/admin-payments-tab';
+import { AdminUsersTab } from './users/admin-users-tab';
 
 // import { AdminFileManager } from './admin-file-manager'; // Removed to resolve unused import lint error; restore when Files tab is re-enabled.
 

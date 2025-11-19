@@ -18,9 +18,9 @@ import type {
 
 import { CommunityView } from '@/components/community/community-view';
 import { DashboardView } from '@/components/dashboard/dashboard-view';
-import { ExpenseAnalyticsView } from '@/components/expense-analytics/expense-analytics-view';
-import { ExpensesList } from '@/components/expenses/expenses-list';
-import { FaultView } from '@/components/fault-reporting/fault-view';
+import { ExpenseAnalyticsView } from '@/components/expense-management/analytics/expense-analytics-view';
+import { ExpensesList } from '@/components/expense-management/all-expenses/expenses-list';
+import { FaultView } from '@/components/fault-management/fault-view';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -165,7 +165,7 @@ export function MainContent({
   const currentUserApartment = user?.apartment;
 
   const ExpensesListComponent = (
-    props: Partial<import('../expenses/expenses-list').ExpensesListProps>
+    props: Partial<import('@/components/expense-management/all-expenses/expenses-list').ExpensesListProps>
   ) => (
     <ExpensesList
       {...props}

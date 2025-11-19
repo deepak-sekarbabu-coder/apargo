@@ -1,4 +1,4 @@
-import { FaultView } from '@/components/fault-reporting/fault-view';
+import { FaultView } from '@/components/fault-management/fault-view';
 
 export default function FaultsPage() {
   return (

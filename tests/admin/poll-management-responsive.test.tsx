@@ -5,7 +5,7 @@ import React from 'react';
 
 import type { Poll, User } from '@/lib/types';
 
-import { ActivePolls } from '@/components/admin/active-polls';
+import { ActivePolls } from '@/components/admin/community/active-polls';
 
 // Mock data
 const mockPolls: Poll[] = [

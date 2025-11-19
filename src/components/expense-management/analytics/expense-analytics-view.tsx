@@ -7,12 +7,12 @@ import * as React from 'react';
 import type { Apartment, Category, Expense, User } from '@/lib/types';
 
 import { AnalyticsView } from '@/components/analytics/analytics-view';
-import { ExpensesView } from '@/components/expenses/expenses-view';
+import { ExpensesView } from '@/components/expense-management/all-expenses/expenses-view';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { useAnalyticsData } from '@/hooks/use-analytics-data';
 
-import type { ExpensesListProps } from '../expenses/expenses-list';
+import type { ExpensesListProps } from '../all-expenses/expenses-list';
 
 interface ExpenseAnalyticsViewProps {
   expenses: Expense[];

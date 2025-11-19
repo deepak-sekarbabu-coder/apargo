@@ -18,8 +18,8 @@ import { toast } from '@/hooks/use-toast';
 
 // Removed useToast import (toast not used)
 
-import { MaintenanceDashboard } from './maintenance-dashboard';
-import { VendorList } from './vendor-list';
+import { MaintenanceDashboard } from './maintenance-dashboard/maintenance-dashboard';
+import { VendorList } from './vendors/vendor-list';
 
 function MaintenanceViewContent() {
   const { user } = useAuth();

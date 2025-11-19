@@ -14,8 +14,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { useToast } from '@/hooks/use-toast';
 
-import { FaultDashboard } from './fault-dashboard';
-import { FaultManagement } from './fault-management';
+import { FaultDashboard } from './fault-dashboard/fault-dashboard';
+import { FaultManagement } from './management/fault-management';
 
 export function FaultView() {
   const { user } = useAuth();

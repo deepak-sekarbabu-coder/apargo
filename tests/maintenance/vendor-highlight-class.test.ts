@@ -1,4 +1,4 @@
-import { getVendorHighlightClasses } from '@/components/maintenance/vendor-list';
+import { getVendorHighlightClasses } from '@/components/maintenance/vendors/vendor-list';
 
 describe('getVendorHighlightClasses', () => {
   it('returns empty string when no highlight id', () => {
