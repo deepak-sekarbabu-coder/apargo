@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import Script from 'next/script';
 
-import ClientRoot from '@/components/client-root';
-import HeadMeta from '@/components/head-meta';
+import ClientRoot from '@/components/core/client-root';
+import HeadMeta from '@/components/core/head-meta';
 import { SkipLink } from '@/components/ui/accessibility';
 
 import './globals.css';
@@ -65,7 +65,7 @@ export default function RootLayout({
         <HeadMeta />
       </head>
       <body className={inter.className} suppressHydrationWarning={true} data-hydration-root="true">
-      <SkipLink href="#main-content">Skip to main content</SkipLink>
+        <SkipLink href="#main-content">Skip to main content</SkipLink>
         {/* Pre-hydration cleanup of extension-injected attributes (e.g. bis_skin_checked) to avoid hydration mismatches */}
         <Script
           id="extension-attr-cleanup"

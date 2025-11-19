@@ -10,7 +10,7 @@ import { db } from '@/lib/firebase';
 import { AdminNotificationListener, NotificationListener } from '@/lib/notification-listener';
 import type { Notification } from '@/lib/types';
 
-import { NotificationItem } from '@/components/notification-item';
+import { NotificationItem } from '@/components/notifications/notification-item';
 import { Button, type ButtonProps } from '@/components/ui/button';
 import {
   Dialog,

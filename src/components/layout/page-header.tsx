@@ -10,7 +10,7 @@ import type { View } from '@/lib/types';
 import { AddExpenseDialog } from '@/components/dialogs/add-expense-dialog';
 import { AddPaymentDialog } from '@/components/dialogs/add-payment-dialog';
 import { UserProfileDialog } from '@/components/dialogs/user-profile-dialog';
-import { NotificationsPanel } from '@/components/notifications-panel';
+import { NotificationsPanel } from '@/components/notifications/notifications-panel';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {

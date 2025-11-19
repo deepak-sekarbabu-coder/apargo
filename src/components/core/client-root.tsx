@@ -10,9 +10,9 @@ import React, { useEffect } from 'react';
 // Ensure mobile alert override runs early on client initialization
 import '@/lib/override-alert.client';
 
-import { FirebaseDebugPanel } from '@/components/firebase-debug-panel';
-import { NotificationSystemTest } from '@/components/notification-system-test';
-import { PollLoginNotification } from '@/components/poll-login-notification';
+import { FirebaseDebugPanel } from '@/components/debug/firebase-debug-panel';
+import { NotificationSystemTest } from '@/components/debug/notification-system-test';
+import { PollLoginNotification } from '@/components/notifications/poll-login-notification';
 import ServiceWorkerRegister from '@/components/ui/service-worker-register';
 import { ToastProvider } from '@/components/ui/toast-provider';
 

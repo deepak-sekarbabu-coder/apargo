@@ -6,17 +6,20 @@ This directory contains all reusable UI and feature components for the Apargo ap
 
 - **admin/**: Admin-only components (e.g., announcement management, file manager, admin dashboard)
 - **analytics/**: Analytics and reporting views
+- **auth/**: Authentication components (login form, protected routes)
 - **community/**: Community polls, voting, and related UI
-- **dashboard/**: Dashboard widgets and feature grid
+- **core/**: Core application components (main app, client root, meta tags)
+- **dashboard/**: Dashboard widgets, feature grid, and outstanding balance
+- **debug/**: Development and debugging tools (Firebase debug panel, notification system tests)
 - **dialogs/**: ShadCN-based dialogs for add/edit flows (expenses, users, polls, vendors, etc.)
-- **expense-analytics/**: Expense analytics and insights
-- **expenses/**: Expense list, item, and view components
-- **fault-reporting/**: Fault reporting forms, dashboards, and management
+- **expense-management/**: Expense analytics and insights
+- **fault-management/**: Fault reporting forms, dashboards, and management
 - **icons/**: Custom and third-party icon components
 - **layout/**: Navigation menus, headers, and layout utilities
 - **ledger/**: Ledger and payments table views
 - **maintenance/**: Maintenance dashboard, vendor management, and budget tracking
-- **payment-events/**: Payment event history and views
+- **monitoring/**: Performance monitoring and web vitals tracking
+- **notifications/**: Notification system components (panel, items, poll notifications)
 - **ui/**: Shared UI primitives (ShadCN components, form elements, dialogs, popovers, etc.)
 
 ## Conventions
@@ -29,10 +32,15 @@ This directory contains all reusable UI and feature components for the Apargo ap
 
 ## Example Usage
 
+- Main app component: `core/apargo-app.tsx`
+- Login form: `auth/login-form.tsx`
 - Dashboard feature grid: `dashboard/feature-grid.tsx`
 - Add expense dialog: `dialogs/add-expense-dialog.tsx`
 - Vendor list: `maintenance/vendor-list.tsx`
 - Community poll voting: `community/poll-vote-dialog.tsx`
+- Notifications panel: `notifications/notifications-panel.tsx`
+- Firebase debug panel: `debug/firebase-debug-panel.tsx`
+- Performance monitor: `monitoring/PerformanceMonitor.tsx`
 - Shared button: `ui/button.tsx`
 
 ## Best Practices
@@ -41,6 +49,7 @@ This directory contains all reusable UI and feature components for the Apargo ap
 - Use the centralized dialog and form validation patterns
 - Keep feature logic within feature folders; use `ui/` for generic elements
 - Follow mobile-first and accessibility best practices
+- Debug components should only be shown in development mode
 
 ## See Also
 
@@ -49,7 +58,12 @@ This directory contains all reusable UI and feature components for the Apargo ap
 
 ## Components Directory Structure
 
-- Grouped by feature/domain (e.g., `admin`, `analytics`, `dashboard`, `fault-reporting`, `community`, `ledger`, `expenses`, `dialogs`, `ui`).
+- Grouped by feature/domain (e.g., `admin`, `analytics`, `auth`, `core`, `dashboard`, `fault-management`, `community`, `ledger`, `notifications`, `dialogs`, `ui`).
+- Core application components are in `core/`.
+- Authentication components are in `auth/`.
+- Notification system components are in `notifications/`.
+- Debug and development tools are in `debug/`.
+- Performance monitoring is in `monitoring/`.
 - Shared UI components are in `ui/`.
 - Feature-specific components are in their respective folders.
 

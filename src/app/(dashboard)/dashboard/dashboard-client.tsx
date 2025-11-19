@@ -4,7 +4,7 @@ import * as React from 'react';
 
 import { getCategories } from '@/lib/firestore/categories';
 
-import { ApargoApp } from '@/components/apargo-app';
+import { ApargoApp } from '@/components/core/apargo-app';
 
 export default function DashboardClient() {
   const [categories, setCategories] = React.useState(

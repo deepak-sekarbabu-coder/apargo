@@ -12,7 +12,7 @@ import { MaintenancePaymentStatus } from '@/components/dashboard/maintenance-pay
 import { AddExpenseDialog } from '@/components/dialogs/add-expense-dialog';
 import { AddPaymentDialog } from '@/components/dialogs/add-payment-dialog';
 import type { ExpensesListProps } from '@/components/expense-management/all-expenses/expenses-list';
-import { OutstandingBalance } from '@/components/outstanding-balance';
+import { OutstandingBalance } from '@/components/dashboard/outstanding-balance';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';

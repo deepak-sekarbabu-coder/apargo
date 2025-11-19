@@ -1,6 +1,6 @@
 import Image from 'next/image';
 
-import { LoginForm } from '@/components/login-form';
+import { LoginForm } from '@/components/auth/login-form';
 import { ThemeSwitch } from '@/components/ui/theme-switch';
 
 export default function LoginPage() {
