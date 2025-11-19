@@ -25,15 +25,15 @@ export function PaymentStatusButton({
             type="button"
             disabled={disabled || isLoading}
             className={cn(
-                'group relative inline-flex h-8 items-center justify-center overflow-hidden rounded-full px-4 text-xs font-medium transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+                'group relative inline-flex h-8 min-w-[7rem] items-center justify-center overflow-hidden rounded-full border px-4 text-xs font-semibold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
                 isPaid
-                    ? 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-900/50'
-                    : 'bg-red-100 text-red-700 hover:bg-red-200 dark:bg-red-900/30 dark:text-red-400 dark:hover:bg-red-900/50',
+                    ? 'border-transparent bg-green-600 text-white hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700'
+                    : 'border-transparent bg-red-600 text-white hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700',
                 className
             )}
             {...props}
         >
-            <div className="relative flex items-center gap-1.5">
+            <div className="relative z-10 flex items-center gap-2">
                 {isLoading ? (
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 ) : (
@@ -52,11 +52,11 @@ export function PaymentStatusButton({
                                 )}
                             />
                         </div>
-                        <span className="relative grid items-center justify-items-center overflow-hidden">
+                        <div className="relative inline-grid items-center justify-items-center whitespace-nowrap">
                             <span
                                 className={cn(
                                     'col-start-1 row-start-1 transition-all duration-300',
-                                    isPaid ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'
+                                    isPaid ? 'opacity-100' : 'opacity-0'
                                 )}
                             >
                                 {labelPaid}
@@ -64,18 +64,18 @@ export function PaymentStatusButton({
                             <span
                                 className={cn(
                                     'col-start-1 row-start-1 transition-all duration-300',
-                                    !isPaid ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0'
+                                    !isPaid ? 'opacity-100' : 'opacity-0'
                                 )}
                             >
                                 {labelUnpaid}
                             </span>
-                        </span>
+                        </div>
                     </>
                 )}
             </div>
 
             {/* Shine effect on hover */}
-            <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:animate-shimmer" />
+            <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:animate-shimmer pointer-events-none" />
         </button>
     );
 }
