@@ -256,27 +256,11 @@ export const getBalanceSheets = async (
   });
 };
 
-export const addBalanceSheet = async (sheet: Omit<BalanceSheet, 'id'>): Promise<BalanceSheet> => {
-  const db = database;
-  const sheetsCollection = db.collection<BalanceSheet>('balanceSheets');
-  const docRef = await sheetsCollection.add(sheet);
-  return { id: docRef.id, ...sheet } as BalanceSheet;
-};
 
-export const updateBalanceSheet = async (
-  id: string,
-  sheet: Partial<BalanceSheet>
-): Promise<void> => {
-  const db = database;
-  const sheetDoc = db.collection<BalanceSheet>('balanceSheets').doc(id);
-  await sheetDoc.update(sheet);
-};
 
-export const deleteBalanceSheet = async (id: string): Promise<void> => {
-  const db = database;
-  const sheetDoc = db.collection<BalanceSheet>('balanceSheets').doc(id);
-  await sheetDoc.delete();
-};
+
+
+
 
 export const subscribeToBalanceSheets = async (
   callback: (sheets: BalanceSheet[]) => void,
@@ -287,15 +271,15 @@ export const subscribeToBalanceSheets = async (
   const filters: Array<{
     field: string;
     operator:
-      | '=='
-      | '!='
-      | '<'
-      | '<='
-      | '>'
-      | '>='
-      | 'array-contains'
-      | 'in'
-      | 'array-contains-any';
+    | '=='
+    | '!='
+    | '<'
+    | '<='
+    | '>'
+    | '>='
+    | 'array-contains'
+    | 'in'
+    | 'array-contains-any';
     value: unknown;
   }> = [];
   if (apartmentId) {

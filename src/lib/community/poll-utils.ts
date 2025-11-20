@@ -1,7 +1,4 @@
-import { collection, getDocs, query, where } from 'firebase/firestore';
-
-import { Poll, PollNotification, User } from '../core/types';
-import { db } from '../firebase/firebase';
+import { Poll, User } from '../core/types';
 import { listenToPolls } from '../firestore/polls';
 
 /**
@@ -9,27 +6,7 @@ import { listenToPolls } from '../firestore/polls';
  * @param user The current user
  * @returns A promise that resolves to an array of polls the user hasn't voted on
  */
-export const getUnvotedPolls = async (user: User | null): Promise<Poll[]> => {
-  if (!user || !user.apartment) return [];
 
-  try {
-    // Get all active polls
-    const pollsCol = collection(db, 'polls');
-    const q = query(pollsCol, where('isActive', '==', true));
-    const snapshot = await getDocs(q);
-
-    const polls = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Poll);
-
-    // Filter out polls the user has already voted on
-    return polls.filter(poll => {
-      // Check if user's apartment ID is in the votes object
-      return !poll.votes || !poll.votes[user.apartment];
-    });
-  } catch (error) {
-    console.error('Error checking for unvoted polls:', error);
-    return [];
-  }
-};
 
 /**
  * Sets up a listener for active polls that the user hasn't voted on
@@ -43,7 +20,7 @@ export const listenToUnvotedPolls = (
 ): (() => void) => {
   if (!user || !user.apartment) {
     callback([]);
-    return () => {};
+    return () => { };
   }
 
   return listenToPolls(polls => {
@@ -61,16 +38,4 @@ export const listenToUnvotedPolls = (
  * @param apartmentId The user's apartment ID
  * @returns A notification object
  */
-export const createPollNotification = (poll: Poll, apartmentId: string): PollNotification => {
-  return {
-    id: `poll-${poll.id}`,
-    type: 'poll',
-    title: 'New Community Poll',
-    message: poll.question,
-    toApartmentId: apartmentId,
-    createdAt: poll.createdAt,
-    // Poll-specific fields can be added here if needed
-    relatedExpenseId: undefined,
-    fromApartmentId: undefined,
-  };
-};
+

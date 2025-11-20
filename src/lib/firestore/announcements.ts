@@ -2,7 +2,6 @@ import {
   collection,
   deleteDoc,
   doc,
-  getDocs,
   onSnapshot,
   orderBy,
   query,
@@ -12,17 +11,7 @@ import {
 import type { AnnouncementNotification } from '../core/types';
 import { db } from '../firebase/firebase';
 
-export const getActiveAnnouncements = async (): Promise<AnnouncementNotification[]> => {
-  const notificationsCol = collection(db, 'notifications');
-  const q = query(
-    notificationsCol,
-    where('type', '==', 'announcement'),
-    where('isActive', '==', true),
-    orderBy('createdAt', 'desc')
-  );
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as AnnouncementNotification);
-};
+
 
 export const listenToActiveAnnouncements = (
   callback: (announcements: AnnouncementNotification[]) => void

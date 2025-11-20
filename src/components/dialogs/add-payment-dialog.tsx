@@ -252,4 +252,4 @@ export function AddPaymentDialog({ users, onAddPayment, children }: AddPaymentDi
   );
 }
 
-export default AddPaymentDialog;
+

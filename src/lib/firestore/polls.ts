@@ -4,7 +4,6 @@ import {
   deleteDoc,
   doc,
   getDoc,
-  getDocs,
   onSnapshot,
   query,
   updateDoc,
@@ -15,15 +14,7 @@ import type { Poll } from '../core/types';
 import { db } from '../firebase/firebase';
 import { removeUndefined } from './firestore-utils';
 
-export const getPolls = async (activeOnly = false): Promise<Poll[]> => {
-  const pollsCol = collection(db, 'polls');
-  let q = query(pollsCol);
-  if (activeOnly) {
-    q = query(pollsCol, where('isActive', '==', true));
-  }
-  const snapshot = await getDocs(q);
-  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Poll);
-};
+
 
 export const listenToPolls = (cb: (polls: Poll[]) => void, activeOnly = false) => {
   const pollsCol = collection(db, 'polls');
@@ -60,21 +51,13 @@ export const voteOnPoll = async (
   if (poll.votes && poll.votes[apartmentId]) {
     throw new Error('This apartment has already voted.');
   }
-  const update = { [`votes.${apartmentId}`]: optionId };
+  const update = { [`votes.${apartmentId} `]: optionId };
   await updateDoc(pollDoc, update);
 };
 
-export const getPollResults = async (pollId: string): Promise<Poll | null> => {
-  const pollDoc = doc(db, 'polls', pollId);
-  const pollSnap = await getDoc(pollDoc);
-  if (!pollSnap.exists()) return null;
-  return { id: pollSnap.id, ...pollSnap.data() } as Poll;
-};
 
-export const closePoll = async (pollId: string): Promise<void> => {
-  const pollDoc = doc(db, 'polls', pollId);
-  await updateDoc(pollDoc, { isActive: false });
-};
+
+
 
 // Secure delete: only creator or incharge role may delete a poll.
 // Admins can only delete their own polls (data ownership rule).

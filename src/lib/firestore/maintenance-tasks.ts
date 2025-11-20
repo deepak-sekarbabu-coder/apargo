@@ -246,24 +246,4 @@ export const subscribeToMaintenanceTasks = (
 };
 
 // Helper to apply actualCost to budget aggregations when task completes
-export const applyTaskCostToBudget = async (taskId: string): Promise<void> => {
-  // Fetch task
-  const taskDoc = doc(db, 'maintenanceTasks', taskId);
-  const snap = await getDoc(taskDoc);
-  if (!snap.exists()) return;
-  const task = { id: snap.id, ...snap.data() } as MaintenanceTask;
-  if (task.status !== 'completed' || !task.actualCost) return; // Only apply once when cost & completed
-  const year = new Date(task.scheduledDate).getFullYear();
-  const budget = await import('./maintenance-budgets').then(m => m.getMaintenanceBudget(year));
-  if (!budget) return; // No budget defined
-  const cat = task.category || 'other';
-  const spentByCategory = { ...(budget.spentByCategory || {}) };
-  const prev = spentByCategory[cat] || 0;
-  // Prevent double count by checking a marker field on task maybe? For now ensure we only add if task.updatedAt ~ recently and not previously incremented.
-  // Simplified: always increment (risk double count if editing). TODO: Add an idempotent marker (e.g., budgetApplied=true) later.
-  spentByCategory[cat] = prev + (task.actualCost || 0);
-  const totalSpent = (budget.totalSpent || 0) + (task.actualCost || 0);
-  await import('./maintenance-budgets').then(m =>
-    m.updateMaintenanceBudget(budget.id, { spentByCategory, totalSpent })
-  );
-};
+

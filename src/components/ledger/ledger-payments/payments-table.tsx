@@ -18,7 +18,7 @@ import * as React from 'react';
 
 import { Payment, User } from '@/lib/core/types';
 
-import AddPaymentDialog from '@/components/dialogs/add-payment-dialog';
+import { AddPaymentDialog } from '@/components/dialogs/add-payment-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -524,50 +524,50 @@ export function PaymentsTable({
     },
     ...(currentUser.role === 'admin'
       ? [
-          {
-            id: 'actions',
-            header: () => <div className="text-right">Actions</div>,
-            cell: ({ row }: { row: { original: Payment } }) => {
-              const payment = row.original;
-              return (
-                <div className="flex gap-2 justify-end">
-                  {payment.status === 'pending' ? (
-                    <>
-                      <Button
-                        size="sm"
-                        variant="default"
-                        onClick={() => onApprovePayment(payment.id)}
-                        aria-label={`Approve payment ${payment.id}`}
-                      >
-                        <Check className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => onRejectPayment(payment.id)}
-                        aria-label={`Reject payment ${payment.id}`}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </>
-                  ) : (
-                    <span className="text-sm text-muted-foreground">-</span>
-                  )}
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="border-red-500 text-red-600 hover:bg-red-50"
-                    onClick={() => setDeleteId(payment.id)}
-                    disabled={isDeleting}
-                    aria-label={`Delete payment ${payment.id}`}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-              );
-            },
+        {
+          id: 'actions',
+          header: () => <div className="text-right">Actions</div>,
+          cell: ({ row }: { row: { original: Payment } }) => {
+            const payment = row.original;
+            return (
+              <div className="flex gap-2 justify-end">
+                {payment.status === 'pending' ? (
+                  <>
+                    <Button
+                      size="sm"
+                      variant="default"
+                      onClick={() => onApprovePayment(payment.id)}
+                      aria-label={`Approve payment ${payment.id}`}
+                    >
+                      <Check className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => onRejectPayment(payment.id)}
+                      aria-label={`Reject payment ${payment.id}`}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </>
+                ) : (
+                  <span className="text-sm text-muted-foreground">-</span>
+                )}
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-red-500 text-red-600 hover:bg-red-50"
+                  onClick={() => setDeleteId(payment.id)}
+                  disabled={isDeleting}
+                  aria-label={`Delete payment ${payment.id}`}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            );
           },
-        ]
+        },
+      ]
       : []),
   ];
 

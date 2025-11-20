@@ -33,7 +33,7 @@ import { app, db } from '../firebase/firebase';
 const storage = getStorage(app);
 
 // Storage Configuration - Centralized for Firebase free tier optimization
-export const STORAGE_CONFIG: StorageConfig = {
+const STORAGE_CONFIG: StorageConfig = {
   maxFileSize: 2 * 1024 * 1024, // 2MB in bytes
   allowedMimeTypes: ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf'],
   bucket: 'unicorndev-b532a.firebasestorage.app', // Centralized bucket
@@ -44,7 +44,7 @@ export const STORAGE_CONFIG: StorageConfig = {
  * Enhanced Storage Service Class
  * Provides centralized file upload, validation, and metadata management
  */
-export class StorageService {
+class StorageService {
   private readonly config: StorageConfig;
 
   constructor(config: StorageConfig = STORAGE_CONFIG) {
@@ -443,19 +443,4 @@ export class StorageService {
 export const storageService = new StorageService();
 
 // Legacy function wrapper for backward compatibility
-export async function uploadImage(file: File, path: string): Promise<string> {
-  try {
-    const storageRef = ref(storage, path);
-    await uploadBytes(storageRef, file);
-    return await getDownloadURL(storageRef);
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    log.error('Firebase Storage upload failed:', err);
-    if (msg.includes('storage') || msg.includes('bucket')) {
-      throw new Error(
-        'Upload failed. Verify Firebase Storage bucket configuration and rules allow authenticated writes.'
-      );
-    }
-    throw new Error('Upload failed. Please try again.');
-  }
-}
+

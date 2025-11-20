@@ -13,7 +13,7 @@ const APARTMENTS_10 = ['G1', 'G2', 'F1', 'F2', 'F3', 'S1', 'S2', 'S3', 'T1', 'T2
  * This function is exported for individual use but `getApartmentIds` is preferred.
  * @returns {number} The configured apartment count.
  */
-export const getApartmentCount = (): number => {
+const getApartmentCount = (): number => {
   if (APARTMENT_COUNT_ENV) {
     const parsedCount = parseInt(APARTMENT_COUNT_ENV, 10);
     if (!isNaN(parsedCount) && parsedCount > 0) {

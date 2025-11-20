@@ -23,8 +23,8 @@ import { useDebounce } from '@/hooks/use-debounce';
 import { useToast } from '@/hooks/use-toast';
 
 import { filterVendors } from './vendor-filter';
-import RatingStars from './vendor-rating-stars';
-import StatusBadge from './vendor-status-badge';
+import { RatingStars } from './vendor-rating-stars';
+import { StatusBadge } from './vendor-status-badge';
 
 export function getVendorHighlightClasses(vendorId: string, highlightVendorId?: string | null) {
   if (!highlightVendorId || vendorId !== highlightVendorId) return '';
@@ -306,4 +306,4 @@ export function VendorList({
     </div>
   );
 }
-export default VendorList;
+

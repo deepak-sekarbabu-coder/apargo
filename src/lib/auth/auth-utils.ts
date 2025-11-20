@@ -14,7 +14,7 @@ export function isAuthUserNotFoundError(error: unknown): boolean {
   );
 }
 
-export function isInvalidSessionError(error: unknown): boolean {
+function isInvalidSessionError(error: unknown): boolean {
   const err = error as { code?: string; message?: string };
   return !!(
     err?.code === 'auth/invalid-session-cookie' ||

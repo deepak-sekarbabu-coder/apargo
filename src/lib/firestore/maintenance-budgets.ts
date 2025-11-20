@@ -4,7 +4,6 @@ import {
   doc,
   getDocs,
   limit,
-  onSnapshot,
   query,
   updateDoc,
   where,
@@ -53,18 +52,4 @@ export const updateMaintenanceBudget = async (
   await updateDoc(budgetDoc, clean);
 };
 
-export const subscribeToMaintenanceBudget = (
-  year: number,
-  callback: (budget: MaintenanceBudget | null) => void
-) => {
-  const budgetsQuery = query(
-    collection(db, 'maintenanceBudgets'),
-    where('year', '==', year),
-    limit(1)
-  );
-  return onSnapshot(budgetsQuery, snapshot => {
-    if (snapshot.empty) return callback(null);
-    const docSnap = snapshot.docs[0];
-    callback({ id: docSnap.id, ...docSnap.data() } as MaintenanceBudget);
-  });
-};
+

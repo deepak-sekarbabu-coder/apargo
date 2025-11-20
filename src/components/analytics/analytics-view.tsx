@@ -371,16 +371,16 @@ export function AnalyticsView({
                             analyticsMonth === 'all'
                               ? expenses.filter(e => e.categoryId === category?.id)
                               : expenses.filter(e => {
-                                  try {
-                                    return (
-                                      e.categoryId === category?.id &&
-                                      e.date &&
-                                      format(new Date(e.date), 'yyyy-MM') === analyticsMonth
-                                    );
-                                  } catch {
-                                    return false;
-                                  }
-                                });
+                                try {
+                                  return (
+                                    e.categoryId === category?.id &&
+                                    e.date &&
+                                    format(new Date(e.date), 'yyyy-MM') === analyticsMonth
+                                  );
+                                } catch {
+                                  return false;
+                                }
+                              });
 
                           const recentExpenses = categoryExpenses.filter(e => {
                             try {
@@ -608,4 +608,4 @@ export function AnalyticsView({
   );
 }
 
-export default AnalyticsView;
+

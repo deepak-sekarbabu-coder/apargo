@@ -1,0 +1,27 @@
+{
+    "$schema": "https://unpkg.com/knip@5/schema.json",
+    "entry": [
+        "src/app/**/page.tsx",
+        "src/app/**/layout.tsx",
+        "src/app/**/route.ts",
+        "scripts/*.js",
+        "scripts/*.ts"
+    ],
+    "project": [
+        "src/**/*.{ts,tsx,js,jsx}",
+        "scripts/**/*.{js,ts}"
+    ],
+    "ignore": [
+        "public/firebase-messaging-sw.js",
+        "public/sw-optimized.js",
+        "public/sw.js",
+        "firebase/firebase-messaging-sw.js",
+        "src/lib/firebase/firebase-messaging-sw.js",
+        "next-env.d.ts"
+    ],
+    "ignoreDependencies": [
+        "postcss-load-config",
+        "sharp"
+    ],
+    "ignoreExportsUsedInFile": true
+}

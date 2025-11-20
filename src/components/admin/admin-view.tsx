@@ -301,4 +301,4 @@ export function AdminView(props: AdminViewProps | AdminViewLegacyProps | AdminVi
   );
 }
 
-export default AdminView;
+

@@ -2,7 +2,6 @@
 import { getApp, getApps, initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { Firestore, getFirestore, initializeFirestore } from 'firebase/firestore';
-import { getMessaging } from 'firebase/messaging';
 
 // Your web app's Firebase configuration
 // Use environment variables to ensure consistency between client and server
@@ -55,6 +54,5 @@ if (!isNodeEnvironment) {
 
 // Initialize auth only in browser environment to avoid SSR issues
 const auth = isNodeEnvironment ? getAuth(app) : getAuth(app);
-const messaging = !isNodeEnvironment ? getMessaging(app) : null;
 
-export { db, auth, messaging, app };
+export { db, auth, app };

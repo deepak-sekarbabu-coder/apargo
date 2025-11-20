@@ -24,14 +24,7 @@ export const getAllUsers = async (apartment?: string): Promise<User[]> => {
   return userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as User);
 };
 
-export const getUser = async (id: string): Promise<User | null> => {
-  const userDoc = database.collection<User>('users').doc(id);
-  const userSnapshot = await userDoc.get();
-  if (userSnapshot.exists) {
-    return { id: userSnapshot.id, ...userSnapshot.data() } as User;
-  }
-  return null;
-};
+
 
 export const getUserByEmail = async (email: string): Promise<User | null> => {
   const usersCollection = database.collection<User>('users');
@@ -59,10 +52,7 @@ export const addUser = async (user: Omit<User, 'id'>): Promise<User> => {
   return { id: docRef.id, ...cleanUser } as User;
 };
 
-export const approveUser = async (id: string): Promise<void> => {
-  const userDoc = database.collection<User>('users').doc(id);
-  await userDoc.update({ isApproved: true });
-};
+
 
 export const updateUser = async (id: string, user: Partial<User>): Promise<void> => {
   const userDoc = database.collection<User>('users').doc(id);
@@ -98,15 +88,15 @@ export const subscribeToAllUsers = async (
   const filters: Array<{
     field: string;
     operator:
-      | '=='
-      | '!='
-      | '<'
-      | '<='
-      | '>'
-      | '>='
-      | 'array-contains'
-      | 'in'
-      | 'array-contains-any';
+    | '=='
+    | '!='
+    | '<'
+    | '<='
+    | '>'
+    | '>='
+    | 'array-contains'
+    | 'in'
+    | 'array-contains-any';
     value: unknown;
   }> = [];
   if (apartment) {

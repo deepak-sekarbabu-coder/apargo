@@ -13,4 +13,4 @@ export function filterVendors(vendors: Vendor[], search: string, showInactive: b
   });
 }
 
-export default filterVendors;
+

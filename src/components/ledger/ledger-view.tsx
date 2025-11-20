@@ -355,4 +355,4 @@ export function LedgerView({ payments, users }: LedgerViewProps) {
   );
 }
 
-export default LedgerView;
+
