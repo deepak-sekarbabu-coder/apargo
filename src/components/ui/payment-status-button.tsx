@@ -17,7 +17,7 @@ export function PaymentStatusButton({
   isPaid,
   isLoading,
   labelPaid = 'Paid',
-  labelUnpaid = 'Unpaid',
+  labelUnpaid = 'Mark Paid',
   className,
   disabled,
   readOnly,
