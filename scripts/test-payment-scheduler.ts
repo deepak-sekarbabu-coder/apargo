@@ -15,10 +15,14 @@
  *   node scripts/test-payment-scheduler.js 2024-01 true  # Force generation
  */
 
-const https = require('https');
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
+import https from 'https';
+import http from 'http';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Get command line arguments
 const args = process.argv.slice(2);
@@ -28,13 +32,13 @@ const force = args[1] === 'true'; // Force generation if true
 // Load environment variables
 const envPath = path.resolve(__dirname, '../.env.local');
 if (fs.existsSync(envPath)) {
-  const envContent = fs.readFileSync(envPath, 'utf8');
-  envContent.split('\n').forEach(line => {
-    const match = line.match(/^([^=]+)=(.*)$/);
-    if (match) {
-      process.env[match[1]] = match[2].replace(/^"(.*)"$/, '$1'); // Remove quotes if present
-    }
-  });
+    const envContent = fs.readFileSync(envPath, 'utf8');
+    envContent.split('\n').forEach(line => {
+        const match = line.match(/^([^=]+)=(.*)$/);
+        if (match) {
+            process.env[match[1]] = match[2].replace(/^"(.*)"$/, '$1'); // Remove quotes if present
+        }
+    });
 }
 
 // Get the base URL from environment or default to localhost
@@ -43,9 +47,9 @@ const SCHEDULER_TOKEN = process.env.SCHEDULER_TOKEN;
 
 // Validate environment
 if (!SCHEDULER_TOKEN) {
-  console.error('❌ Error: SCHEDULER_TOKEN not found in environment variables');
-  console.error('Please set SCHEDULER_TOKEN in your .env.local file');
-  process.exit(1);
+    console.error('❌ Error: SCHEDULER_TOKEN not found in environment variables');
+    console.error('Please set SCHEDULER_TOKEN in your .env.local file');
+    process.exit(1);
 }
 
 // Determine if we're using HTTPS
@@ -59,21 +63,21 @@ const port = portString ? parseInt(portString) : isHttps ? 443 : 80;
 
 // Prepare request data
 const postData = JSON.stringify({
-  monthYear,
-  force,
+    monthYear,
+    force,
 });
 
 // Request options
-const options = {
-  hostname,
-  port,
-  path: '/api/payment-events/scheduler',
-  method: 'POST',
-  headers: {
-    'Content-Type': 'application/json',
-    'Content-Length': Buffer.byteLength(postData),
-    'x-scheduler-token': SCHEDULER_TOKEN,
-  },
+const options: http.RequestOptions = {
+    hostname,
+    port,
+    path: '/api/payment-events/scheduler',
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': Buffer.byteLength(postData),
+        'x-scheduler-token': SCHEDULER_TOKEN,
+    },
 };
 
 console.log(`🚀 Triggering payment events scheduler...`);
@@ -84,33 +88,33 @@ console.log('');
 
 // Make the request
 const req = client.request(options, res => {
-  let data = '';
+    let data = '';
 
-  res.on('data', chunk => {
-    data += chunk;
-  });
+    res.on('data', chunk => {
+        data += chunk;
+    });
 
-  res.on('end', () => {
-    try {
-      const result = JSON.parse(data);
+    res.on('end', () => {
+        try {
+            const result = JSON.parse(data);
 
-      if (res.statusCode >= 200 && res.statusCode < 300) {
-        console.log('✅ Scheduler executed successfully:');
-        console.log(JSON.stringify(result, null, 2));
-      } else {
-        console.error(`❌ Scheduler failed with status ${res.statusCode}:`);
-        console.error(JSON.stringify(result, null, 2));
-      }
-    } catch (parseError) {
-      console.error('❌ Failed to parse response:');
-      console.error(data);
-    }
-  });
+            if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
+                console.log('✅ Scheduler executed successfully:');
+                console.log(JSON.stringify(result, null, 2));
+            } else {
+                console.error(`❌ Scheduler failed with status ${res.statusCode}:`);
+                console.error(JSON.stringify(result, null, 2));
+            }
+        } catch (parseError) {
+            console.error('❌ Failed to parse response:');
+            console.error(data);
+        }
+    });
 });
 
 req.on('error', error => {
-  console.error('❌ Request failed:');
-  console.error(error.message);
+    console.error('❌ Request failed:');
+    console.error(error.message);
 });
 
 // Write data to request body
