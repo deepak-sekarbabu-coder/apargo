@@ -13,9 +13,10 @@
 - **(auth)**: Authentication routes
   - `login/`: Login page
 
-- **api/**: API routes for backend logic (server actions, data fetching, etc.)
+- **api/**: API routes for backend logic (data fetching, etc.)
   - Follows Next.js API route conventions
   - Subfolders for admin, expenses, payments, maintenance, notifications, etc.
+- **../actions/**: Server actions for mutations and business logic (e.g., `expense.ts`)
 
 ## Route Grouping
 
