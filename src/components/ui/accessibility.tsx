@@ -22,12 +22,7 @@ export function ScreenReaderAnnouncement({
 
   return (
     <>
-      <div
-        aria-live={priority}
-        aria-atomic="true"
-        className="sr-only"
-        role="status"
-      >
+      <div aria-live={priority} aria-atomic="true" className="sr-only" role="status">
         {announcement}
       </div>
       {children}
@@ -151,15 +146,9 @@ export function AccessibleField({
 
   return (
     <div className="space-y-2">
-      <label
-        htmlFor={id}
-        className="text-sm font-medium"
-        id={`${id}-label`}
-      >
+      <label htmlFor={id} className="text-sm font-medium" id={`${id}-label`}>
         {label}
-        {required && (
-          <span className="sr-only"> (required)</span>
-        )}
+        {required && <span className="sr-only"> (required)</span>}
         {required && (
           <span aria-hidden="true" className="text-destructive ml-1">
             *
@@ -168,10 +157,7 @@ export function AccessibleField({
       </label>
 
       {description && (
-        <p
-          id={descriptionId}
-          className="text-sm text-muted-foreground"
-        >
+        <p id={descriptionId} className="text-sm text-muted-foreground">
           {description}
         </p>
       )}
@@ -180,21 +166,16 @@ export function AccessibleField({
         {React.cloneElement(children as React.ReactElement, {
           id,
           'aria-labelledby': `${id}-label`,
-          'aria-describedby': [
-            description ? descriptionId : undefined,
-            error ? errorId : undefined,
-          ].filter(Boolean).join(' ') || undefined,
+          'aria-describedby':
+            [description ? descriptionId : undefined, error ? errorId : undefined]
+              .filter(Boolean)
+              .join(' ') || undefined,
           'aria-invalid': error ? 'true' : undefined,
         })}
       </div>
 
       {error && (
-        <p
-          id={errorId}
-          className="text-sm text-destructive"
-          role="alert"
-          aria-live="polite"
-        >
+        <p id={errorId} className="text-sm text-destructive" role="alert" aria-live="polite">
           {error}
         </p>
       )}

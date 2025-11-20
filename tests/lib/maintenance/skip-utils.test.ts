@@ -1,9 +1,9 @@
 // Test file for skip-related utility functions
+import { MaintenanceTask } from '@/lib/core/types';
 import {
   createRecurringTaskFromSkipped,
   shouldCreateRecurringTaskOnSkip,
 } from '@/lib/maintenance/maintenance-utils';
-import { MaintenanceTask } from '@/lib/core/types';
 
 describe('Skip Functionality Utility Functions', () => {
   const baseSkippedTask: MaintenanceTask = {

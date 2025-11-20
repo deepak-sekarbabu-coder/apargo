@@ -4,9 +4,9 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import * as React from 'react';
 
-import { addExpense, deleteExpense } from '@/lib/firestore/expenses';
 import log from '@/lib/core/logger';
 import type { Apartment, Category, Expense, User } from '@/lib/core/types';
+import { addExpense, deleteExpense } from '@/lib/firestore/expenses';
 
 import { useToast } from '@/hooks/use-toast';
 

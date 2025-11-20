@@ -46,42 +46,42 @@ export function PollResults({ poll, apartmentCount, user, onDeletePoll }: PollRe
         {totalVotes} of {apartmentCount} apartments voted
       </div>
       {onDeletePoll && user && (user.id === poll.createdBy || user.role === 'incharge') && (
-      <>
+        <>
           <div id="delete-poll-description" className="sr-only">
             This action will permanently delete the poll and all its votes. This cannot be undone.
           </div>
           <AlertDialog>
-        <AlertDialogTrigger asChild>
-        <button
-        className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
-          aria-label={`Delete poll: ${poll.question}`}
-            aria-describedby="delete-poll-description"
-            >
-              Delete Poll
-            </button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete{' '}
-                <strong>this poll</strong> and all its votes.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={async () => {
-                  await onDeletePoll(poll.id);
-                }}
-                className="bg-destructive hover:bg-destructive/90"
+            <AlertDialogTrigger asChild>
+              <button
+                className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                aria-label={`Delete poll: ${poll.question}`}
+                aria-describedby="delete-poll-description"
               >
                 Delete Poll
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete{' '}
+                  <strong>this poll</strong> and all its votes.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={async () => {
+                    await onDeletePoll(poll.id);
+                  }}
+                  className="bg-destructive hover:bg-destructive/90"
+                >
+                  Delete Poll
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
           </AlertDialog>
-            </>
+        </>
       )}
     </div>
   );

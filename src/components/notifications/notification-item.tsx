@@ -99,17 +99,17 @@ export function NotificationItem({ notification, onMarkAsRead }: NotificationIte
               </h3>
               <div className="flex items-center gap-1 flex-shrink-0">
                 <Badge
-                variant={!isRead ? 'default' : 'outline'}
-                className={`text-xs ${
-                !isRead
-                ? 'bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-900/70 dark:text-blue-200 dark:hover:bg-blue-900/50'
-                : ''
-                }`}
+                  variant={!isRead ? 'default' : 'outline'}
+                  className={`text-xs ${
+                    !isRead
+                      ? 'bg-blue-100 text-blue-800 hover:bg-blue-200 dark:bg-blue-900/70 dark:text-blue-200 dark:hover:bg-blue-900/50'
+                      : ''
+                  }`}
                 >
                   {getTypeLabel()}
                 </Badge>
                 {!isRead && (
-                <span className="h-2.5 w-2.5 rounded-full bg-blue-500 dark:bg-blue-400 animate-pulse"></span>
+                  <span className="h-2.5 w-2.5 rounded-full bg-blue-500 dark:bg-blue-400 animate-pulse"></span>
                 )}
               </div>
             </div>
@@ -138,15 +138,15 @@ export function NotificationItem({ notification, onMarkAsRead }: NotificationIte
               </span>
 
               {!isRead && (
-              <Button
-              variant="ghost"
-              size="sm"
-              className="h-7 gap-1 text-xs px-2"
-              onClick={handleMarkAsRead}
-              >
-              <Check className="h-3 w-3" />
-              <span className="hidden sm:inline">Read</span>
-              </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 gap-1 text-xs px-2"
+                  onClick={handleMarkAsRead}
+                >
+                  <Check className="h-3 w-3" />
+                  <span className="hidden sm:inline">Read</span>
+                </Button>
               )}
             </div>
           </div>

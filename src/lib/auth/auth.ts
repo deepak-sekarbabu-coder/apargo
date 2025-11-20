@@ -5,10 +5,10 @@ import * as React from 'react';
 
 import { cookies } from 'next/headers';
 
+import type { User } from '../core/types';
 import { app } from '../firebase/firebase';
 import { getFirebaseAdminApp } from '../firebase/firebase-admin';
 import { getUserByEmail } from '../firestore/users';
-import type { User } from '../core/types';
 
 export const auth = getAuth(app);
 

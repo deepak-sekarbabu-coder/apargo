@@ -6,8 +6,8 @@ import { LayoutDashboard, Store } from 'lucide-react';
 
 import React, { useCallback, useEffect, useState } from 'react';
 
-import { deleteVendor } from '@/lib/firestore/vendors';
 import { MaintenanceTask, Vendor } from '@/lib/core/types';
+import { deleteVendor } from '@/lib/firestore/vendors';
 
 import { MaintenanceTaskDialog } from '@/components/dialogs/maintenance-task-dialog';
 import { VendorDialog } from '@/components/dialogs/vendor-dialog';

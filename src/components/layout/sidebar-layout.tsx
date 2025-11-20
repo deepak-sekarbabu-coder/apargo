@@ -82,7 +82,10 @@ export function SidebarLayout({
             onNavigateHome={() => setView('dashboard')}
             isLoadingApartments={isLoadingApartments}
           />
-          <main id="main-content" className="flex-1 p-3 sm:p-4 lg:p-6 bg-background overflow-x-hidden scrollable-container">
+          <main
+            id="main-content"
+            className="flex-1 p-3 sm:p-4 lg:p-6 bg-background overflow-x-hidden scrollable-container"
+          >
             <div className="max-w-7xl mx-auto">{children}</div>
           </main>
         </div>

@@ -152,7 +152,9 @@ describe('useUserFilter', () => {
 
       const { result } = renderHook(() => useUserFilter(usersWithInvalidFields, 'valid'));
       expect(result.current).toHaveLength(2);
-      expect(result.current.map(u => u.name)).toEqual(expect.arrayContaining(['Valid User', 'Valid Name']));
+      expect(result.current.map(u => u.name)).toEqual(
+        expect.arrayContaining(['Valid User', 'Valid Name'])
+      );
     });
 
     it('should handle malformed user objects', () => {

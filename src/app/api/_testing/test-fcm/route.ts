@@ -3,9 +3,12 @@ import { getAuth } from 'firebase-admin/auth';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { sendPushNotificationToApartments, testFCMConfiguration } from '@/lib/notifications/fcm-admin';
 import { getFirebaseAdminApp } from '@/lib/firebase/firebase-admin';
 import { getUserByEmail } from '@/lib/firestore/users';
+import {
+  sendPushNotificationToApartments,
+  testFCMConfiguration,
+} from '@/lib/notifications/fcm-admin';
 
 async function verifySessionCookie(sessionCookie: string) {
   try {

@@ -7,8 +7,8 @@ import * as React from 'react';
 
 import { useRouter } from 'next/navigation';
 
-import { voteOnPoll } from '@/lib/firestore/polls';
 import { Poll } from '@/lib/core/types';
+import { voteOnPoll } from '@/lib/firestore/polls';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';

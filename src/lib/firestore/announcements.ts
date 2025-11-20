@@ -9,8 +9,8 @@ import {
   where,
 } from 'firebase/firestore';
 
-import { db } from '../firebase/firebase';
 import type { AnnouncementNotification } from '../core/types';
+import { db } from '../firebase/firebase';
 
 export const getActiveAnnouncements = async (): Promise<AnnouncementNotification[]> => {
   const notificationsCol = collection(db, 'notifications');

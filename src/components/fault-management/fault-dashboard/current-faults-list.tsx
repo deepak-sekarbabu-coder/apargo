@@ -6,8 +6,8 @@ import React, { useEffect, useState } from 'react';
 
 import Image from 'next/image';
 
-import { deleteFault, getFaults, updateFault } from '@/lib/firestore/faults';
 import type { Fault } from '@/lib/core/types';
+import { deleteFault, getFaults, updateFault } from '@/lib/firestore/faults';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

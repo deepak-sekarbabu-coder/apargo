@@ -1,9 +1,9 @@
 // Fallback authentication for when session cookies fail
 import { User as FirebaseUser } from 'firebase/auth';
 
+import type { User } from '../core/types';
 import { auth } from '../firebase/firebase';
 import { getUserByEmail } from '../firestore/users';
-import type { User } from '../core/types';
 
 export async function getCurrentUserFallback(): Promise<User | null> {
   return new Promise(resolve => {

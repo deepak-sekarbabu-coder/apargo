@@ -1,10 +1,8 @@
 #!/usr/bin/env node
-
 /**
  * Post-build cleanup script
  * Runs after Next.js build to optimize for deployment
  */
-
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';

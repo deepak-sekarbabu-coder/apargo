@@ -1,12 +1,12 @@
 import { useAuth } from '@/context/auth-context';
-import { CreditCard, BarChart3 } from 'lucide-react';
+import { format } from 'date-fns';
+import { BarChart3, CreditCard } from 'lucide-react';
 
 import * as React from 'react';
-import { format } from 'date-fns';
 
+import type { BalanceSheet, Payment, User } from '@/lib/core/types';
 import { addPayment, deletePayment, updatePayment } from '@/lib/firestore/payments';
 import { uploadImage } from '@/lib/storage/storage';
-import type { BalanceSheet, Payment, User } from '@/lib/core/types';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

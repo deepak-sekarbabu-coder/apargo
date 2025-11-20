@@ -2,11 +2,7 @@
 // Provides fallback strategies, error boundaries, and automatic recovery mechanisms
 import { createError, wrapError } from './factory';
 import { logger } from './logger';
-import type {
-  ApargoError,
-  ErrorContext,
-  RecoveryStrategy,
-} from './types';
+import type { ApargoError, ErrorContext, RecoveryStrategy } from './types';
 
 // Global recovery strategies registry
 const recoveryStrategies: RecoveryStrategy[] = [];
@@ -358,9 +354,9 @@ export async function executeBulk<T, R>(
     const chunkResults = await Promise.all(chunkPromises);
 
     for (const result of chunkResults) {
-    if (result.success) {
-    results.push(result.result!);
-    } else {
+      if (result.success) {
+        results.push(result.result!);
+      } else {
         failures.push({ item: result.item, error: result.error! });
 
         if (failFast || failures.length >= maxFailures) {

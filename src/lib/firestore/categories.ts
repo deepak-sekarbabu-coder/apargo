@@ -1,6 +1,6 @@
+import type { Category } from '../core/types';
 import { type QuerySnapshot, database } from '../database';
 import { removeUndefined } from './firestore-utils';
-import type { Category } from '../core/types';
 
 export const getCategories = async (): Promise<Category[]> => {
   const categoriesCollection = database.collection<Category>('categories');

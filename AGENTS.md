@@ -2,20 +2,20 @@
 
 ## Build & Test Commands
 
-| Command | Purpose |
-|---------|---------|
-| `pnpm install` | Install dependencies with pnpm |
-| `pnpm run dev` | Start dev server with Turbopack (<http://localhost:3000>) |
-| `pnpm run build` | Production build with post-build cleanup |
-| `pnpm run start` | Serve production build locally |
-| `pnpm test` | Run all Jest tests |
-| `pnpm test -- --watch` | Run tests in watch mode |
-| `pnpm test -- --coverage` | Run tests with coverage report (enforces >80% line coverage in CI) |
-| `pnpm test -- src/**/*.test.ts` | Run specific test file or pattern |
-| `pnpm run lint` | Run ESLint checks |
-| `pnpm run lint:fix` | Fix ESLint errors automatically |
-| `pnpm run typecheck` | Check TypeScript types (no emit) |
-| `pnpm run format` | Format code with Prettier |
+| Command                         | Purpose                                                            |
+| ------------------------------- | ------------------------------------------------------------------ |
+| `pnpm install`                  | Install dependencies with pnpm                                     |
+| `pnpm run dev`                  | Start dev server with Turbopack (<http://localhost:3000>)          |
+| `pnpm run build`                | Production build with post-build cleanup                           |
+| `pnpm run start`                | Serve production build locally                                     |
+| `pnpm test`                     | Run all Jest tests                                                 |
+| `pnpm test -- --watch`          | Run tests in watch mode                                            |
+| `pnpm test -- --coverage`       | Run tests with coverage report (enforces >80% line coverage in CI) |
+| `pnpm test -- src/**/*.test.ts` | Run specific test file or pattern                                  |
+| `pnpm run lint`                 | Run ESLint checks                                                  |
+| `pnpm run lint:fix`             | Fix ESLint errors automatically                                    |
+| `pnpm run typecheck`            | Check TypeScript types (no emit)                                   |
+| `pnpm run format`               | Format code with Prettier                                          |
 
 ## Architecture & Codebase Structure
 

@@ -2,9 +2,9 @@
  * Example implementations demonstrating how to extend the expense calculation system
  * using the Open/Closed Principle with the Strategy Pattern.
  */
+import type { Expense } from '../core/types';
 import type { ExpenseCalculationStrategy } from './expense-calculation-strategies';
 import { registerExpenseCalculationStrategy } from './expense-calculation-strategies';
-import type { Expense } from '../core/types';
 
 /**
  * Example: Maintenance Fee Expense Strategy
@@ -121,7 +121,14 @@ export const registerCustomExpenseStrategies = () => {
  * Here's how you would create a strategy for a specific business rule
  */
 export class CustomBusinessExpenseStrategy implements ExpenseCalculationStrategy {
-  constructor(private businessRules: { appliesTo: (expense: Expense) => boolean; calculate: (expense: Expense) => Record<string, { totalIncomeDelta: number; totalExpensesDelta: number }> }) {}
+  constructor(
+    private businessRules: {
+      appliesTo: (expense: Expense) => boolean;
+      calculate: (
+        expense: Expense
+      ) => Record<string, { totalIncomeDelta: number; totalExpensesDelta: number }>;
+    }
+  ) {}
 
   canHandle(expense: Expense): boolean {
     // Custom logic to determine if this strategy applies

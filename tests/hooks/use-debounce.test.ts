@@ -1,13 +1,12 @@
-jest.useFakeTimers();
-
 import { act, renderHook } from '@testing-library/react';
 
 import { DEBOUNCE_CONFIG } from '@/lib/utils';
 
 import { useDebounce, useDebouncedCallback } from '@/hooks/use-debounce';
 
-describe('useDebounce', () => {
+jest.useFakeTimers();
 
+describe('useDebounce', () => {
   afterEach(() => {
     jest.clearAllTimers();
     jest.clearAllMocks();
@@ -99,7 +98,6 @@ describe('useDebounce', () => {
   });
 
   describe('Debounce options', () => {
-
     it('should support trailing edge execution (default behavior)', () => {
       const { result, rerender } = renderHook(
         ({ value }: { value: string }) => useDebounce(value, 300, { trailing: true }),
@@ -197,7 +195,6 @@ describe('useDebounce', () => {
 });
 
 describe('useDebouncedCallback', () => {
-
   afterEach(() => {
     jest.clearAllTimers();
     jest.clearAllMocks();

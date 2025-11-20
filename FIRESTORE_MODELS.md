@@ -37,9 +37,9 @@ The primary entity representing a shared living space (house, flat, etc.).
 
 ```typescript
 type Apartment = {
-  id: string;                 // Firestore doc ID
-  name: string;               // Apartment name/address
-  members: string[];          // Array of User IDs
+  id: string; // Firestore doc ID
+  name: string; // Apartment name/address
+  members: string[]; // Array of User IDs
 };
 ```
 
@@ -60,15 +60,15 @@ Represents a member of an apartment with authentication and system roles.
 type User = {
   id: string;
   name: string;
-  avatar?: string;            // URL or data URI
+  avatar?: string; // URL or data URI
   email?: string;
   phone?: string;
-  role?: 'user' | 'admin' | 'incharge';  // System-level permissions
-  propertyRole?: 'tenant' | 'owner';     // Property relationship
-  fcmToken?: string;          // Firebase Cloud Messaging token for push notifications
-  apartment: string;          // Associated Apartment ID (required)
-  isApproved?: boolean;       // Admin approval status (default: false)
-  isSuspended?: boolean;      // Account suspension status
+  role?: 'user' | 'admin' | 'incharge'; // System-level permissions
+  propertyRole?: 'tenant' | 'owner'; // Property relationship
+  fcmToken?: string; // Firebase Cloud Messaging token for push notifications
+  apartment: string; // Associated Apartment ID (required)
+  isApproved?: boolean; // Admin approval status (default: false)
+  isSuspended?: boolean; // Account suspension status
 };
 ```
 
@@ -94,14 +94,14 @@ Defines expense categories and can be configured as automatic payment events.
 ```typescript
 type Category = {
   id: string;
-  name: string;               // e.g., 'Maintenance', 'Utilities'
-  icon: string;               // Icon identifier/emoji
-  noSplit?: boolean;          // If true, expenses aren't split among apartments
+  name: string; // e.g., 'Maintenance', 'Utilities'
+  icon: string; // Icon identifier/emoji
+  noSplit?: boolean; // If true, expenses aren't split among apartments
   // Payment Event Configuration
-  isPaymentEvent?: boolean;   // Marks this as auto-payment generator
-  monthlyAmount?: number;     // Monthly fee amount
-  dayOfMonth?: number;        // Day to generate (1-28, default: 1)
-  autoGenerate?: boolean;     // Enable/disable automatic generation
+  isPaymentEvent?: boolean; // Marks this as auto-payment generator
+  monthlyAmount?: number; // Monthly fee amount
+  dayOfMonth?: number; // Day to generate (1-28, default: 1)
+  autoGenerate?: boolean; // Enable/disable automatic generation
 };
 ```
 
@@ -123,15 +123,15 @@ Represents a shared expense between apartments.
 type Expense = {
   id: string;
   description: string;
-  amount: number;             // Total expense amount
-  date: string;               // ISO date string
-  paidByApartment: string;    // Apartment ID that paid
+  amount: number; // Total expense amount
+  date: string; // ISO date string
+  paidByApartment: string; // Apartment ID that paid
   owedByApartments: string[]; // Apartment IDs that owe a share
-  perApartmentShare: number;  // Amount each owing apartment owes
-  categoryId: string;         // Category ID
-  receipt?: string;           // Data URI for receipt image
+  perApartmentShare: number; // Amount each owing apartment owes
+  categoryId: string; // Category ID
+  receipt?: string; // Data URI for receipt image
   paidByApartments?: string[]; // Apartments that have paid their share back
-  paid?: boolean;             // Completion flag
+  paid?: boolean; // Completion flag
 };
 ```
 
@@ -160,19 +160,19 @@ Represents money transferred between apartments or payment of an expense share.
 ```typescript
 type Payment = {
   id: string;
-  payerId: string;            // User ID who paid
-  payeeId: string;            // User ID to receive payment
-  apartmentId?: string;       // Associated Apartment ID
-  category?: 'income' | 'expense';  // Income (received) or Expense (spent)
+  payerId: string; // User ID who paid
+  payeeId: string; // User ID to receive payment
+  apartmentId?: string; // Associated Apartment ID
+  category?: 'income' | 'expense'; // Income (received) or Expense (spent)
   amount: number;
-  expenseId?: string;         // Linked Expense (optional)
-  status: PaymentStatus;      // pending | approved | rejected | paid | failed | cancelled
-  createdAt: string;          // ISO date string
-  approvedBy?: string;        // Admin User ID who approved
-  approvedByName?: string;    // Admin name (cached)
-  receiptURL?: string;        // Uploaded receipt URL
-  monthYear: string;          // Format: YYYY-MM (for grouping)
-  reason?: string;            // Optional reason description
+  expenseId?: string; // Linked Expense (optional)
+  status: PaymentStatus; // pending | approved | rejected | paid | failed | cancelled
+  createdAt: string; // ISO date string
+  approvedBy?: string; // Admin User ID who approved
+  approvedByName?: string; // Admin name (cached)
+  receiptURL?: string; // Uploaded receipt URL
+  monthYear: string; // Format: YYYY-MM (for grouping)
+  reason?: string; // Optional reason description
 };
 ```
 
@@ -203,11 +203,11 @@ Monthly summary of financial activity for an apartment.
 ```typescript
 type BalanceSheet = {
   apartmentId: string;
-  monthYear: string;          // Format: YYYY-MM
-  openingBalance: number;     // Balance at month start
-  totalIncome: number;        // Total money received
-  totalExpenses: number;      // Total money spent
-  closingBalance: number;     // Balance at month end
+  monthYear: string; // Format: YYYY-MM
+  openingBalance: number; // Balance at month start
+  totalIncome: number; // Total money received
+  totalExpenses: number; // Total money spent
+  closingBalance: number; // Balance at month end
 };
 ```
 
@@ -235,10 +235,10 @@ Notifications use a **discriminated union** pattern with different structures fo
 ```typescript
 interface BaseNotification {
   id: string;
-  type: NotificationType;     // 'payment_request' | 'payment_received' | ... 
+  type: NotificationType; // 'payment_request' | 'payment_received' | ...
   title: string;
   message: string;
-  createdAt: string;          // ISO date string
+  createdAt: string; // ISO date string
   isRead?: boolean | { [apartmentId: string]: boolean };
   dueDate?: string;
   amount?: number;
@@ -264,8 +264,8 @@ interface PaymentNotification extends BaseNotification {
   paymentMethod?: PaymentMethodType;
   transactionId?: string;
   category?: string;
-  requestedBy?: string;       // User ID
-  paidAt?: string;            // ISO date
+  requestedBy?: string; // User ID
+  paidAt?: string; // ISO date
 }
 ```
 
@@ -280,12 +280,12 @@ For admin announcements to apartments.
 ```typescript
 interface AnnouncementNotification extends BaseNotification {
   type: 'announcement';
-  createdBy: string;          // Admin User ID (required)
-  isActive: boolean;          // Required for announcements
+  createdBy: string; // Admin User ID (required)
+  isActive: boolean; // Required for announcements
   priority: 'low' | 'medium' | 'high';
-  expiresAt?: string;         // ISO date
+  expiresAt?: string; // ISO date
   toApartmentId: string | string[];
-  isRead: { [apartmentId: string]: boolean };  // Object mapping (required for announcements)
+  isRead: { [apartmentId: string]: boolean }; // Object mapping (required for announcements)
   isDismissed?: boolean;
 }
 ```
@@ -335,11 +335,11 @@ Community voting/polling feature.
 type Poll = {
   id: string;
   question: string;
-  options: PollOption[];      // Array of { id, text }
-  createdBy: string;          // Admin User ID
-  createdAt: string;          // ISO date
-  expiresAt?: string;         // ISO date (optional expiration)
-  votes: { [apartmentId: string]: string };  // apartmentId -> selected optionId
+  options: PollOption[]; // Array of { id, text }
+  createdBy: string; // Admin User ID
+  createdAt: string; // ISO date
+  expiresAt?: string; // ISO date (optional expiration)
+  votes: { [apartmentId: string]: string }; // apartmentId -> selected optionId
   isActive: boolean;
 };
 
@@ -367,22 +367,22 @@ Reports and tracking of building faults/maintenance issues.
 ```typescript
 type Fault = {
   id: string;
-  images: string[];           // URLs or base64 encoded
-  location: string;           // Where the fault is located
-  description: string;        // Fault details
-  reportedBy: string;         // User ID who reported
-  reportedAt: string;         // ISO date string
-  severity: FaultSeverity;    // 'critical' | 'warning' | 'low'
-  status: FaultStatus;        // 'open' | 'in_progress' | 'resolved' | 'closed'
-  assignedTo?: string;        // User ID assigned to fix (optional)
+  images: string[]; // URLs or base64 encoded
+  location: string; // Where the fault is located
+  description: string; // Fault details
+  reportedBy: string; // User ID who reported
+  reportedAt: string; // ISO date string
+  severity: FaultSeverity; // 'critical' | 'warning' | 'low'
+  status: FaultStatus; // 'open' | 'in_progress' | 'resolved' | 'closed'
+  assignedTo?: string; // User ID assigned to fix (optional)
   estimatedCost?: number;
   actualCost?: number;
-  priority: number;           // 1-5 scale
-  fixed: boolean;             // Legacy field (backward compatibility)
-  fixedAt?: string;           // ISO date when marked fixed
-  resolvedAt?: string;        // ISO date when resolved
-  notes?: string;             // Updates/progress notes
-  updatedAt?: string;         // ISO date of last update
+  priority: number; // 1-5 scale
+  fixed: boolean; // Legacy field (backward compatibility)
+  fixedAt?: string; // ISO date when marked fixed
+  resolvedAt?: string; // ISO date when resolved
+  notes?: string; // Updates/progress notes
+  updatedAt?: string; // ISO date of last update
 };
 ```
 
@@ -413,9 +413,9 @@ type Announcement = {
   id: string;
   title: string;
   message: string;
-  createdBy: string;          // Admin User ID
-  createdAt: string;          // ISO date
-  expiresAt?: string;         // ISO date
+  createdBy: string; // Admin User ID
+  createdAt: string; // ISO date
+  expiresAt?: string; // ISO date
   isActive: boolean;
   priority: 'low' | 'medium' | 'high';
 };
@@ -435,16 +435,16 @@ Third-party service providers for maintenance.
 type Vendor = {
   id: string;
   name: string;
-  serviceType: string;        // e.g., 'elevator', 'plumbing', 'electrical'
+  serviceType: string; // e.g., 'elevator', 'plumbing', 'electrical'
   phone?: string;
   email?: string;
   address?: string;
-  rating?: number;            // 1-5 star rating
+  rating?: number; // 1-5 star rating
   notes?: string;
-  isActive: boolean;          // Can be deactivated
-  lastUsedAt?: string;        // ISO date of last usage
-  createdAt: string;          // ISO date
-  updatedAt?: string;         // ISO date
+  isActive: boolean; // Can be deactivated
+  lastUsedAt?: string; // ISO date of last usage
+  createdAt: string; // ISO date
+  updatedAt?: string; // ISO date
 };
 ```
 
@@ -465,21 +465,21 @@ type MaintenanceTask = {
   id: string;
   title: string;
   description?: string;
-  category: string;           // 'elevator', 'water_tank', 'generator', 'common_area', 'other'
-  vendorId?: string;          // Linked Vendor ID (optional)
-  scheduledDate: string;      // ISO date (planned date)
-  dueDate?: string;           // Optional due date if different
-  completedDate?: string;     // ISO date when completed
-  skippedDate?: string;       // ISO date if skipped
-  status: MaintenanceTaskStatus;  // 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'overdue' | 'skipped'
+  category: string; // 'elevator', 'water_tank', 'generator', 'common_area', 'other'
+  vendorId?: string; // Linked Vendor ID (optional)
+  scheduledDate: string; // ISO date (planned date)
+  dueDate?: string; // Optional due date if different
+  completedDate?: string; // ISO date when completed
+  skippedDate?: string; // ISO date if skipped
+  status: MaintenanceTaskStatus; // 'scheduled' | 'in_progress' | 'completed' | 'cancelled' | 'overdue' | 'skipped'
   costEstimate?: number;
   actualCost?: number;
-  attachments?: string[];     // File metadata IDs or storage URLs
+  attachments?: string[]; // File metadata IDs or storage URLs
   notes?: string;
   recurrence?: 'monthly' | 'quarterly' | 'semi_annual' | 'annual' | 'none';
-  createdBy: string;          // User ID who created
-  createdAt: string;          // ISO date
-  updatedAt?: string;         // ISO date
+  createdBy: string; // User ID who created
+  createdAt: string; // ISO date
+  updatedAt?: string; // ISO date
 };
 ```
 
@@ -502,13 +502,13 @@ Annual budget allocation for maintenance.
 ```typescript
 type MaintenanceBudget = {
   id: string;
-  year: number;               // Budget year (e.g., 2024)
-  totalBudget: number;        // Annual allocated amount
-  allocatedByCategory: { [category: string]: number };  // Planned allocation per category
-  spentByCategory: { [category: string]: number };      // Actual spent per category
-  totalSpent: number;         // Derived: sum of spentByCategory
-  createdAt: string;          // ISO date
-  updatedAt?: string;         // ISO date
+  year: number; // Budget year (e.g., 2024)
+  totalBudget: number; // Annual allocated amount
+  allocatedByCategory: { [category: string]: number }; // Planned allocation per category
+  spentByCategory: { [category: string]: number }; // Actual spent per category
+  totalSpent: number; // Derived: sum of spentByCategory
+  createdAt: string; // ISO date
+  updatedAt?: string; // ISO date
 };
 ```
 
@@ -529,17 +529,17 @@ Metadata for files stored in Firebase Storage.
 ```typescript
 type FileMetadata = {
   id: string;
-  originalName: string;       // Original filename from upload
-  fileName: string;           // Stored filename with timestamp
-  storagePath: string;        // Full path in Firebase Storage
-  downloadURL: string;        // Public download URL
-  fileSize: number;           // in bytes
+  originalName: string; // Original filename from upload
+  fileName: string; // Stored filename with timestamp
+  storagePath: string; // Full path in Firebase Storage
+  downloadURL: string; // Public download URL
+  fileSize: number; // in bytes
   mimeType: string;
-  uploadedBy: string;         // User ID
-  uploadedAt: string;         // ISO date string
+  uploadedBy: string; // User ID
+  uploadedAt: string; // ISO date string
   category: 'receipt' | 'fault' | 'avatar' | 'announcement' | 'maintenance';
-  relatedId?: string;         // Related document ID (expense/fault/user)
-  apartmentId?: string;       // Associated apartment
+  relatedId?: string; // Related document ID (expense/fault/user)
+  apartmentId?: string; // Associated apartment
 };
 ```
 
@@ -579,14 +579,14 @@ type FileUploadProgress = {
 
 type StorageStats = {
   totalFiles: number;
-  totalSize: number;         // in bytes
+  totalSize: number; // in bytes
   categoryCounts: { [category: string]: number };
-  oldFileCount: number;      // files older than 3 months
-  oldFileSize: number;       // total size of old files in bytes
+  oldFileCount: number; // files older than 3 months
+  oldFileSize: number; // total size of old files in bytes
 };
 
 type StorageConfig = {
-  maxFileSize: number;       // e.g., 2MB in bytes
+  maxFileSize: number; // e.g., 2MB in bytes
   allowedMimeTypes: string[];
   bucket: string;
   baseUploadPath: string;
@@ -722,12 +722,12 @@ type PaymentStatus = 'pending' | 'approved' | 'rejected' | 'paid' | 'failed' | '
 
 ```typescript
 type NotificationType =
-  | 'payment_request'   // When payment is requested
-  | 'payment_received'  // When payment is received
+  | 'payment_request' // When payment is requested
+  | 'payment_received' // When payment is received
   | 'payment_confirmed' // When payment is confirmed by admin
-  | 'reminder'          // Payment due reminder
-  | 'announcement'      // Admin announcement
-  | 'poll';             // Community poll
+  | 'reminder' // Payment due reminder
+  | 'announcement' // Admin announcement
+  | 'poll'; // Community poll
 ```
 
 ---
@@ -735,13 +735,7 @@ type NotificationType =
 ### PaymentMethodType
 
 ```typescript
-type PaymentMethodType =
-  | 'googlepay'
-  | 'phonepay'
-  | 'upi'
-  | 'card'
-  | 'cash'
-  | 'bank_transfer';
+type PaymentMethodType = 'googlepay' | 'phonepay' | 'upi' | 'card' | 'cash' | 'bank_transfer';
 ```
 
 ---
@@ -798,34 +792,34 @@ type View =
 #### Apartments
 
 ```typescript
-getApartments()              // Get all apartments user has access to
-subscribeToApartments()      // Real-time listener
+getApartments(); // Get all apartments user has access to
+subscribeToApartments(); // Real-time listener
 ```
 
 #### Users
 
 ```typescript
-getUsers(apartmentId)        // Get apartment members
-getAllUsers()                // Get all system users
-getUser(userId)              // Get specific user
-getUserByEmail(email)        // Look up by email
-subscribeToUsers()           // Real-time listener
+getUsers(apartmentId); // Get apartment members
+getAllUsers(); // Get all system users
+getUser(userId); // Get specific user
+getUserByEmail(email); // Look up by email
+subscribeToUsers(); // Real-time listener
 ```
 
 #### Categories
 
 ```typescript
-getCategories(apartmentId)
-subscribeToCategories(apartmentId)
+getCategories(apartmentId);
+subscribeToCategories(apartmentId);
 // PaymentEvent categories auto-generate payments monthly
 ```
 
 #### Expenses
 
 ```typescript
-getExpenses(apartmentId)                      // All expenses
-subscribeToExpenses(apartmentId)              // Real-time
-subscribeToRelevantExpenses(apartmentId)      // Filter by ownership/liability
+getExpenses(apartmentId); // All expenses
+subscribeToExpenses(apartmentId); // Real-time
+subscribeToRelevantExpenses(apartmentId); // Filter by ownership/liability
 
 // Expense queries are typically grouped by:
 // - Date range
@@ -836,10 +830,10 @@ subscribeToRelevantExpenses(apartmentId)      // Filter by ownership/liability
 #### Payments
 
 ```typescript
-getPayments(apartmentId)
-subscribeToPayments(apartmentId)
-generatePaymentEvents(categoryId, monthYear)  // Auto-generates from PaymentEvent categories
-generateAllPaymentEvents(monthYear)           // Generate for all categories
+getPayments(apartmentId);
+subscribeToPayments(apartmentId);
+generatePaymentEvents(categoryId, monthYear); // Auto-generates from PaymentEvent categories
+generateAllPaymentEvents(monthYear); // Generate for all categories
 
 // Payment queries typically filtered by:
 // - Status (pending, approved, paid)
@@ -850,8 +844,8 @@ generateAllPaymentEvents(monthYear)           // Generate for all categories
 #### Balance Sheets
 
 ```typescript
-getBalanceSheets(apartmentId)
-subscribeToBalanceSheets(apartmentId)
+getBalanceSheets(apartmentId);
+subscribeToBalanceSheets(apartmentId);
 
 // Calculations:
 // totalIncome = sum of Payment records where category='income'
@@ -862,9 +856,9 @@ subscribeToBalanceSheets(apartmentId)
 #### Notifications
 
 ```typescript
-getActiveAnnouncements(apartmentId)
-listenToActiveAnnouncements(apartmentId)
-deleteAnnouncement(announcementId)
+getActiveAnnouncements(apartmentId);
+listenToActiveAnnouncements(apartmentId);
+deleteAnnouncement(announcementId);
 
 // Types are discriminated by 'type' field:
 // - payment_*: Payment-related
@@ -876,11 +870,11 @@ deleteAnnouncement(announcementId)
 #### Polls
 
 ```typescript
-getPolls(apartmentId)
-listenToPolls(apartmentId)
-voteOnPoll(pollId, apartmentId, optionId)
-getPollResults(pollId)
-closePoll(pollId)
+getPolls(apartmentId);
+listenToPolls(apartmentId);
+voteOnPoll(pollId, apartmentId, optionId);
+getPollResults(pollId);
+closePoll(pollId);
 
 // Votes stored as:
 // votes = { [apartmentId]: optionId }
@@ -889,7 +883,7 @@ closePoll(pollId)
 #### Faults
 
 ```typescript
-getFaults(apartmentId)
+getFaults(apartmentId);
 // Filters can be:
 // - status (open, in_progress, resolved, closed)
 // - severity (critical, warning, low)
@@ -901,28 +895,28 @@ getFaults(apartmentId)
 
 ```typescript
 // Tasks
-getMaintenanceTasks(apartmentId)
-getUpcomingMaintenanceTasks(apartmentId)
-getCompletedMaintenanceTasks(apartmentId)
-subscribeToMaintenanceTasks(apartmentId)
+getMaintenanceTasks(apartmentId);
+getUpcomingMaintenanceTasks(apartmentId);
+getCompletedMaintenanceTasks(apartmentId);
+subscribeToMaintenanceTasks(apartmentId);
 
 // Budgets
-getMaintenanceBudget(apartmentId, year)
-subscribeToMaintenanceBudget(apartmentId, year)
+getMaintenanceBudget(apartmentId, year);
+subscribeToMaintenanceBudget(apartmentId, year);
 
 // Vendors
-getVendors(apartmentId)
-subscribeToVendors(apartmentId)
+getVendors(apartmentId);
+subscribeToVendors(apartmentId);
 ```
 
 #### Files
 
 ```typescript
-getFileMetadata(apartmentId, fileId)
-getFileMetadataByCategory(apartmentId, category)
-getFileMetadataByUploader(apartmentId, userId)
-getFileMetadataByAge(apartmentId, daysOld)
-subscribeToFileMetadata(apartmentId)
+getFileMetadata(apartmentId, fileId);
+getFileMetadataByCategory(apartmentId, category);
+getFileMetadataByUploader(apartmentId, userId);
+getFileMetadataByAge(apartmentId, daysOld);
+subscribeToFileMetadata(apartmentId);
 ```
 
 ---

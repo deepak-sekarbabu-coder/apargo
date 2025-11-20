@@ -148,21 +148,29 @@ export function AdminPaymentEventsTab({ payments, users, categories }: AdminPaym
               <p className="text-sm text-blue-700 dark:text-blue-300">Active payment events</p>
             </div>
             <div className="bg-green-50 dark:bg-green-950/30 p-4 rounded-lg">
-              <h4 className="font-medium text-green-900 dark:text-green-100">Configured Categories</h4>
+              <h4 className="font-medium text-green-900 dark:text-green-100">
+                Configured Categories
+              </h4>
               <p className="text-2xl font-bold text-green-600 dark:text-green-400">
                 {categories.filter(cat => cat.isPaymentEvent && cat.autoGenerate).length}
               </p>
-              <p className="text-sm text-green-700 dark:text-green-300">Auto-generating payment events</p>
+              <p className="text-sm text-green-700 dark:text-green-300">
+                Auto-generating payment events
+              </p>
             </div>
             <div className="bg-orange-50 dark:bg-orange-950/30 p-4 rounded-lg">
-              <h4 className="font-medium text-orange-900 dark:text-orange-100">Total Monthly Amount</h4>
+              <h4 className="font-medium text-orange-900 dark:text-orange-100">
+                Total Monthly Amount
+              </h4>
               <p className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                 ₹
                 {categories
                   .filter(cat => cat.isPaymentEvent && cat.autoGenerate && cat.monthlyAmount)
                   .reduce((sum, cat) => sum + (cat.monthlyAmount || 0), 0)}
               </p>
-              <p className="text-sm text-orange-700 dark:text-orange-300">Per apartment per month</p>
+              <p className="text-sm text-orange-700 dark:text-orange-300">
+                Per apartment per month
+              </p>
             </div>
           </div>
         </CardContent>

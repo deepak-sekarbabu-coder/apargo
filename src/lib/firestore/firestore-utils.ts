@@ -1,5 +1,5 @@
-import { expenseCalculationRegistry } from '../expense-management/expense-calculation-strategies';
 import type { Expense } from '../core/types';
+import { expenseCalculationRegistry } from '../expense-management/expense-calculation-strategies';
 
 // Helper: derive monthYear (YYYY-MM) from ISO date or now
 export const getMonthYearFromDate = (isoDate?: string) => {

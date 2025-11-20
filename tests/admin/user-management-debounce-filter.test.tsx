@@ -143,7 +143,7 @@ describe('User Management Search Filter Integration', () => {
       // Simulate rapid typing
       const searchTerms = ['j', 'jo', 'joh', 'john'];
 
-      searchTerms.forEach((term) => {
+      searchTerms.forEach(term => {
         fireEvent.change(searchInput, { target: { value: term } });
 
         // Advance time less than debounce delay to simulate rapid typing

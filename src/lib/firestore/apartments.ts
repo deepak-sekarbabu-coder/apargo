@@ -1,5 +1,5 @@
-import { type QuerySnapshot, database } from '../database';
 import type { Apartment } from '../core/types';
+import { type QuerySnapshot, database } from '../database';
 
 export const getApartments = async (): Promise<Apartment[]> => {
   // Only fetch needed fields for dashboard

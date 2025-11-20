@@ -118,8 +118,8 @@ userActionRegistry.register({
     title: 'Approve User?',
     description: (user: User) => (
       <>
-        This will approve <strong>{user.name || 'this user'}</strong>&apos;s application and grant them
-        access to the system.
+        This will approve <strong>{user.name || 'this user'}</strong>&apos;s application and grant
+        them access to the system.
       </>
     ),
     actionLabel: 'Approve User',
@@ -143,8 +143,8 @@ userActionRegistry.register({
     title: 'Reject Application?',
     description: (user: User) => (
       <>
-        This will permanently reject <strong>{user.name || 'this user'}</strong>&apos;s application and
-        remove their data.
+        This will permanently reject <strong>{user.name || 'this user'}</strong>&apos;s application
+        and remove their data.
       </>
     ),
     actionLabel: 'Reject Application',
@@ -184,8 +184,8 @@ userActionRegistry.register({
     title: 'Delete User?',
     description: (user: User) => (
       <>
-        This will permanently delete <strong>{user.name || 'this user'}</strong>&apos;s account and all
-        associated data.
+        This will permanently delete <strong>{user.name || 'this user'}</strong>&apos;s account and
+        all associated data.
       </>
     ),
     actionLabel: 'Delete User',
@@ -211,8 +211,8 @@ export const createSuspendAction = (
     title: 'Suspend User?',
     description: (user: User) => (
       <>
-        This will temporarily suspend <strong>{user.name || 'this user'}</strong>&apos;s access to the
-        system.
+        This will temporarily suspend <strong>{user.name || 'this user'}</strong>&apos;s access to
+        the system.
       </>
     ),
     actionLabel: 'Suspend User',

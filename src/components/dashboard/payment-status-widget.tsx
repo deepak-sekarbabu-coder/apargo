@@ -55,7 +55,7 @@ export function PaymentStatusWidget({
 
   const handleMarkAsPaid = async (paymentId: string) => {
     try {
-      const response = await fetch(`/api/payments/${paymentId}`, {
+      const response = await fetch(`/api/core/payments/${paymentId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

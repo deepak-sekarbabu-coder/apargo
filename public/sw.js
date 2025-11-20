@@ -5,8 +5,6 @@ const DYNAMIC_CACHE = `apargo-dynamic-${CACHE_VERSION}`;
 const API_CACHE = `apargo-api-${CACHE_VERSION}`;
 const IMAGE_CACHE = `apargo-images-${CACHE_VERSION}`;
 
-
-
 // Enhanced static assets to cache
 const STATIC_ASSETS = [
   '/',
@@ -128,7 +126,7 @@ async function handleNavigationRequest(request) {
     }
 
     return response;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_err) {
     // Fallback to cache, then to offline page
     const cachedResponse = await caches.match(request);
@@ -156,7 +154,7 @@ async function handleImageRequest(request) {
       cache.put(request, response.clone());
     }
     return response;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_err) {
     // Return placeholder image or empty response
     return new Response('', { status: 404 });
@@ -174,7 +172,7 @@ async function handleAPIRequest(request) {
     }
 
     return response;
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_err) {
     // Fallback to cache
     const cachedResponse = await caches.match(request);
@@ -388,7 +386,7 @@ async function getOfflineData() {
     const offlineKey = 'offline-data';
     const response = await cache.match(offlineKey);
     return response ? await response.json() : { expenses: [], payments: [] };
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
   } catch (_err) {
     return { expenses: [], payments: [] };
   }

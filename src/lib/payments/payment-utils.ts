@@ -1,7 +1,7 @@
 import { addDoc, collection } from 'firebase/firestore';
 
-import { db } from '../firebase/firebase';
 import type { Apartment, Category, PaymentNotification } from '../core/types';
+import { db } from '../firebase/firebase';
 
 export interface PaymentDistribution {
   totalAmount: number; // Amount owed by other apartments (excluding paying apartment's share)

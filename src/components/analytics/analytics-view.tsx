@@ -18,7 +18,6 @@ import {
   Pie,
   PieChart,
   Tooltip as RechartsTooltip,
-
   XAxis,
   YAxis,
 } from 'recharts';
@@ -470,7 +469,12 @@ export function AnalyticsView({
                       }}
                       className="h-[250px] sm:h-[300px] lg:h-[350px] w-full min-w-[280px] max-w-full overflow-x-auto"
                     >
-                      <AreaChart data={analyticsData.monthlySpending} accessibilityLayer width={800} height={350}>
+                      <AreaChart
+                        data={analyticsData.monthlySpending}
+                        accessibilityLayer
+                        width={800}
+                        height={350}
+                      >
                         <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
                         <XAxis
                           dataKey="name"

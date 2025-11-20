@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { useEffect, useRef, useState } from 'react';
 
+import type { Apartment, BalanceSheet, Category, Expense, Payment, User } from '@/lib/core/types';
 import { getApartments } from '@/lib/firestore/apartments';
 import { subscribeToCategories } from '@/lib/firestore/categories';
 import {
@@ -13,7 +14,6 @@ import {
 import { subscribeToPayments } from '@/lib/firestore/payments';
 import { subscribeToAllUsers, subscribeToUsers } from '@/lib/firestore/users';
 import { requestNotificationPermission } from '@/lib/notifications/push-notifications';
-import type { Apartment, BalanceSheet, Category, Expense, Payment, User } from '@/lib/core/types';
 
 interface Subscription {
   unsubscribe: () => void;
@@ -38,7 +38,10 @@ interface SubscriptionHandlers {
   onBalanceSheets: (balanceSheets: BalanceSheet[]) => void;
 }
 
-function useDataSubscriptionManager(user: User | null, queryClient: ReturnType<typeof useQueryClient>) {
+function useDataSubscriptionManager(
+  user: User | null,
+  queryClient: ReturnType<typeof useQueryClient>
+) {
   const [dataStreams, setDataStreams] = useState<DataStreams>({
     apartments: [],
     categories: [],
@@ -124,13 +127,13 @@ function useDataSubscriptionManager(user: User | null, queryClient: ReturnType<t
         subscribeToPayments(handlers.onPayments),
         subscribeToBalanceSheets(handlers.onBalanceSheets),
       ])
-      .then((subs: Subscription[]) => {
-        unsubscribes.push(
-          () => subs[0].unsubscribe(),
-          () => subs[1].unsubscribe(),
-          () => subs[2].unsubscribe(),
-          () => subs[3].unsubscribe()
-        );
+        .then((subs: Subscription[]) => {
+          unsubscribes.push(
+            () => subs[0].unsubscribe(),
+            () => subs[1].unsubscribe(),
+            () => subs[2].unsubscribe(),
+            () => subs[3].unsubscribe()
+          );
         })
         .catch(err => {
           console.error('Error setting up admin subscriptions:', err);
@@ -193,8 +196,6 @@ function useApartmentSetupDialog(user: User | null) {
 export function useApargoAppData() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
-
-
 
   // Use simplified subscription manager
   const dataStreams = useDataSubscriptionManager(user, queryClient);

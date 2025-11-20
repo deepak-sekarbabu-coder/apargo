@@ -2,8 +2,8 @@
 
 import { AlertTriangle } from 'lucide-react';
 
-import { calculateTotalOutstanding } from '@/lib/expense-management/expense-utils';
 import type { Expense } from '@/lib/core/types';
+import { calculateTotalOutstanding } from '@/lib/expense-management/expense-utils';
 
 import { Card, CardContent } from '@/components/ui/card';
 
@@ -20,10 +20,10 @@ export function OutstandingBalance({ expenses, currentUserApartment }: Outstandi
   if (totalOutstanding <= 0) return null;
 
   return (
-  <Card
-  className="border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20"
-  suppressHydrationWarning
-    role="alert"
+    <Card
+      className="border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20"
+      suppressHydrationWarning
+      role="alert"
       aria-live="polite"
       aria-label={`Outstanding balance alert: ${totalOutstanding.toFixed(2)} rupees owed`}
     >

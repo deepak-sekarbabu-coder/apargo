@@ -4,7 +4,6 @@ import * as React from 'react';
 
 import dynamic from 'next/dynamic';
 
-import type { ApartmentBalance } from '@/lib/expense-management/balance-calculation';
 import type {
   Apartment,
   BalanceSheet,
@@ -15,31 +14,29 @@ import type {
   User,
   View,
 } from '@/lib/core/types';
+import type { ApartmentBalance } from '@/lib/expense-management/balance-calculation';
 
 import { CommunityView } from '@/components/community/community-view';
 import { DashboardView } from '@/components/dashboard/dashboard-view';
-import { ExpenseAnalyticsView } from '@/components/expense-management/analytics/expense-analytics-view';
 import { ExpensesList } from '@/components/expense-management/all-expenses/expenses-list';
+import { ExpenseAnalyticsView } from '@/components/expense-management/analytics/expense-analytics-view';
 import { FaultView } from '@/components/fault-management/fault-view';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 
 import { useExpenseFilters } from '@/hooks/use-expense-filters';
 
-const LedgerView = dynamic(
-  () => import('@/components/ledger/ledger-view'),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading ledger view...</p>
-        </div>
+const LedgerView = dynamic(() => import('@/components/ledger/ledger-view'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+        <p className="text-muted-foreground">Loading ledger view...</p>
       </div>
-    )
-  }
-);
+    </div>
+  ),
+});
 
 const AdminView = dynamic(() => import('@/components/admin/admin-view').then(mod => mod.default), {
   ssr: false,
@@ -165,7 +162,9 @@ export function MainContent({
   const currentUserApartment = user?.apartment;
 
   const ExpensesListComponent = (
-    props: Partial<import('@/components/expense-management/all-expenses/expenses-list').ExpensesListProps>
+    props: Partial<
+      import('@/components/expense-management/all-expenses/expenses-list').ExpensesListProps
+    >
   ) => (
     <ExpensesList
       {...props}

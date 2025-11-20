@@ -6,7 +6,7 @@ export interface CreateAnnouncementData {
 }
 
 export const createAnnouncement = async (data: CreateAnnouncementData) => {
-  const response = await fetch(`${window.location.origin}/api/announcements`, {
+  const response = await fetch(`${window.location.origin}/api/core/announcements`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

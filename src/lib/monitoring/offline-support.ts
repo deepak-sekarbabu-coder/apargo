@@ -83,7 +83,10 @@ class OfflineSupportManager {
   }
 
   // Public methods for app integration
-  public async addOfflineAction(type: 'expense' | 'payment', data: Expense | Payment): Promise<void> {
+  public async addOfflineAction(
+    type: 'expense' | 'payment',
+    data: Expense | Payment
+  ): Promise<void> {
     const action: OfflineAction = {
       id: `${type}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       type,
@@ -110,7 +113,7 @@ class OfflineSupportManager {
     try {
       this.syncInProgress = true;
 
-      const endpoint = action.type === 'expense' ? '/api/expenses' : '/api/payments';
+      const endpoint = action.type === 'expense' ? '/api/core/expenses' : '/api/core/payments';
       const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
@@ -197,7 +200,11 @@ class OfflineSupportManager {
     this.notifyStatusChange();
   }
 
-  public async exportOfflineData(): Promise<{ pendingActions: OfflineAction[]; exportTime: string; version: string }> {
+  public async exportOfflineData(): Promise<{
+    pendingActions: OfflineAction[];
+    exportTime: string;
+    version: string;
+  }> {
     return {
       pendingActions: this.pendingActions,
       exportTime: new Date().toISOString(),

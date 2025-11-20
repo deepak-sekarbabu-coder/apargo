@@ -150,8 +150,8 @@ class ErrorLogger {
   }
 
   /**
-  * Log debug information
-  */
+   * Log debug information
+   */
   debug(message: string, context: Partial<ErrorContext> = {}): void {
     if (this.config.enableConsoleLogging && log.getLevel() <= log.levels.DEBUG) {
       log.debug(message, context);

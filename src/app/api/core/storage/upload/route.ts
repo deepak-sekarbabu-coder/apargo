@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { storageService } from '@/lib/storage/storage-enhanced';
 import { FileMetadata } from '@/lib/core/types';
+import { storageService } from '@/lib/storage/storage-enhanced';
 
 // POST /api/storage/upload - Enhanced file upload with metadata
 export async function POST(request: NextRequest) {

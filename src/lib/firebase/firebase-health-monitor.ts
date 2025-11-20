@@ -320,9 +320,31 @@ export const diagnostics: {
     }
 
     const connection =
-      (navigator as { connection?: { type?: string; effectiveType?: string; downlink?: number; rtt?: number } }).connection ||
-      (navigator as { mozConnection?: { type?: string; effectiveType?: string; downlink?: number; rtt?: number } }).mozConnection ||
-      (navigator as { webkitConnection?: { type?: string; effectiveType?: string; downlink?: number; rtt?: number } }).webkitConnection;
+      (
+        navigator as {
+          connection?: { type?: string; effectiveType?: string; downlink?: number; rtt?: number };
+        }
+      ).connection ||
+      (
+        navigator as {
+          mozConnection?: {
+            type?: string;
+            effectiveType?: string;
+            downlink?: number;
+            rtt?: number;
+          };
+        }
+      ).mozConnection ||
+      (
+        navigator as {
+          webkitConnection?: {
+            type?: string;
+            effectiveType?: string;
+            downlink?: number;
+            rtt?: number;
+          };
+        }
+      ).webkitConnection;
 
     return {
       type: connection?.type || 'unknown',

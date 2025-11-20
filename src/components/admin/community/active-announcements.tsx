@@ -2,8 +2,8 @@
 
 import * as React from 'react';
 
-import { deleteAnnouncement, listenToActiveAnnouncements } from '@/lib/firestore/announcements';
 import { AnnouncementNotification } from '@/lib/core/types';
+import { deleteAnnouncement, listenToActiveAnnouncements } from '@/lib/firestore/announcements';
 
 import { AnnouncementCard } from './announcement-card';
 import { AnnouncementsEmpty } from './announcements-empty';

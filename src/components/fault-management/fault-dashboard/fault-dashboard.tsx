@@ -222,21 +222,27 @@ export function FaultDashboard({
                 <div className="w-3 h-3 bg-red-500 rounded-full flex-shrink-0" />
                 <span className="text-sm font-medium">Critical</span>
               </div>
-              <Badge variant="secondary" className="ml-auto">{stats.critical}</Badge>
+              <Badge variant="secondary" className="ml-auto">
+                {stats.critical}
+              </Badge>
             </div>
             <div className="flex items-center justify-between sm:justify-start space-x-2 p-3 sm:p-0 bg-yellow-50 dark:bg-yellow-950/30 sm:bg-transparent sm:dark:bg-transparent rounded-lg sm:rounded-none">
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-yellow-500 rounded-full flex-shrink-0" />
                 <span className="text-sm font-medium">Warning</span>
               </div>
-              <Badge variant="secondary" className="ml-auto">{stats.warning}</Badge>
+              <Badge variant="secondary" className="ml-auto">
+                {stats.warning}
+              </Badge>
             </div>
             <div className="flex items-center justify-between sm:justify-start space-x-2 p-3 sm:p-0 bg-green-50 dark:bg-green-950/30 sm:bg-transparent sm:dark:bg-transparent rounded-lg sm:rounded-none">
               <div className="flex items-center space-x-2">
                 <div className="w-3 h-3 bg-green-500 rounded-full flex-shrink-0" />
                 <span className="text-sm font-medium">Low</span>
               </div>
-              <Badge variant="secondary" className="ml-auto">{stats.low}</Badge>
+              <Badge variant="secondary" className="ml-auto">
+                {stats.low}
+              </Badge>
             </div>
           </div>
         </CardContent>
@@ -272,7 +278,10 @@ export function FaultDashboard({
                           {getSeverityIcon(fault.severity)}
                           <span className="ml-1 capitalize">{fault.severity}</span>
                         </Badge>
-                        <Badge variant="outline" className={`${statusColors[fault.status]} text-xs`}>
+                        <Badge
+                          variant="outline"
+                          className={`${statusColors[fault.status]} text-xs`}
+                        >
                           {getStatusIcon(fault.status)}
                           <span className="ml-1 capitalize">{fault.status.replace('_', ' ')}</span>
                         </Badge>
@@ -290,7 +299,9 @@ export function FaultDashboard({
                         )}
                       </div>
                       <h4 className="text-sm font-medium mb-1 line-clamp-1">{fault.location}</h4>
-                      <p className="text-sm text-muted-foreground mb-2 line-clamp-2 sm:line-clamp-1">{fault.description}</p>
+                      <p className="text-sm text-muted-foreground mb-2 line-clamp-2 sm:line-clamp-1">
+                        {fault.description}
+                      </p>
                       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-2">
                         <p className="text-xs text-muted-foreground">
                           Reported {new Date(fault.reportedAt).toLocaleDateString()}

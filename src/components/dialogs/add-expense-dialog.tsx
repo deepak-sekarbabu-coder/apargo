@@ -8,8 +8,8 @@ import * as React from 'react';
 
 import Image from 'next/image';
 
-import { uploadImage } from '@/lib/storage/storage';
 import type { Category, Expense, User } from '@/lib/core/types';
+import { uploadImage } from '@/lib/storage/storage';
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -97,9 +97,10 @@ export function AddExpenseDialog({
 
   // Watch form values to enable/disable button similar to Add Payment dialog
   const watchedValues = form.watch();
-  const isFormValid = watchedValues.description.trim() !== '' &&
-                     watchedValues.amount > 0 &&
-                     watchedValues.categoryId !== '';
+  const isFormValid =
+    watchedValues.description.trim() !== '' &&
+    watchedValues.amount > 0 &&
+    watchedValues.categoryId !== '';
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;

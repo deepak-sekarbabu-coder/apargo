@@ -2,8 +2,8 @@ import { useAuth } from '@/context/auth-context';
 
 import * as React from 'react';
 
-import { deletePoll, listenToPolls, voteOnPoll } from '@/lib/firestore/polls';
 import { Apartment, Poll } from '@/lib/core/types';
+import { deletePoll, listenToPolls, voteOnPoll } from '@/lib/firestore/polls';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { SimplePagination } from '@/components/ui/pagination';

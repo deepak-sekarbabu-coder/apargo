@@ -4,12 +4,12 @@ import { getFirestore as getAdminFirestore } from 'firebase-admin/firestore';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
+import type { User } from '@/lib/core/types';
 import {
   getFirebaseAdminApp,
   getInitializationError,
   isFirebaseAdminAvailable,
 } from '@/lib/firebase/firebase-admin';
-import type { User } from '@/lib/core/types';
 
 // POST /api/payment-events/generate
 // Generate payment events for all configured categories for the current month or specified month

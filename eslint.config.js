@@ -1,5 +1,5 @@
-import reactHooks from 'eslint-plugin-react-hooks'
-import ts from 'typescript-eslint'
+import reactHooks from 'eslint-plugin-react-hooks';
+import ts from 'typescript-eslint';
 
 export default [
   // Global ignores
@@ -28,8 +28,8 @@ export default [
       '**/*.config.js',
       '**/*.config.ts',
       'jest.setup.ts',
-      'jest.config.*'
-    ]
+      'jest.config.*',
+    ],
   },
   ...ts.configs.recommended,
   {
@@ -37,20 +37,20 @@ export default [
       'react-hooks': reactHooks,
     },
     rules: {
-      "react-hooks/exhaustive-deps": "warn",
-      "@typescript-eslint/no-unused-vars": "error",
+      'react-hooks/exhaustive-deps': 'warn',
+      '@typescript-eslint/no-unused-vars': 'error',
       // Allow require() in configuration files and scripts
-      "@typescript-eslint/no-require-imports": "off",
+      '@typescript-eslint/no-require-imports': 'off',
       // Allow any types in test files and mocks
-      "@typescript-eslint/no-explicit-any": "off",
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
   // Specific rules for source code (stricter)
   {
     files: ['src/**/*.ts', 'src/**/*.tsx'],
     rules: {
-      "@typescript-eslint/no-require-imports": "error",
-      "@typescript-eslint/no-explicit-any": "error",
+      '@typescript-eslint/no-require-imports': 'error',
+      '@typescript-eslint/no-explicit-any': 'error',
     },
   },
-]
+];

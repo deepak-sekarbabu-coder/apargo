@@ -7,13 +7,13 @@ import { useEffect, useState } from 'react';
 
 import Image from 'next/image';
 
+import type { Category, Expense, User } from '@/lib/core/types';
 import {
   calculateExpenseAmounts,
   markApartmentAsPaid,
   markApartmentAsUnpaid,
 } from '@/lib/expense-management/expense-utils';
 import { updateExpense } from '@/lib/firestore/expenses';
-import type { Category, Expense, User } from '@/lib/core/types';
 
 import { CategoryIcon } from '@/components/icons/category-icon';
 import { Badge } from '@/components/ui/badge';
@@ -53,7 +53,9 @@ export function ExpenseItem({
   const { toast } = useToast();
   const [loadingMap, setLoadingMap] = useState<{ [apartmentId: string]: boolean }>({});
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [optimisticPaidByApartments, setOptimisticPaidByApartments] = useState<string[] | null>(null);
+  const [optimisticPaidByApartments, setOptimisticPaidByApartments] = useState<string[] | null>(
+    null
+  );
 
   // Reset optimistic state when expense prop changes
   useEffect(() => {
@@ -61,9 +63,10 @@ export function ExpenseItem({
   }, [expense.id, expense.paidByApartments]);
 
   // Use optimistic state if available, otherwise use the expense prop
-  const effectiveExpense = optimisticPaidByApartments !== null
-    ? { ...expense, paidByApartments: optimisticPaidByApartments }
-    : expense;
+  const effectiveExpense =
+    optimisticPaidByApartments !== null
+      ? { ...expense, paidByApartments: optimisticPaidByApartments }
+      : expense;
 
   const calculation = calculateExpenseAmounts(effectiveExpense);
 
@@ -119,8 +122,14 @@ export function ExpenseItem({
     try {
       const updatedExpense = markApartmentAsPaid(expense, apartmentId);
       // Check if all owing apartments have now paid
-      const allPaid = updatedExpense.owedByApartments?.every(id => updatedExpense.paidByApartments?.includes(id)) ?? false;
-      await updateExpense(expense.id, { paidByApartments: updatedExpense.paidByApartments, paid: allPaid });
+      const allPaid =
+        updatedExpense.owedByApartments?.every(id =>
+          updatedExpense.paidByApartments?.includes(id)
+        ) ?? false;
+      await updateExpense(expense.id, {
+        paidByApartments: updatedExpense.paidByApartments,
+        paid: allPaid,
+      });
 
       // Update the expense with the new paid status
       const finalExpense = { ...updatedExpense, paid: allPaid };
@@ -174,8 +183,14 @@ export function ExpenseItem({
     try {
       const updatedExpense = markApartmentAsUnpaid(expense, apartmentId);
       // Check if all owing apartments are still paid after this change
-      const allPaid = updatedExpense.owedByApartments?.every(id => updatedExpense.paidByApartments?.includes(id)) ?? false;
-      await updateExpense(expense.id, { paidByApartments: updatedExpense.paidByApartments, paid: allPaid });
+      const allPaid =
+        updatedExpense.owedByApartments?.every(id =>
+          updatedExpense.paidByApartments?.includes(id)
+        ) ?? false;
+      await updateExpense(expense.id, {
+        paidByApartments: updatedExpense.paidByApartments,
+        paid: allPaid,
+      });
 
       // Update the expense with the new paid status
       const finalExpense = { ...updatedExpense, paid: allPaid };
@@ -198,8 +213,6 @@ export function ExpenseItem({
       setLoadingMap(prev => ({ ...prev, [apartmentId]: false }));
     }
   };
-
-
 
   return (
     <Card className="w-full">
@@ -297,7 +310,6 @@ export function ExpenseItem({
                 </Dialog>
               </div>
             )}
-
           </div>
         </div>
       </CardHeader>
@@ -347,10 +359,11 @@ export function ExpenseItem({
                 return (
                   <div
                     key={apartmentId}
-                    className={`flex flex-col gap-2 p-2 sm:p-3 rounded-lg border transition-all duration-300 ease-in-out ${isPaid
-                      ? 'bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-700'
-                      : 'bg-red-100 dark:bg-red-900/30 border-red-300 dark:border-red-700'
-                      }`}
+                    className={`flex flex-col gap-2 p-2 sm:p-3 rounded-lg border transition-all duration-300 ease-in-out ${
+                      isPaid
+                        ? 'bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-700'
+                        : 'bg-red-100 dark:bg-red-900/30 border-red-300 dark:border-red-700'
+                    }`}
                   >
                     {/* Apartment info row */}
                     <div className="flex items-center gap-2 min-w-0">
@@ -374,8 +387,14 @@ export function ExpenseItem({
                             <PaymentStatusButton
                               isPaid={isPaid}
                               isLoading={!!loadingMap[apartmentId]}
-                              onClick={() => isPaid ? handleMarkUnpaid(apartmentId) : handleMarkPaid(apartmentId)}
-                              title={isPayer ? 'Toggle payment status (Payer can mark all)' : 'Toggle payment status'}
+                              onClick={() =>
+                                isPaid ? handleMarkUnpaid(apartmentId) : handleMarkPaid(apartmentId)
+                              }
+                              title={
+                                isPayer
+                                  ? 'Toggle payment status (Payer can mark all)'
+                                  : 'Toggle payment status'
+                              }
                             />
                           </div>
                         )}
@@ -397,7 +416,11 @@ export function ExpenseItem({
         {expense.receipt && (
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="outline" size="sm" className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full sm:w-auto text-xs sm:text-sm h-8 sm:h-9"
+              >
                 <Receipt className="h-3 sm:h-4 w-3 sm:w-4 mr-1 sm:mr-2" />
                 <span className="truncate">View Receipt</span>
               </Button>

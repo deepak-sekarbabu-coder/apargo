@@ -6,9 +6,12 @@ import { Bell, BellOff } from 'lucide-react';
 
 import { useEffect, useRef, useState } from 'react';
 
-import { db } from '@/lib/firebase/firebase';
-import { AdminNotificationListener, NotificationListener } from '@/lib/notifications/notification-listener';
 import type { Notification } from '@/lib/core/types';
+import { db } from '@/lib/firebase/firebase';
+import {
+  AdminNotificationListener,
+  NotificationListener,
+} from '@/lib/notifications/notification-listener';
 
 import { NotificationItem } from '@/components/notifications/notification-item';
 import { Button, type ButtonProps } from '@/components/ui/button';
@@ -48,7 +51,10 @@ export function NotificationsPanel({ className }: NotificationsPanelProps) {
       if (user && user.role === 'admin') {
         const adminListener = new AdminNotificationListener(
           (notifications: Notification[]) => {
-            const unread = notifications.reduce((acc, n) => acc + (typeof n.isRead === 'boolean' && !n.isRead ? 1 : 0), 0);
+            const unread = notifications.reduce(
+              (acc, n) => acc + (typeof n.isRead === 'boolean' && !n.isRead ? 1 : 0),
+              0
+            );
             setNotifications(notifications);
             setUnreadCount(unread);
             setConnectionError(null);
@@ -91,7 +97,10 @@ export function NotificationsPanel({ className }: NotificationsPanelProps) {
             notifications.map(n => ({ id: n.id, title: n.title, isRead: n.isRead }))
           );
         }
-        const unread = notifications.reduce((acc, n) => acc + (typeof n.isRead === 'boolean' && !n.isRead ? 1 : 0), 0);
+        const unread = notifications.reduce(
+          (acc, n) => acc + (typeof n.isRead === 'boolean' && !n.isRead ? 1 : 0),
+          0
+        );
         if (apartment === 'T2') {
           console.log(`🔍 T2 unread count:`, unread);
         }

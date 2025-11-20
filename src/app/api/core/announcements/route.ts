@@ -5,13 +5,13 @@ import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getApartmentIds } from '@/lib/core/apartment-constants';
-import { sendPushNotificationToApartments } from '@/lib/notifications/fcm-admin';
+import type { User } from '@/lib/core/types';
 import {
   getFirebaseAdminApp,
   getInitializationError,
   isFirebaseAdminAvailable,
 } from '@/lib/firebase/firebase-admin';
-import type { User } from '@/lib/core/types';
+import { sendPushNotificationToApartments } from '@/lib/notifications/fcm-admin';
 
 // Add a simple GET endpoint for testing
 export async function GET() {

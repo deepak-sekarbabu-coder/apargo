@@ -1,8 +1,9 @@
 'use client';
 
-import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import * as React from 'react';
+
+import Image from 'next/image';
 
 import { useDeviceInfo } from '@/hooks/use-mobile';
 
@@ -77,7 +78,13 @@ export const OptimizedImage: React.FC<OptimizedImageProps> = ({
       {placeholder === 'blur' && !isLoaded && (
         <div className="absolute inset-0 bg-muted animate-pulse">
           {blurDataURL && (
-            <Image src={blurDataURL} alt="" layout="fill" objectFit="cover" className="w-full h-full object-cover filter blur-sm" />
+            <Image
+              src={blurDataURL}
+              alt=""
+              layout="fill"
+              objectFit="cover"
+              className="w-full h-full object-cover filter blur-sm"
+            />
           )}
         </div>
       )}

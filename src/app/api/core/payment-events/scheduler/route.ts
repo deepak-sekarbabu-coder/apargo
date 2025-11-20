@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { adminAuth } from '@/lib/auth/auth';
-import * as firestoreAdmin from '@/lib/firestore/firestore-admin';
 import { getCategories } from '@/lib/firestore/categories';
+import * as firestoreAdmin from '@/lib/firestore/firestore-admin';
 import { generatePaymentEvents } from '@/lib/firestore/payments';
 
 // POST /api/payment-events/scheduler

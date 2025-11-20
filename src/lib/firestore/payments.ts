@@ -1,7 +1,7 @@
 // Removed unused imports
+import type { Apartment, Category, Payment, User } from '../core/types';
 import { type QuerySnapshot, database } from '../database';
 import { computeApprovedExpensePaymentDeltas } from '../payments/payments';
-import type { Apartment, Category, Payment, User } from '../core/types';
 import { getApartments } from './apartments';
 import { getCategories } from './categories';
 import { applyDeltasToBalanceSheets } from './expenses';
@@ -213,15 +213,15 @@ export const subscribeToPayments = async (
   const filters: Array<{
     field: string;
     operator:
-    | '=='
-    | '!='
-    | '<'
-    | '<='
-    | '>'
-    | '>='
-    | 'array-contains'
-    | 'in'
-    | 'array-contains-any';
+      | '=='
+      | '!='
+      | '<'
+      | '<='
+      | '>'
+      | '>='
+      | 'array-contains'
+      | 'in'
+      | 'array-contains-any';
     value: unknown;
   }> = [];
   if (apartmentId) {

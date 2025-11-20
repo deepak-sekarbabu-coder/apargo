@@ -205,10 +205,7 @@ export function createSystemError(
 /**
  * Wrap an existing error into an ApargoError
  */
-export function wrapError(
-  originalError: Error,
-  context: Partial<ErrorContext> = {}
-): ApargoError {
+export function wrapError(originalError: Error, context: Partial<ErrorContext> = {}): ApargoError {
   // Check if it's already an ApargoError
   if ('code' in originalError && 'category' in originalError) {
     return originalError as ApargoError;

@@ -28,15 +28,15 @@ describe('Liskov Substitution Principle - Type Safety', () => {
       };
 
       const announcementNotification: AnnouncementNotification = {
-      id: '2',
-      type: 'announcement',
-      title: 'Building Maintenance',
-      message: 'Elevator maintenance scheduled',
-      createdBy: 'admin1',
-      isActive: true,
-      priority: 'high',
-      isRead: { apt1: true, apt2: false },
-      toApartmentId: ['apt1', 'apt2'],
+        id: '2',
+        type: 'announcement',
+        title: 'Building Maintenance',
+        message: 'Elevator maintenance scheduled',
+        createdBy: 'admin1',
+        isActive: true,
+        priority: 'high',
+        isRead: { apt1: true, apt2: false },
+        toApartmentId: ['apt1', 'apt2'],
         createdAt: '2024-01-01T00:00:00Z',
       };
 
@@ -96,15 +96,15 @@ describe('Liskov Substitution Principle - Type Safety', () => {
 
       // Announcement notifications require createdBy and isActive
       const announcementNotification: AnnouncementNotification = {
-      id: '2',
-      type: 'announcement',
-      title: 'Announcement',
-      message: 'Important news',
-      createdBy: 'admin1', // Required for announcements
-      isActive: true, // Required for announcements
-      priority: 'high',
-      isRead: { apt1: false },
-      toApartmentId: ['apt1'],
+        id: '2',
+        type: 'announcement',
+        title: 'Announcement',
+        message: 'Important news',
+        createdBy: 'admin1', // Required for announcements
+        isActive: true, // Required for announcements
+        priority: 'high',
+        isRead: { apt1: false },
+        toApartmentId: ['apt1'],
         createdAt: '2024-01-01T00:00:00Z',
       };
 

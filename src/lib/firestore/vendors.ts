@@ -12,9 +12,9 @@ import {
   where,
 } from 'firebase/firestore';
 
+import type { Vendor } from '../core/types';
 import { db } from '../firebase/firebase';
 import { removeUndefined } from './firestore-utils';
-import type { Vendor } from '../core/types';
 
 export const getVendors = async (activeOnly = false): Promise<Vendor[]> => {
   let vendorsQuery = query(collection(db, 'vendors'));
@@ -56,7 +56,9 @@ export const subscribeToVendors = (callback: (vendors: Vendor[]) => void, active
   return onSnapshot(vendorsQuery, (snapshot: QuerySnapshot<DocumentData>) => {
     const vendors = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Vendor);
     // Remove duplicates by id in case of any Firestore issues
-    const uniqueVendors = vendors.filter((v, index, arr) => arr.findIndex(x => x.id === v.id) === index);
+    const uniqueVendors = vendors.filter(
+      (v, index, arr) => arr.findIndex(x => x.id === v.id) === index
+    );
     callback(uniqueVendors);
   });
 };

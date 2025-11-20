@@ -11,9 +11,9 @@ import {
   where,
 } from 'firebase/firestore';
 
+import type { Poll } from '../core/types';
 import { db } from '../firebase/firebase';
 import { removeUndefined } from './firestore-utils';
-import type { Poll } from '../core/types';
 
 export const getPolls = async (activeOnly = false): Promise<Poll[]> => {
   const pollsCol = collection(db, 'polls');

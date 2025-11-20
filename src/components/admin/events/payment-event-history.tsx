@@ -248,7 +248,9 @@ export function PaymentEventHistory({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-blue-50 dark:bg-blue-950/30 p-4 rounded-lg">
               <h4 className="font-medium text-blue-900 dark:text-blue-100">Total Months</h4>
-              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">{filteredData.length}</p>
+              <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                {filteredData.length}
+              </p>
               <p className="text-sm text-blue-700 dark:text-blue-300">With payment events</p>
             </div>
             <div className="bg-green-50 dark:bg-green-950/30 p-4 rounded-lg">

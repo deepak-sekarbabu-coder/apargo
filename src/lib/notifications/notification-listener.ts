@@ -13,8 +13,8 @@ import {
   where,
 } from 'firebase/firestore';
 
-import { db } from '@/lib/firebase/firebase';
 import type { Notification } from '@/lib/core/types';
+import { db } from '@/lib/firebase/firebase';
 
 interface NotificationListenerOptions {
   apartment: string;

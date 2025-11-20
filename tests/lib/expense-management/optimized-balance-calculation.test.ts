@@ -1,9 +1,9 @@
+import type { Apartment, Expense } from '@/lib/core/types';
 import {
   calculateApartmentBalances,
   calculateApartmentBalancesOptimized,
   calculateUnpaidBillsCount,
 } from '@/lib/expense-management/balance-calculation';
-import type { Apartment, Expense } from '@/lib/core/types';
 
 describe('Optimized Balance Calculation Tests', () => {
   // Mock expense data

@@ -1,4 +1,7 @@
-import { aggregateBalanceSheets, validateBalanceSheetContinuity } from '../../../../src/lib/expense-management/balance-utils';
+import {
+  aggregateBalanceSheets,
+  validateBalanceSheetContinuity,
+} from '../../../../src/lib/expense-management/balance-utils';
 
 describe('Balance Sheet Continuity', () => {
   test('should maintain continuity between consecutive months', () => {

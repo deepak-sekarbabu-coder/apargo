@@ -1,10 +1,8 @@
 #!/usr/bin/env node
-
 /**
  * Accessibility Check Script
  * Runs basic accessibility checks on the application
  */
-
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -48,9 +46,7 @@ const checks = [
   },
   {
     file: 'src/components/layout/sidebar-layout.tsx',
-    patterns: [
-      { regex: /id=["']main-content["']/, description: 'Main content element has ID' },
-    ],
+    patterns: [{ regex: /id=["']main-content["']/, description: 'Main content element has ID' }],
   },
 ];
 

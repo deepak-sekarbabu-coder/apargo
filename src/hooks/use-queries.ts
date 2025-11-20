@@ -2,10 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { getApartments } from '@/lib/firestore/apartments';
 import { getCategories } from '@/lib/firestore/categories';
-import {
-  getBalanceSheets,
-  getExpenses,
-} from '@/lib/firestore/expenses';
+import { getBalanceSheets, getExpenses } from '@/lib/firestore/expenses';
 import { getPayments } from '@/lib/firestore/payments';
 import { getAllUsers, getUsers } from '@/lib/firestore/users';
 

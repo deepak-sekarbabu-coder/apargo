@@ -9,10 +9,10 @@ import { Category } from '@/lib/core/types';
 
 import { FeatureGrid } from '@/components/dashboard/feature-grid';
 import { MaintenancePaymentStatus } from '@/components/dashboard/maintenance-payment-status';
+import { OutstandingBalance } from '@/components/dashboard/outstanding-balance';
 import { AddExpenseDialog } from '@/components/dialogs/add-expense-dialog';
 import { AddPaymentDialog } from '@/components/dialogs/add-payment-dialog';
 import type { ExpensesListProps } from '@/components/expense-management/all-expenses/expenses-list';
-import { OutstandingBalance } from '@/components/dashboard/outstanding-balance';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
@@ -125,8 +125,6 @@ export function DashboardView({
     currentUserApartment
   );
 
-
-
   return (
     <div className="grid gap-6" suppressHydrationWarning>
       {/* Quick feature navigation grid */}
@@ -179,7 +177,9 @@ export function DashboardView({
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-lg sm:text-xl">Apartment Balances</CardTitle>
-            <CardDescription className="text-xs sm:text-sm">Summary of amounts owed between apartments</CardDescription>
+            <CardDescription className="text-xs sm:text-sm">
+              Summary of amounts owed between apartments
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2 sm:space-y-3">
             {/* What you are owed */}
@@ -261,7 +261,9 @@ export function DashboardView({
             <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 pb-2 sm:pb-3">
               <div className="min-w-0 flex-1">
                 <CardTitle className="text-base sm:text-lg">Recent Expenses</CardTitle>
-                <CardDescription className="text-xs sm:text-sm">The last 2 expenses added to your apartment.</CardDescription>
+                <CardDescription className="text-xs sm:text-sm">
+                  The last 2 expenses added to your apartment.
+                </CardDescription>
               </div>
               {onNavigateToExpenses && (
                 <Button
@@ -293,13 +295,17 @@ export function DashboardView({
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base sm:text-lg">Account Summary</CardTitle>
-              <CardDescription className="text-xs sm:text-sm">Your personal balance status and account overview.</CardDescription>
+              <CardDescription className="text-xs sm:text-sm">
+                Your personal balance status and account overview.
+              </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-3 sm:gap-4">
               <div className="flex items-start gap-3 sm:gap-4 min-w-0">
                 <Bell className="h-5 sm:h-6 w-5 sm:w-6 text-accent flex-shrink-0 mt-0.5" />
                 <div className="grid gap-1 min-w-0 flex-1">
-                  <p className="text-xs sm:text-sm font-medium break-words">Welcome to Apargo, {user?.name}!</p>
+                  <p className="text-xs sm:text-sm font-medium break-words">
+                    Welcome to Apargo, {user?.name}!
+                  </p>
                   <p className="text-xs sm:text-sm text-muted-foreground">
                     Here is a summary of your account.
                   </p>
@@ -314,7 +320,9 @@ export function DashboardView({
                   <p className="text-xs sm:text-sm font-medium break-words">
                     Your balance is {accountSummary.formattedAmount}
                   </p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">{accountSummary.statusText}</p>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    {accountSummary.statusText}
+                  </p>
                 </div>
               </div>
               {showReminder && (

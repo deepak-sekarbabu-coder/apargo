@@ -210,10 +210,21 @@ export function MaintenanceDashboard({
           <AlertDescription className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <span className="text-sm">{error}</span>
             <div className="flex gap-2 w-full sm:w-auto">
-              <Button variant="outline" size="sm" onClick={clearErrors} className="flex-1 sm:flex-none">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={clearErrors}
+                className="flex-1 sm:flex-none"
+              >
                 Dismiss
               </Button>
-              <Button variant="outline" size="sm" onClick={handleRefresh} disabled={loading} className="flex-1 sm:flex-none">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleRefresh}
+                disabled={loading}
+                className="flex-1 sm:flex-none"
+              >
                 <RefreshCw className={`h-4 w-4 mr-1 ${loading ? 'animate-spin' : ''}`} />
                 Retry
               </Button>

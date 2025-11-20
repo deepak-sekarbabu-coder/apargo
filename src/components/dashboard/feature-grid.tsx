@@ -128,23 +128,23 @@ export function FeatureGrid({ onSelect, isAdmin }: FeatureGridProps) {
       </div>
 
       <div
-      ref={containerRef}
-      className="relative overflow-hidden"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
+        ref={containerRef}
+        className="relative overflow-hidden"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
-      <div
-      className={cn(
-      'grid grid-cols-2 sm:grid-cols-3 transition-transform duration-300 ease-out',
-      // widen columns when admin adds extra card
-      isAdmin ? 'md:grid-cols-6' : 'md:grid-cols-5',
-      'gap-2 sm:gap-3 touch-pan-x'
-      )}
-      style={{
-      transform: `translateX(-${currentIndex * 50}%)`,
-      }}
-      >
+        <div
+          className={cn(
+            'grid grid-cols-2 sm:grid-cols-3 transition-transform duration-300 ease-out',
+            // widen columns when admin adds extra card
+            isAdmin ? 'md:grid-cols-6' : 'md:grid-cols-5',
+            'gap-2 sm:gap-3 touch-pan-x'
+          )}
+          style={{
+            transform: `translateX(-${currentIndex * 50}%)`,
+          }}
+        >
           {features.map(f => (
             <button
               key={f.key}

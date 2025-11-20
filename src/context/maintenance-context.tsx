@@ -2,6 +2,7 @@
 
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 
+import { MaintenanceBudget, MaintenanceTask, Vendor } from '@/lib/core/types';
 import {
   addMaintenanceBudget,
   getMaintenanceBudget,
@@ -21,7 +22,6 @@ import {
   subscribeToVendors,
   updateVendor,
 } from '@/lib/firestore/vendors';
-import { MaintenanceBudget, MaintenanceTask, Vendor } from '@/lib/core/types';
 
 interface MaintenanceContextValue {
   tasks: MaintenanceTask[];

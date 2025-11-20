@@ -105,7 +105,7 @@ export function useMaintenanceTasks() {
       setError(null);
 
       const response = await apiRequest<{ tasks: MaintenanceTask[] }>(
-        '/api/maintenance/tasks?type=upcoming'
+        '/api/admin/maintenance/tasks?type=upcoming'
       );
       setUpcomingTasks(response.tasks);
     } catch (err) {
@@ -128,7 +128,7 @@ export function useMaintenanceTasks() {
         hasMore: boolean;
         page: number;
         pageSize: number;
-      }>(`/api/maintenance/tasks?type=completed&page=${page}&pageSize=${pageSize}`);
+      }>(`/api/admin/maintenance/tasks?type=completed&page=${page}&pageSize=${pageSize}`);
 
       if (page === 1) {
         setCompletedTasks(response.tasks);
@@ -154,7 +154,7 @@ export function useMaintenanceTasks() {
   const fetchTaskCounts = useCallback(async () => {
     try {
       const response = await apiRequest<{ counts: typeof taskCounts }>(
-        '/api/maintenance/tasks?type=count'
+        '/api/admin/maintenance/tasks?type=count'
       );
       setTaskCounts(response.counts);
     } catch (err) {
@@ -172,7 +172,7 @@ export function useMaintenanceTasks() {
       if (start) params.append('start', start);
       if (end) params.append('end', end);
 
-      const url = `/api/maintenance/tasks${params.toString() ? `?${params.toString()}` : ''}`;
+      const url = `/api/admin/maintenance/tasks${params.toString() ? `?${params.toString()}` : ''}`;
       const response = await apiRequest<TasksResponse>(url);
 
       setTasks(response.tasks);
@@ -189,7 +189,7 @@ export function useMaintenanceTasks() {
   const createTask = useCallback(
     async (taskData: Omit<MaintenanceTask, 'id' | 'createdAt' | 'updatedAt' | 'status'>) => {
       try {
-        const response = await apiRequest<TaskResponse>('/api/maintenance/tasks', {
+        const response = await apiRequest<TaskResponse>('/api/admin/maintenance/tasks', {
           method: 'POST',
           body: JSON.stringify(taskData),
         });
@@ -213,7 +213,7 @@ export function useMaintenanceTasks() {
         // Optimistically update state
         setTasks(prev => prev.map(task => (task.id === id ? { ...task, ...updates } : task)));
 
-        await apiRequest('/api/maintenance/tasks', {
+        await apiRequest('/api/admin/maintenance/tasks', {
           method: 'PUT',
           body: JSON.stringify({ id, ...updates }),
         });
@@ -235,7 +235,7 @@ export function useMaintenanceTasks() {
         // Optimistically update state
         setTasks(prev => prev.filter(task => task.id !== id));
 
-        await apiRequest(`/api/maintenance/tasks?id=${id}`, {
+        await apiRequest(`/api/admin/maintenance/tasks?id=${id}`, {
           method: 'DELETE',
         });
       } catch (err) {
@@ -311,7 +311,7 @@ export function useVendors() {
       setLoading(true);
       setError(null);
 
-      const url = `/api/maintenance/vendors${activeOnly ? '?activeOnly=true' : ''}`;
+      const url = `/api/admin/maintenance/vendors${activeOnly ? '?activeOnly=true' : ''}`;
       const response = await apiRequest<VendorsResponse>(url);
 
       setVendors(response.vendors);
@@ -328,7 +328,7 @@ export function useVendors() {
   const createVendor = useCallback(
     async (vendorData: Omit<Vendor, 'id' | 'createdAt' | 'updatedAt' | 'lastUsedAt'>) => {
       try {
-        const response = await apiRequest<VendorResponse>('/api/maintenance/vendors', {
+        const response = await apiRequest<VendorResponse>('/api/admin/maintenance/vendors', {
           method: 'POST',
           body: JSON.stringify(vendorData),
         });
@@ -354,7 +354,7 @@ export function useVendors() {
           prev.map(vendor => (vendor.id === id ? { ...vendor, ...updates } : vendor))
         );
 
-        await apiRequest('/api/maintenance/vendors', {
+        await apiRequest('/api/admin/maintenance/vendors', {
           method: 'PUT',
           body: JSON.stringify({ id, ...updates }),
         });
@@ -376,7 +376,7 @@ export function useVendors() {
         // Optimistically update state
         setVendors(prev => prev.filter(vendor => vendor.id !== id));
 
-        await apiRequest(`/api/maintenance/vendors?id=${id}`, {
+        await apiRequest(`/api/admin/maintenance/vendors?id=${id}`, {
           method: 'DELETE',
         });
       } catch (err) {

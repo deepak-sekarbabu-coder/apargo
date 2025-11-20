@@ -133,7 +133,13 @@ interface DefaultErrorDisplayProps {
   recoveryActionHandler: (action: { type: string }) => () => void;
 }
 
-function DefaultErrorDisplay({ error, retry, reload, retryCount, recoveryActionHandler }: DefaultErrorDisplayProps) {
+function DefaultErrorDisplay({
+  error,
+  retry,
+  reload,
+  retryCount,
+  recoveryActionHandler,
+}: DefaultErrorDisplayProps) {
   const getSeverityColor = (userMessageType: UserMessageType): string => {
     switch (userMessageType) {
       case 'error':
@@ -210,8 +216,7 @@ function DefaultErrorDisplay({ error, retry, reload, retryCount, recoveryActionH
               onClick={retry}
               className="px-3 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
             >
-              Try Again (
-              {retryCount > 0 ? `${retryCount} attempts` : 'First try'})
+              Try Again ({retryCount > 0 ? `${retryCount} attempts` : 'First try'})
             </button>
 
             <button

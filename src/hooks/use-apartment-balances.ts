@@ -22,16 +22,16 @@ export const useApartmentBalances = (
     // Handle case where apartmentBalances is undefined
     if (!apartmentBalances) {
       return {
-      currentBalance: null,
-      owedItems: [],
-      owesItems: [],
-      netBalance: {
-      amount: 0,
-      isPositive: true,
-      displayText: 'Your apartment is owed',
-      description: 'in total across all apartments',
-        formattedAmount: '+₹0.00',
-      },
+        currentBalance: null,
+        owedItems: [],
+        owesItems: [],
+        netBalance: {
+          amount: 0,
+          isPositive: true,
+          displayText: 'Your apartment is owed',
+          description: 'in total across all apartments',
+          formattedAmount: '+₹0.00',
+        },
         hasBalances: false,
       };
     }
@@ -42,16 +42,16 @@ export const useApartmentBalances = (
 
     if (!currentApartmentBalance) {
       return {
-      currentBalance: null,
-      owedItems: [],
-      owesItems: [],
-      netBalance: {
-      amount: 0,
-      isPositive: true,
-      displayText: 'Your apartment is owed',
-      description: 'in total across all apartments',
-        formattedAmount: '+₹0.00',
-      },
+        currentBalance: null,
+        owedItems: [],
+        owesItems: [],
+        netBalance: {
+          amount: 0,
+          isPositive: true,
+          displayText: 'Your apartment is owed',
+          description: 'in total across all apartments',
+          formattedAmount: '+₹0.00',
+        },
         hasBalances: false,
       };
     }

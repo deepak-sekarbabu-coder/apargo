@@ -21,9 +21,7 @@ export interface SendNotificationResult {
   errors: string[];
 }
 
-async function collectFcmTokens(
-  apartmentIds: string[]
-): Promise<{
+async function collectFcmTokens(apartmentIds: string[]): Promise<{
   tokens: string[];
   tokenToUserMap: Map<string, { id: string; name: string; apartment: string }>;
 }> {
@@ -64,7 +62,10 @@ function prepareMessage(notification: FCMNotificationPayload, tokens: string[]) 
 }
 
 async function processResponse(
-  response: { failureCount: number; responses: Array<{ success: boolean; error?: { code: string; message?: string } }> },
+  response: {
+    failureCount: number;
+    responses: Array<{ success: boolean; error?: { code: string; message?: string } }>;
+  },
   fcmTokens: string[],
   tokenToUserMap: Map<string, { id: string; name: string; apartment: string }>
 ): Promise<{

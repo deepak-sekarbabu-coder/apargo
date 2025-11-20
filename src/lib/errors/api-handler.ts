@@ -2,9 +2,16 @@
 // Provides standardized error handling for Next.js API routes
 import { NextRequest, NextResponse } from 'next/server';
 
-import type { ApargoError, ErrorCode, ErrorContext, OperationResult } from '@/lib/errors';
 import type { User } from '@/lib/core/types';
-import { createAuthError, createError, createOperationResult, createSystemError, logger, wrapError } from '@/lib/errors';
+import type { ApargoError, ErrorCode, ErrorContext, OperationResult } from '@/lib/errors';
+import {
+  createAuthError,
+  createError,
+  createOperationResult,
+  createSystemError,
+  logger,
+  wrapError,
+} from '@/lib/errors';
 
 // Type for API handler functions
 type ApiHandler<T = unknown> = (
@@ -236,7 +243,9 @@ export async function verifyAuth(
     // 2. Get the user from Firestore
     // 3. Check permissions if required
 
-    return { user: { id: 'user123', name: 'Mock User', role: 'user', apartment: 'mock-apartment' } }; // Mock user for now
+    return {
+      user: { id: 'user123', name: 'Mock User', role: 'user', apartment: 'mock-apartment' },
+    }; // Mock user for now
   } catch (error) {
     if (error instanceof Error && error.message.includes('Firebase')) {
       return {
@@ -342,15 +351,15 @@ export function createHealthCheckHandler() {
   return createApiHandler(
     async () => {
       return createOperationResult(true, {
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      version: '1.0.0',
-      environment: process.env.NODE_ENV || 'development',
-      features: {
-      errorHandling: true,
-      logging: true,
-      monitoring: true,
-      },
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        version: '1.0.0',
+        environment: process.env.NODE_ENV || 'development',
+        features: {
+          errorHandling: true,
+          logging: true,
+          monitoring: true,
+        },
       });
     },
     {

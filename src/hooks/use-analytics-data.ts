@@ -1,11 +1,4 @@
-import {
-  format,
-  isThisMonth,
-  isThisWeek,
-  isToday,
-  subDays,
-  subMonths,
-} from 'date-fns';
+import { format, isThisMonth, isThisWeek, isToday, subDays, subMonths } from 'date-fns';
 
 import { useEffect, useMemo, useState } from 'react';
 

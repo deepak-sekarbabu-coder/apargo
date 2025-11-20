@@ -29,8 +29,8 @@ This directory contains all core utilities, service modules, and business logic 
 ## Example Usage
 
 ```ts
-import { addExpense } from '@/lib/firestore/expenses';
 import { calculateBalance } from '@/lib/expense-management/balance-calculation';
+import { addExpense } from '@/lib/firestore/expenses';
 import { sendNotification } from '@/lib/notifications/fcm-admin';
 
 await addExpense(expenseData);

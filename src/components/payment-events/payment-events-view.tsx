@@ -79,7 +79,7 @@ export function PaymentEventsView({ currentUser }: PaymentEventsViewProps) {
         for (const monthYear of months) {
           try {
             const response = await fetch(
-              `/api/payment-events?monthYear=${monthYear}&apartmentId=${currentUser.apartment}`
+              `/api/core/payment-events?monthYear=${monthYear}&apartmentId=${currentUser.apartment}`
             );
 
             if (response.ok) {
@@ -152,7 +152,7 @@ export function PaymentEventsView({ currentUser }: PaymentEventsViewProps) {
         receiptURL = `receipt_${paymentId}_${Date.now()}`;
       }
 
-      const response = await fetch(`/api/payments/${paymentId}`, {
+      const response = await fetch(`/api/core/payments/${paymentId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

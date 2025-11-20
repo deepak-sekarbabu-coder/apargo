@@ -1,6 +1,6 @@
+import type { User } from '../core/types';
 import { type QuerySnapshot, database } from '../database';
 import { removeUndefined } from './firestore-utils';
-import type { User } from '../core/types';
 
 export const getUsers = async (apartment?: string): Promise<User[]> => {
   const usersCollection = database.collection<User>('users');

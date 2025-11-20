@@ -1,6 +1,5 @@
 // Script to replace environment variables in service worker files during build
 // This is necessary because service workers can't access process.env directly
-
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';

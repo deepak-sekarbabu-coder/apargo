@@ -87,7 +87,6 @@ function validateBrowserSupport(result: ValidationResult): void {
 }
 
 function validateNetworkAndExtensions(result: ValidationResult): void {
-   
   const connection =
     (
       navigator as {

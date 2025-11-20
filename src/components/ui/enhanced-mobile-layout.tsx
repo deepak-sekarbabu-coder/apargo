@@ -116,8 +116,6 @@ export const MobileSheet: React.FC<MobileSheetProps> = ({
     bottom: isOpen ? 'translate-y-0' : 'translate-y-full',
   };
 
-
-
   return (
     <>
       {/* Backdrop */}
@@ -251,9 +249,6 @@ interface MobileCardGridProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const MobileCardGrid = React.forwardRef<HTMLDivElement, MobileCardGridProps>(
   ({ className, gap = 'md', children, ...props }, ref) => {
-
-
-
     const gapClasses = {
       sm: 'gap-2',
       md: 'gap-3',

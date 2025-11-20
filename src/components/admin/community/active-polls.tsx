@@ -4,8 +4,8 @@ import { useAuth } from '@/context/auth-context';
 
 import * as React from 'react';
 
-import { deletePoll, listenToPolls } from '@/lib/firestore/polls';
 import { Poll } from '@/lib/core/types';
+import { deletePoll, listenToPolls } from '@/lib/firestore/polls';
 
 import { PollCard } from './poll-card';
 import { PollsEmpty } from './polls-empty';

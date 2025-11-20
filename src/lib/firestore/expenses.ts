@@ -1,11 +1,11 @@
-import { type QuerySnapshot, type DatabaseService, database } from '../database';
+import type { BalanceSheet, Expense } from '../core/types';
+import { type DatabaseService, type QuerySnapshot, database } from '../database';
 import {
   calculateDeltaChanges,
   computeExpenseDeltas,
   getBalanceDocId,
   removeUndefined,
 } from './firestore-utils';
-import type { BalanceSheet, Expense } from '../core/types';
 
 const updateBalanceSheets = async (
   deltas: ReturnType<typeof calculateDeltaChanges>
@@ -172,7 +172,9 @@ export const addExpense = async (expense: Omit<Expense, 'id' | 'date'>): Promise
   };
 
   // Set initial paid status: true if all owing apartments have paid (or none owe for no-split)
-  const allPaid = (newExpense.owedByApartments || []).every(id => (newExpense.paidByApartments || []).includes(id));
+  const allPaid = (newExpense.owedByApartments || []).every(id =>
+    (newExpense.paidByApartments || []).includes(id)
+  );
   const expenseWithPaid = { ...newExpense, paid: allPaid };
 
   const expensesCollection = database.collection<Omit<Expense, 'id'>>('expenses');
