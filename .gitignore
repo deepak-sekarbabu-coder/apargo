@@ -48,6 +48,11 @@ firebase.json
 apartgo.json
 firebase-service-account*.json
 
+# Legacy Firebase v8 messaging worker (kept for reference)
+# Superseded by modular Firebase v11 implementation
+# Can be safely deleted in v2.0.0
+# firebase/firebase-messaging-sw.js
+
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
