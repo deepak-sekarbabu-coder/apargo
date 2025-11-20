@@ -1,7 +1,7 @@
 'use client';
 
 import { format } from 'date-fns';
-import { Check, Receipt, Trash2, Users, X } from 'lucide-react';
+import { Receipt, Trash2, Users } from 'lucide-react';
 
 import { useEffect, useState } from 'react';
 
@@ -348,8 +348,8 @@ export function ExpenseItem({
                   <div
                     key={apartmentId}
                     className={`flex flex-col gap-2 p-2 sm:p-3 rounded-lg border transition-all duration-300 ease-in-out ${isPaid
-                        ? 'bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-700'
-                        : 'bg-red-100 dark:bg-red-900/30 border-red-300 dark:border-red-700'
+                      ? 'bg-green-100 dark:bg-green-900/30 border-green-300 dark:border-green-700'
+                      : 'bg-red-100 dark:bg-red-900/30 border-red-300 dark:border-red-700'
                       }`}
                   >
                     {/* Apartment info row */}

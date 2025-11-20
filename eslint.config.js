@@ -1,4 +1,3 @@
-import nextPlugin from '@next/eslint-plugin-next'
 import reactHooks from 'eslint-plugin-react-hooks'
 import ts from 'typescript-eslint'
 
@@ -32,7 +31,6 @@ export default [
       'jest.config.*'
     ]
   },
-  nextPlugin.configs['core-web-vitals'],
   ...ts.configs.recommended,
   {
     plugins: {

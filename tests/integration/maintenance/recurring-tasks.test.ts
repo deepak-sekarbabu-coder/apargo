@@ -3,8 +3,8 @@ import {
   calculateNextRecurrenceDate,
   createRecurringTaskFromCompleted,
   shouldCreateRecurringTask,
-} from '@/lib/maintenance/maintenance-utils';
-import { MaintenanceTask } from '@/lib/types';
+} from '../../../src/lib/maintenance/maintenance-utils';
+import { MaintenanceTask } from '../../../src/lib/types';
 
 describe('Recurring Maintenance Tasks', () => {
   const baseTask: MaintenanceTask = {
@@ -162,5 +162,3 @@ describe('Recurring Maintenance Tasks', () => {
     });
   });
 });
-
-console.log('✅ All recurring task utility tests defined successfully!');

@@ -2,7 +2,7 @@ jest.useFakeTimers();
 
 import { act, renderHook } from '@testing-library/react';
 
-import { DEBOUNCE_CONFIG, DEBOUNCE_OPTIONS } from '@/lib/utils';
+import { DEBOUNCE_CONFIG } from '@/lib/utils';
 
 import { useDebounce, useDebouncedCallback } from '@/hooks/use-debounce';
 
@@ -123,7 +123,7 @@ describe('useDebounce', () => {
         { initialProps: { value: 'initial' } }
       );
 
-      result.current; // Access to trigger initial render
+      void result.current; // Access to trigger initial render
 
       // Unmount should clean up timers
       unmount();
@@ -137,7 +137,7 @@ describe('useDebounce', () => {
         initialProps: { value: 'initial' },
       });
 
-      result.current; // Trigger initial render
+      void result.current; // Trigger initial render
 
       // Simulate visibility change to hidden (mobile Safari backgrounding)
       Object.defineProperty(document, 'visibilityState', {
