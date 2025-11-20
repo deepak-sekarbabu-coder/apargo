@@ -1,17 +1,7 @@
-import {
-  collection,
-  deleteDoc,
-  doc,
-  onSnapshot,
-  orderBy,
-  query,
-  where,
-} from 'firebase/firestore';
+import { collection, deleteDoc, doc, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 
 import type { AnnouncementNotification } from '../core/types';
 import { db } from '../firebase/firebase';
-
-
 
 export const listenToActiveAnnouncements = (
   callback: (announcements: AnnouncementNotification[]) => void

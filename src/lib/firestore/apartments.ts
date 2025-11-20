@@ -7,5 +7,3 @@ export const getApartments = async (): Promise<Apartment[]> => {
   const apartmentSnapshot = await apartmentsCollection.query().get();
   return apartmentSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Apartment);
 };
-
-

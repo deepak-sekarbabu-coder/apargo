@@ -175,7 +175,6 @@ export async function sendPushNotificationToApartments(
  * Send push notification to a specific user by user ID
  */
 
-
 /**
  * Test FCM configuration by sending a test notification
  */

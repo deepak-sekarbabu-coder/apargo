@@ -12,5 +12,3 @@ export function filterVendors(vendors: Vendor[], search: string, showInactive: b
     );
   });
 }
-
-

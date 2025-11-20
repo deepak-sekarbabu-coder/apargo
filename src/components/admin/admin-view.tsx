@@ -300,5 +300,3 @@ export function AdminView(props: AdminViewProps | AdminViewLegacyProps | AdminVi
     </div>
   );
 }
-
-

@@ -16,7 +16,6 @@ import {
 import { updateExpense } from '@/lib/firestore/expenses';
 
 import { CategoryIcon } from '@/components/icons/category-icon';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -241,9 +240,12 @@ export function ExpenseItem({
                   {expense.paid && (
                     <>
                       <span className="text-muted-foreground">•</span>
-                      <Badge variant="default" className="text-xs bg-green-600">
-                        Paid
-                      </Badge>
+                      <PaymentStatusButton
+                        isPaid={true}
+                        readOnly
+                        labelPaid="Paid"
+                        className="h-5 min-w-[4rem] px-2 text-[10px]"
+                      />
                     </>
                   )}
                 </div>
@@ -325,12 +327,12 @@ export function ExpenseItem({
               </span>
             </div>
             <div className="flex justify-start sm:justify-end">
-              <Badge
-                variant={calculation.unpaidApartments.length === 0 ? 'default' : 'secondary'}
-                className="text-xs"
-              >
-                {calculation.unpaidApartments.length === 0 ? 'Fully Paid' : 'Pending'}
-              </Badge>
+              <PaymentStatusButton
+                isPaid={calculation.unpaidApartments.length === 0}
+                readOnly
+                labelPaid="Fully Paid"
+                labelUnpaid="Pending"
+              />
             </div>
           </div>
         )}
@@ -399,9 +401,14 @@ export function ExpenseItem({
                           </div>
                         )}
                         {!isOwnerOrTenantOfThisApartment && !isPayer && (
-                          <Badge variant={isPaid ? 'default' : 'destructive'} className="text-xs">
-                            {isPaid ? 'Paid' : 'Pending'}
-                          </Badge>
+                          <div className="flex gap-1">
+                            <PaymentStatusButton
+                              isPaid={isPaid}
+                              readOnly
+                              labelPaid="Paid"
+                              labelUnpaid="Pending"
+                            />
+                          </div>
                         )}
                       </div>
                     </div>

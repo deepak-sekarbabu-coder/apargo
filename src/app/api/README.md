@@ -68,7 +68,9 @@ All routes (except health checks) require Firebase authentication:
 ```json
 {
   "success": true,
-  "data": { /* endpoint-specific data */ }
+  "data": {
+    /* endpoint-specific data */
+  }
 }
 ```
 
@@ -135,24 +137,19 @@ All routes (except health checks) require Firebase authentication:
 
    ```typescript
    import { NextRequest, NextResponse } from 'next/server';
+
    import { getAuth } from '@/lib/auth';
 
    export async function GET(req: NextRequest) {
      try {
        const auth = await getAuth();
        if (!auth?.user?.uid) {
-         return NextResponse.json(
-           { success: false, error: 'Unauthorized' },
-           { status: 401 }
-         );
+         return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 });
        }
        // Route logic
        return NextResponse.json({ success: true, data: {} });
      } catch (error) {
-       return NextResponse.json(
-         { success: false, error: 'Server error' },
-         { status: 500 }
-       );
+       return NextResponse.json({ success: false, error: 'Server error' }, { status: 500 });
      }
    }
    ```

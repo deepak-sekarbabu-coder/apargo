@@ -354,5 +354,3 @@ export function LedgerView({ payments, users }: LedgerViewProps) {
     </div>
   );
 }
-
-

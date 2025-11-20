@@ -9,9 +9,9 @@ import { useState } from 'react';
 
 import type { Payment, User } from '@/lib/core/types';
 
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PaymentStatusButton } from '@/components/ui/payment-status-button';
 import {
   Select,
   SelectContent,
@@ -282,9 +282,12 @@ export function PaymentEventHistory({
                       <h4 className="font-medium">
                         {format(new Date(monthData.monthYear + '-01'), 'MMMM yyyy')}
                       </h4>
-                      <Badge variant={monthData.pendingAmount > 0 ? 'destructive' : 'default'}>
-                        {monthData.pendingAmount > 0 ? 'Pending' : 'Complete'}
-                      </Badge>
+                      <PaymentStatusButton
+                        isPaid={monthData.pendingAmount === 0}
+                        readOnly
+                        labelPaid="Complete"
+                        labelUnpaid="Pending"
+                      />
                     </div>
 
                     <div className="grid grid-cols-2 gap-3 text-sm">
@@ -334,9 +337,12 @@ export function PaymentEventHistory({
                       <TableCell className="text-green-600">₹{monthData.paidAmount}</TableCell>
                       <TableCell className="text-red-600">₹{monthData.pendingAmount}</TableCell>
                       <TableCell>
-                        <Badge variant={monthData.pendingAmount > 0 ? 'destructive' : 'default'}>
-                          {monthData.pendingAmount > 0 ? 'Pending' : 'Complete'}
-                        </Badge>
+                        <PaymentStatusButton
+                          isPaid={monthData.pendingAmount === 0}
+                          readOnly
+                          labelPaid="Complete"
+                          labelUnpaid="Pending"
+                        />
                       </TableCell>
                     </TableRow>
                   ))}

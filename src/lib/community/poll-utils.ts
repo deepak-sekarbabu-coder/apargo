@@ -7,7 +7,6 @@ import { listenToPolls } from '../firestore/polls';
  * @returns A promise that resolves to an array of polls the user hasn't voted on
  */
 
-
 /**
  * Sets up a listener for active polls that the user hasn't voted on
  * @param user The current user
@@ -20,7 +19,7 @@ export const listenToUnvotedPolls = (
 ): (() => void) => {
   if (!user || !user.apartment) {
     callback([]);
-    return () => { };
+    return () => {};
   }
 
   return listenToPolls(polls => {
@@ -38,4 +37,3 @@ export const listenToUnvotedPolls = (
  * @param apartmentId The user's apartment ID
  * @returns A notification object
  */
-

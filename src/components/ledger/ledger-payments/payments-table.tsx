@@ -19,7 +19,6 @@ import * as React from 'react';
 import { Payment, User } from '@/lib/core/types';
 
 import { AddPaymentDialog } from '@/components/dialogs/add-payment-dialog';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import {
@@ -32,6 +31,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { PaymentStatusButton } from '@/components/ui/payment-status-button';
 import {
   Table,
   TableBody,
@@ -159,18 +159,13 @@ const PaymentCard = React.memo(
                   <p className="font-medium text-sm sm:text-base">{amountFormatted}</p>
                 )}
                 {showStatus && (
-                  <Badge
-                    variant={
-                      payment.status === 'approved' || payment.status === 'paid'
-                        ? 'default'
-                        : payment.status === 'rejected'
-                          ? 'destructive'
-                          : 'secondary'
-                    }
+                  <PaymentStatusButton
+                    isPaid={payment.status === 'approved' || payment.status === 'paid'}
+                    readOnly
+                    labelPaid={payment.status === 'approved' ? 'Approved' : 'Paid'}
+                    labelUnpaid={payment.status === 'rejected' ? 'Rejected' : 'Pending'}
                     className="capitalize text-xs px-2 py-1"
-                  >
-                    {payment.status}
-                  </Badge>
+                  />
                 )}
               </div>
             </div>
@@ -465,18 +460,13 @@ export function PaymentsTable({
       cell: ({ row }: { row: { getValue: (key: string) => string } }) => {
         const status = row.getValue('status') as string;
         return (
-          <Badge
-            variant={
-              status === 'approved' || status === 'paid'
-                ? 'default'
-                : status === 'rejected'
-                  ? 'destructive'
-                  : 'secondary'
-            }
+          <PaymentStatusButton
+            isPaid={status === 'approved' || status === 'paid'}
+            readOnly
+            labelPaid={status === 'approved' ? 'Approved' : 'Paid'}
+            labelUnpaid={status === 'rejected' ? 'Rejected' : 'Pending'}
             className="capitalize"
-          >
-            {status}
-          </Badge>
+          />
         );
       },
     },
@@ -524,50 +514,50 @@ export function PaymentsTable({
     },
     ...(currentUser.role === 'admin'
       ? [
-        {
-          id: 'actions',
-          header: () => <div className="text-right">Actions</div>,
-          cell: ({ row }: { row: { original: Payment } }) => {
-            const payment = row.original;
-            return (
-              <div className="flex gap-2 justify-end">
-                {payment.status === 'pending' ? (
-                  <>
-                    <Button
-                      size="sm"
-                      variant="default"
-                      onClick={() => onApprovePayment(payment.id)}
-                      aria-label={`Approve payment ${payment.id}`}
-                    >
-                      <Check className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => onRejectPayment(payment.id)}
-                      aria-label={`Reject payment ${payment.id}`}
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  </>
-                ) : (
-                  <span className="text-sm text-muted-foreground">-</span>
-                )}
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="border-red-500 text-red-600 hover:bg-red-50"
-                  onClick={() => setDeleteId(payment.id)}
-                  disabled={isDeleting}
-                  aria-label={`Delete payment ${payment.id}`}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            );
+          {
+            id: 'actions',
+            header: () => <div className="text-right">Actions</div>,
+            cell: ({ row }: { row: { original: Payment } }) => {
+              const payment = row.original;
+              return (
+                <div className="flex gap-2 justify-end">
+                  {payment.status === 'pending' ? (
+                    <>
+                      <Button
+                        size="sm"
+                        variant="default"
+                        onClick={() => onApprovePayment(payment.id)}
+                        aria-label={`Approve payment ${payment.id}`}
+                      >
+                        <Check className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => onRejectPayment(payment.id)}
+                        aria-label={`Reject payment ${payment.id}`}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </>
+                  ) : (
+                    <span className="text-sm text-muted-foreground">-</span>
+                  )}
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="border-red-500 text-red-600 hover:bg-red-50"
+                    onClick={() => setDeleteId(payment.id)}
+                    disabled={isDeleting}
+                    aria-label={`Delete payment ${payment.id}`}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              );
+            },
           },
-        },
-      ]
+        ]
       : []),
   ];
 

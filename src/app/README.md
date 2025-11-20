@@ -64,16 +64,16 @@ Route groups use parentheses syntax: `(groupName)/`
 
 ## URL Mapping Examples
 
-| Route File | URL |
-|---|---|
-| `(auth)/login/page.tsx` | `/login` |
-| `(dashboard)/dashboard/page.tsx` | `/dashboard` |
-| `(dashboard)/fault-reporting/page.tsx` | `/fault-reporting` |
-| `(dashboard)/faults/page.tsx` | `/faults` |
-| `api/_infrastructure/health/route.ts` | `/api/_infrastructure/health` |
-| `api/core/expenses/route.ts` | `/api/core/expenses` |
-| `api/admin/files/route.ts` | `/api/admin/files` |
-| `page.tsx` | `/` |
+| Route File                             | URL                           |
+| -------------------------------------- | ----------------------------- |
+| `(auth)/login/page.tsx`                | `/login`                      |
+| `(dashboard)/dashboard/page.tsx`       | `/dashboard`                  |
+| `(dashboard)/fault-reporting/page.tsx` | `/fault-reporting`            |
+| `(dashboard)/faults/page.tsx`          | `/faults`                     |
+| `api/_infrastructure/health/route.ts`  | `/api/_infrastructure/health` |
+| `api/core/expenses/route.ts`           | `/api/core/expenses`          |
+| `api/admin/files/route.ts`             | `/api/admin/files`            |
+| `page.tsx`                             | `/`                           |
 
 ## Architecture Patterns
 

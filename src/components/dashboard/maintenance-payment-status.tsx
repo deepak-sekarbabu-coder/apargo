@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { PaymentStatusButton } from '@/components/ui/payment-status-button';
 
 interface MaintenancePaymentStatusProps {
   user: User | null;
@@ -200,7 +201,7 @@ export function MaintenancePaymentStatus({
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-2">
-            <Badge className="bg-green-600">Paid</Badge>
+            <PaymentStatusButton isPaid={true} readOnly labelPaid="Paid" />
             <span className="text-sm text-muted-foreground">
               Thank you, all your maintenance fees are recorded.
             </span>
@@ -254,9 +255,7 @@ export function MaintenancePaymentStatus({
                         Pending Approval
                       </Badge>
                     ) : (
-                      <Badge variant="destructive" className="text-xs">
-                        Not Paid
-                      </Badge>
+                      <PaymentStatusButton isPaid={false} readOnly labelUnpaid="Not Paid" />
                     )}
                   </div>
                 </div>

@@ -443,4 +443,3 @@ class StorageService {
 export const storageService = new StorageService();
 
 // Legacy function wrapper for backward compatibility
-

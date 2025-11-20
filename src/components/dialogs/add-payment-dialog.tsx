@@ -251,5 +251,3 @@ export function AddPaymentDialog({ users, onAddPayment, children }: AddPaymentDi
     </Dialog>
   );
 }
-
-

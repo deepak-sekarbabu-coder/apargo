@@ -17,4 +17,3 @@ export type {
 
 // Export synchronous database service instance
 export const database = new FirebaseDatabaseService();
-

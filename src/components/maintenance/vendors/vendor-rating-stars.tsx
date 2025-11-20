@@ -34,5 +34,3 @@ export function RatingStars({ rating, outOf = 5, size = 'sm', className = '' }: 
     </span>
   );
 }
-
-

@@ -256,12 +256,6 @@ export const getBalanceSheets = async (
   });
 };
 
-
-
-
-
-
-
 export const subscribeToBalanceSheets = async (
   callback: (sheets: BalanceSheet[]) => void,
   apartmentId?: string,
@@ -271,15 +265,15 @@ export const subscribeToBalanceSheets = async (
   const filters: Array<{
     field: string;
     operator:
-    | '=='
-    | '!='
-    | '<'
-    | '<='
-    | '>'
-    | '>='
-    | 'array-contains'
-    | 'in'
-    | 'array-contains-any';
+      | '=='
+      | '!='
+      | '<'
+      | '<='
+      | '>'
+      | '>='
+      | 'array-contains'
+      | 'in'
+      | 'array-contains-any';
     value: unknown;
   }> = [];
   if (apartmentId) {

@@ -14,8 +14,6 @@ import type { Poll } from '../core/types';
 import { db } from '../firebase/firebase';
 import { removeUndefined } from './firestore-utils';
 
-
-
 export const listenToPolls = (cb: (polls: Poll[]) => void, activeOnly = false) => {
   const pollsCol = collection(db, 'polls');
   let q = query(pollsCol);
@@ -54,10 +52,6 @@ export const voteOnPoll = async (
   const update = { [`votes.${apartmentId} `]: optionId };
   await updateDoc(pollDoc, update);
 };
-
-
-
-
 
 // Secure delete: only creator or incharge role may delete a poll.
 // Admins can only delete their own polls (data ownership rule).

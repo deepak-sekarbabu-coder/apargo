@@ -20,14 +20,18 @@ export function PaymentStatusButton({
   labelUnpaid = 'Unpaid',
   className,
   disabled,
+  readOnly,
   ...props
-}: PaymentStatusButtonProps) {
+}: PaymentStatusButtonProps & { readOnly?: boolean }) {
   return (
     <button
       type="button"
-      disabled={disabled || isLoading}
+      disabled={disabled || isLoading || readOnly}
       className={cn(
-        'group relative inline-flex h-8 min-w-[7rem] items-center justify-center overflow-hidden rounded-full border px-4 text-xs font-semibold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
+        'group relative inline-flex h-8 min-w-[7rem] items-center justify-center overflow-hidden rounded-full border px-4 text-xs font-semibold transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+        // Only apply opacity reduction if disabled but NOT readOnly
+        (disabled || isLoading) && !readOnly ? 'pointer-events-none opacity-50' : '',
+        readOnly ? 'pointer-events-none' : '',
         isPaid
           ? 'border-transparent bg-green-600 text-white hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700'
           : 'border-transparent bg-red-600 text-white hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700',
@@ -76,8 +80,10 @@ export function PaymentStatusButton({
         )}
       </div>
 
-      {/* Shine effect on hover */}
-      <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:animate-shimmer pointer-events-none" />
+      {/* Shine effect on hover - only if not readOnly */}
+      {!readOnly && (
+        <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:animate-shimmer pointer-events-none" />
+      )}
     </button>
   );
 }

@@ -51,5 +51,3 @@ export const updateMaintenanceBudget = async (
   const clean = removeUndefined({ ...budget, updatedAt: new Date().toISOString() });
   await updateDoc(budgetDoc, clean);
 };
-
-

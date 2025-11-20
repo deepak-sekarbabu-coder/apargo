@@ -24,8 +24,6 @@ export const getAllUsers = async (apartment?: string): Promise<User[]> => {
   return userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as User);
 };
 
-
-
 export const getUserByEmail = async (email: string): Promise<User | null> => {
   const usersCollection = database.collection<User>('users');
   const queryBuilder = usersCollection
@@ -51,8 +49,6 @@ export const addUser = async (user: Omit<User, 'id'>): Promise<User> => {
   const docRef = await usersCollection.add(cleanUser);
   return { id: docRef.id, ...cleanUser } as User;
 };
-
-
 
 export const updateUser = async (id: string, user: Partial<User>): Promise<void> => {
   const userDoc = database.collection<User>('users').doc(id);
@@ -88,15 +84,15 @@ export const subscribeToAllUsers = async (
   const filters: Array<{
     field: string;
     operator:
-    | '=='
-    | '!='
-    | '<'
-    | '<='
-    | '>'
-    | '>='
-    | 'array-contains'
-    | 'in'
-    | 'array-contains-any';
+      | '=='
+      | '!='
+      | '<'
+      | '<='
+      | '>'
+      | '>='
+      | 'array-contains'
+      | 'in'
+      | 'array-contains-any';
     value: unknown;
   }> = [];
   if (apartment) {

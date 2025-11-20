@@ -1,90 +1,62 @@
-# AGENTS.md
+# AGENTS.md – Apargo Codebase Guide
 
-## Build & Test Commands
+## Build, Lint & Test Commands
 
-| Command                         | Purpose                                                            |
-| ------------------------------- | ------------------------------------------------------------------ |
-| `pnpm install`                  | Install dependencies with pnpm                                     |
-| `pnpm run dev`                  | Start dev server with Turbopack (<http://localhost:3000>)          |
-| `pnpm run build`                | Production build (runs pre/post-build scripts)                     |
-| `pnpm run start`                | Serve production build locally                                     |
-| `pnpm test`                     | Run all Jest tests                                                 |
-| `pnpm test -- --watch`          | Run tests in watch mode                                            |
-| `pnpm test -- --coverage`       | Run tests with coverage report (enforces >80% line coverage in CI) |
-| `pnpm test -- src/**/*.test.ts` | Run specific test file or pattern                                  |
-| `pnpm run lint`                 | Run ESLint checks                                                  |
-| `pnpm run lint:fix`             | Fix ESLint errors automatically                                    |
-| `pnpm run typecheck`            | Check TypeScript types (no emit)                                   |
-| `pnpm run format`               | Format code with Prettier                                          |
-| `pnpm run format:check`         | Check code formatting without modifying                            |
-| `pnpm run netlify-build`        | Netlify-optimized build (excludes routes, cleans .next)            |
+| Command                   | Purpose                                                              |
+| ------------------------- | -------------------------------------------------------------------- |
+| `pnpm install`            | Install dependencies                                                 |
+| `pnpm run dev`            | Start dev server (Turbopack) on <http://localhost:3000>              |
+| `pnpm run build`          | Production build (includes `replace-sw-env.js` + post-build cleanup) |
+| `pnpm run start`          | Serve production build locally                                       |
+| `pnpm test`               | Run all Jest tests                                                   |
+| `pnpm test -- --watch`    | Run tests in watch mode                                              |
+| `pnpm test -- --coverage` | Generate coverage report (>80% enforced in CI)                       |
+| `pnpm run lint`           | ESLint check all files                                               |
+| `pnpm run lint:fix`       | ESLint fix all auto-fixable issues                                   |
+| `pnpm run typecheck`      | Run TypeScript type-checking                                         |
+| `pnpm run format`         | Format all files with Prettier                                       |
 
-## Architecture & Codebase Structure
+**Running a single test:** `pnpm test -- <test-file-name-pattern>` (e.g., `pnpm test -- auth` runs all test files containing "auth")
 
-**Stack:** React 18 + Next.js 16 (App Router + Turbopack) | TypeScript 5 | Firebase 11 (Client+Admin SDK) | Tailwind CSS | Radix UI | TanStack React Query | Jest
+## Architecture & Structure
 
-**Directory Layout:**
+**Stack:** React 18 + Next.js 16 App Router + TypeScript 5 + Firebase 11 (Client + Admin SDK) + Tailwind CSS + Radix UI
 
-- `src/actions/` – Server actions & API utilities
-- `src/app/` – Next.js App Router pages & server routes (`src/app/api/*` → `/api/**`)
-- `src/components/` – Reusable UI components organized by feature (admin, analytics, app, auth, community, core, dashboard, debug, dialogs, expense-management, fault-management, icons, layout, ledger, maintenance, monitoring, notifications, payment-events, ui)
-- `src/lib/` – Core logic & utilities (auth, core constants, firebase initialization, firestore data layer)
-- `src/hooks/` – Custom React hooks
-- `src/context/` – React context providers
-- `src/proxy.ts` – Proxy utilities
-- `public/` – Static assets & service workers (`sw-optimized.js`, `firebase-messaging-sw.js`)
-- `scripts/` – Node/TypeScript maintenance scripts (seeding, deployment checks, admin tasks, build optimization)
+**Key Folders:**
+
+- `src/app/` – App Router pages and API routes (`/api/**`)
+- `src/components/` – Re-usable UI components (organized by feature: `admin/`, `analytics/`, `auth/`, `dashboard/`, etc.)
+- `src/lib/` – Core logic and utilities (`auth/`, `firebase/`, `firestore/`, `core/`)
+- `src/hooks/` & `src/context/` – Custom hooks and React contexts
+- `src/actions/` – Server actions
+- `public/` – Static assets and service workers (`sw-optimized.js`, `firebase-messaging-sw.js`)
+- `scripts/` – Node.js maintenance scripts (data seeding, deployment checks, Firebase admin operations)
 - `tests/` – Jest unit test suites
-- `firebase/` – Firebase config & legacy messaging worker (v8, kept for reference only)
 
-**Key Dependencies:**
+**Database:** Firestore (Firebase) with security rules in `firestore.rules`
 
-- **Firestore** for data persistence
-- **Firebase Auth** for user authentication (custom tokens & custom claims for authorization)
-- **Firebase Cloud Messaging** for push notifications
-- **React Query** for server state management & data fetching
-- **Recharts** for analytics visualizations
-- **Zod** for schema validation
+**Service Workers:** Production-optimized (`sw-optimized.js`) with fallback (`sw.js`). Configured at build-time via `scripts/replace-sw-env.js`.
 
-**Important Patterns:**
-
-- **Thin client, heavy server:** UI is lightweight; bulk operations run via admin scripts or server routes
-- **Custom claims:** Users have `apartmentId` & `role` claims (required for security rules)
-- **Service workers:** Use `cacheFirst`, `networkFirst`, `staleWhileRevalidate` strategies; config injected at build time via `scripts/replace-sw-env.js`
+**Internal APIs:** Server-only routes in `src/app/api/` for authentication, expenses, faults, notifications, and more.
 
 ## Code Style & Conventions
 
-**TypeScript:**
+**TypeScript:** Strict mode enabled. No `any` types in `src/**` files. Use explicit types on all function parameters and return values.
 
-- Strict mode enabled (`"strict": true` in tsconfig.json)
-- No `any` types in source code (`src/**/*.ts{,x}`); allowed in tests/mocks only
-- No `require()` in source code; ESM imports only
-- Path aliases: `@/*` → `src/*`
+**Imports:** Organized by `prettier-plugin-sort-imports`: React/Next → `@/lib/*` → `@/components/*` → relative imports. Auto-formatted on save.
 
-**Imports & Formatting:**
+**Naming:**
 
-- Use sorted imports: `react` → `next` → `@/lib` → `@/components` → `@/hooks` → local imports (via `@trivago/prettier-plugin-sort-imports`)
-- Prettier config: 2-space indentation, 100-char line width, single quotes, trailing commas (ES5), semicolons, sorted imports
-- Format: `pnpm run format` (enforced pre-commit if git hooks exist)
-- Check formatting: `pnpm run format:check`
+- Components: PascalCase (e.g., `AdminDashboard.tsx`)
+- Utilities/hooks: camelCase (e.g., `useAuth.ts`)
+- Constants: UPPER_SNAKE_CASE (e.g., `MAX_RETRIES`)
 
-**Naming & Naming Conventions:**
+**Formatting:** Prettier config in `.prettierrc` (100-char line width, 2-space indents, trailing commas, single quotes, LF line endings).
 
-- Components: PascalCase (e.g., `UserDashboard`, `ExpenseList`)
-- Hooks: `use` prefix (e.g., `useUserFilter`, `useAnalyticsData`)
-- Utilities/constants: camelCase (e.g., `getApartmentIds`, `DEFAULT_CACHE_TTL`)
-- Files: match export name (`UserDashboard.tsx` for `export const UserDashboard`)
+**Error Handling:** Wrap API calls in try-catch. Log errors to console (via `loglevel`) but never expose internal details to users. Return structured `{ error, status }` responses.
 
-**Error Handling:**
+**Firebase Auth:** Email/password and Google OAuth. Session cookie (5-day expiry) set via `/api/auth/session`. Custom claims (`apartmentId`, `role`) embedded in ID tokens for Firestore rule checks.
 
-- Throw descriptive errors with context; avoid silent failures
-- Validate input with Zod schemas before processing
-- Log errors to console in dev; use structured logging in production
-- Graceful fallbacks for Firebase operations (handle offline, auth failures)
+**Testing:** Jest with jsdom. Firebase modules mocked in `jest.setup.ts`. Minimum 80% line coverage enforced in CI.
 
-**Testing:**
-
-- Place tests in `tests/` directory with same structure as `src/`
-- Use `*.test.ts` suffix (e.g., `tests/lib/auth/auth.test.ts`)
-- Mock Firebase modules via `jest.setup.ts` (all Firebase calls are mocked in tests)
-- Aim for ≥80% line coverage in CI
+**Environment:** All `NEXT_PUBLIC_*` vars public; private vars never committed. Service-account (`apartgo.json`) base64-encoded in CI secrets. Emulator support via `NEXT_PUBLIC_FIREBASE_EMULATOR_HOST`.
