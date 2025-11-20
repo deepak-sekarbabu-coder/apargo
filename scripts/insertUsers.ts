@@ -1,6 +1,6 @@
 import { addDoc, collection } from 'firebase/firestore';
 
-import { db } from '../src/lib/firebase';
+import { db } from '../src/lib/firebase/firebase';
 
 const insertUsers = async () => {
   const usersCol = collection(db, 'users');

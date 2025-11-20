@@ -53,9 +53,9 @@ export function SkipLink({ href, children }: { href: string; children: React.Rea
  * Focus trap utility for modals and dialogs
  */
 export function useFocusTrap(isActive: boolean) {
-  const containerRef = React.useRef<HTMLElement>(null);
-  const firstFocusableRef = React.useRef<HTMLElement>(null);
-  const lastFocusableRef = React.useRef<HTMLElement>(null);
+  const containerRef = React.useRef<HTMLElement | null>(null);
+  const firstFocusableRef = React.useRef<HTMLElement | null>(null);
+  const lastFocusableRef = React.useRef<HTMLElement | null>(null);
 
   React.useEffect(() => {
     if (!isActive || !containerRef.current) return;

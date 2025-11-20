@@ -1,5 +1,3 @@
-import { jest } from '@jest/globals';
-
 // Mock Firebase modules
 jest.mock('firebase/app', () => ({
   initializeApp: jest.fn(() => ({})),
@@ -9,7 +7,7 @@ jest.mock('firebase/app', () => ({
 jest.mock('firebase/auth', () => {
   const mockAuth = {
     currentUser: null,
-    onAuthStateChanged: jest.fn((auth, callback: (user: any) => void) => {
+    onAuthStateChanged: jest.fn((auth: any, callback: (user: any) => void) => {
       // Simulate no user initially
       process.nextTick(() => callback(null));
       return jest.fn();
@@ -42,7 +40,7 @@ jest.mock('firebase/firestore', () => {
   };
 
   // Define getDoc separately to avoid duplicate property name issue
-  const getDoc = jest.fn(async docRef => ({
+  const getDoc = jest.fn(async (docRef: any) => ({
     exists: true,
     data: () => ({}),
     id: 'mock-doc-id',
@@ -58,7 +56,7 @@ jest.mock('firebase/firestore', () => {
     updateDoc: jest.fn(),
     deleteDoc: jest.fn(),
     getDoc, // Use the separately defined getDoc
-    getDocs: jest.fn(async query => ({
+    getDocs: jest.fn(async (query: any) => ({
       docs: [
         // Return at least one mock document to prevent issues when tests expect data
         {
@@ -72,11 +70,11 @@ jest.mock('firebase/firestore', () => {
       empty: false,
       forEach: jest.fn(),
     })),
-    query: jest.fn(query => query),
-    where: jest.fn((field, operator, value) => ({ field, operator, value })),
-    orderBy: jest.fn((field, direction) => ({ field, direction })),
-    limit: jest.fn(count => ({ count })),
-    onSnapshot: jest.fn((reference, callback: (snapshot: any) => void) => {
+    query: jest.fn((query: any) => query),
+    where: jest.fn((field: any, operator: any, value: any) => ({ field, operator, value })),
+    orderBy: jest.fn((field: any, direction: any) => ({ field, direction })),
+    limit: jest.fn((count: any) => ({ count })),
+    onSnapshot: jest.fn((reference: any, callback: (snapshot: any) => void) => {
       // Immediately call the callback with empty data to simulate Firebase subscription
       process.nextTick(() => callback({ docs: [], forEach: jest.fn() }));
       return jest.fn(); // Return unsubscribe function
@@ -88,9 +86,9 @@ jest.mock('firebase/firestore', () => {
       delete: jest.fn(),
       commit: jest.fn(),
     })),
-    arrayUnion: jest.fn((...values) => ({ values, type: 'array-union' })),
-    arrayRemove: jest.fn((...values) => ({ values, type: 'array-remove' })),
-    increment: jest.fn(value => ({ value, type: 'increment' })),
+    arrayUnion: jest.fn((...values: any[]) => ({ values, type: 'array-union' })),
+    arrayRemove: jest.fn((...values: any[]) => ({ values, type: 'array-remove' })),
+    increment: jest.fn((value: any) => ({ value, type: 'increment' })),
   };
 });
 

@@ -1,7 +1,7 @@
 import { getFirestore } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
 
-import { getFirebaseAdminApp } from '../src/lib/firebase-admin.ts';
+import { getFirebaseAdminApp } from '../src/lib/firebase/firebase-admin.ts';
 
 async function cleanInvalidTokens() {
   console.log('Cleaning invalid FCM tokens...');

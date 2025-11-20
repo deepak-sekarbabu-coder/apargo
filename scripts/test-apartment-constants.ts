@@ -1,5 +1,5 @@
 // scripts/test-apartment-constants.ts
-import { getApartmentCount, getApartmentIds } from '../src/lib/apartment-constants';
+import { getApartmentCount, getApartmentIds } from '../src/lib/core/apartment-constants';
 
 console.log('--- Running Apartment Configuration Test ---');
 console.log('This test reads the NEXT_PUBLIC_APP_APARTMENT_COUNT environment variable.');

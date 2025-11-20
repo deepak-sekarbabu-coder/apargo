@@ -3,7 +3,7 @@ import {
   calculateNextRecurrenceDate,
   createRecurringTaskFromCompleted,
   shouldCreateRecurringTask,
-} from '@/lib/maintenance-utils';
+} from '@/lib/maintenance/maintenance-utils';
 import { MaintenanceTask } from '@/lib/types';
 
 describe('Recurring Maintenance Tasks', () => {

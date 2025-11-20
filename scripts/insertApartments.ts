@@ -3,7 +3,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { getApartmentIds } from '../src/lib/apartment-constants';
+import { getApartmentIds } from '../src/lib/core/apartment-constants';
 
 // Initialize Firebase Admin SDK
 const initializeFirebaseAdmin = () => {
