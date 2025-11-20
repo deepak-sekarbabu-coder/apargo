@@ -9,6 +9,7 @@ import {
   isInvalidTokenError,
 } from '@/lib/auth/auth-utils';
 import { firebaseManager } from '@/lib/firebase/firebase-connection-manager';
+import { withLogging } from '@/lib/middleware/request-logger';
 
 async function createSession(request: NextRequest) {
   try {
@@ -93,7 +94,7 @@ async function createSession(request: NextRequest) {
   }
 }
 
-export const POST = createSession;
+export const POST = withLogging(createSession);
 
 async function deleteSession() {
   try {
@@ -110,4 +111,4 @@ async function deleteSession() {
   }
 }
 
-export const DELETE = deleteSession;
+export const DELETE = withLogging(deleteSession);

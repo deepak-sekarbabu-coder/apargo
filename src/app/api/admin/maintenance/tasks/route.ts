@@ -14,6 +14,7 @@ import {
   updateMaintenanceTask,
 } from '@/lib/firestore/maintenance-tasks';
 import { getUserByEmail } from '@/lib/firestore/users';
+import { withLogging } from '@/lib/middleware/request-logger';
 
 // Helper function to verify authentication and get user
 async function verifyAuth() {
@@ -47,7 +48,7 @@ async function verifyAuth() {
 }
 
 // GET /api/maintenance/tasks - Get all maintenance tasks
-export async function GET(request: NextRequest) {
+export const GET = withLogging(async (request: NextRequest) => {
   try {
     const authResult = await verifyAuth();
     if ('error' in authResult) {
@@ -94,10 +95,10 @@ export async function GET(request: NextRequest) {
     console.error('Get maintenance tasks error:', error);
     return NextResponse.json({ error: 'Failed to fetch maintenance tasks' }, { status: 500 });
   }
-}
+});
 
 // POST /api/maintenance/tasks - Create new maintenance task
-export async function POST(request: NextRequest) {
+export const POST = withLogging(async (request: NextRequest) => {
   try {
     const authResult = await verifyAuth();
     if ('error' in authResult) {
@@ -132,10 +133,10 @@ export async function POST(request: NextRequest) {
     console.error('Create maintenance task error:', error);
     return NextResponse.json({ error: 'Failed to create maintenance task' }, { status: 500 });
   }
-}
+});
 
 // PUT /api/maintenance/tasks - Update maintenance task
-export async function PUT(request: NextRequest) {
+export const PUT = withLogging(async (request: NextRequest) => {
   try {
     const authResult = await verifyAuth();
     if ('error' in authResult) {
@@ -159,10 +160,10 @@ export async function PUT(request: NextRequest) {
     console.error('Update maintenance task error:', error);
     return NextResponse.json({ error: 'Failed to update maintenance task' }, { status: 500 });
   }
-}
+});
 
 // DELETE /api/maintenance/tasks - Delete maintenance task
-export async function DELETE(request: NextRequest) {
+export const DELETE = withLogging(async (request: NextRequest) => {
   try {
     const authResult = await verifyAuth();
     if ('error' in authResult) {
@@ -192,4 +193,4 @@ export async function DELETE(request: NextRequest) {
     console.error('Delete maintenance task error:', error);
     return NextResponse.json({ error: 'Failed to delete maintenance task' }, { status: 500 });
   }
-}
+});

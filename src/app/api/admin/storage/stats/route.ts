@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getUserByEmail } from '@/lib/firestore/users';
+import { withLogging } from '@/lib/middleware/request-logger';
 import { storageService } from '@/lib/storage/storage-enhanced';
 
 // Helper function to verify admin role
@@ -43,7 +44,7 @@ async function verifyAdminRole(request: NextRequest): Promise<{
 }
 
 // GET /api/admin/storage/stats - Get storage statistics
-export async function GET(request: NextRequest) {
+export const GET = withLogging(async (request: NextRequest) => {
   try {
     // Verify admin role
     const authResult = await verifyAdminRole(request);
@@ -73,4 +74,4 @@ export async function GET(request: NextRequest) {
     console.error('Storage stats API error:', error);
     return NextResponse.json({ error: 'Failed to retrieve storage statistics' }, { status: 500 });
   }
-}
+});

@@ -2,6 +2,7 @@ import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
 import { getUserByEmail } from '@/lib/firestore/users';
+import { withLogging } from '@/lib/middleware/request-logger';
 import { storageService } from '@/lib/storage/storage-enhanced';
 
 // Helper function to verify admin role
@@ -46,7 +47,7 @@ async function verifyAdminRole(request: NextRequest): Promise<{
 }
 
 // GET /api/admin/files - List files with optional filtering
-export async function GET(request: NextRequest) {
+export const GET = withLogging(async (request: NextRequest) => {
   try {
     // Verify admin role
     const authResult = await verifyAdminRole(request);
@@ -87,10 +88,10 @@ export async function GET(request: NextRequest) {
     console.error('Admin files list API error:', error);
     return NextResponse.json({ error: 'Failed to retrieve files' }, { status: 500 });
   }
-}
+});
 
 // DELETE /api/admin/files - Bulk delete files
-export async function DELETE(request: NextRequest) {
+export const DELETE = withLogging(async (request: NextRequest) => {
   try {
     // Verify admin role
     const authResult = await verifyAdminRole(request);
@@ -129,4 +130,4 @@ export async function DELETE(request: NextRequest) {
     console.error('Admin files delete API error:', error);
     return NextResponse.json({ error: 'Failed to delete files' }, { status: 500 });
   }
-}
+});

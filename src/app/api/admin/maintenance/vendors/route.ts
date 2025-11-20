@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getFirebaseAdminApp } from '@/lib/firebase/firebase-admin';
 import { getUserByEmail } from '@/lib/firestore/users';
 import { addVendor, deleteVendor, getVendors, updateVendor } from '@/lib/firestore/vendors';
+import { withLogging } from '@/lib/middleware/request-logger';
 
 // Helper function to verify authentication and get user
 async function verifyAuth() {
@@ -39,7 +40,7 @@ async function verifyAuth() {
 }
 
 // GET /api/maintenance/vendors - Get all vendors
-export async function GET(request: NextRequest) {
+export const GET = withLogging(async (request: NextRequest) => {
   try {
     const authResult = await verifyAuth();
     if ('error' in authResult) {
@@ -59,10 +60,10 @@ export async function GET(request: NextRequest) {
     console.error('Get vendors error:', error);
     return NextResponse.json({ error: 'Failed to fetch vendors' }, { status: 500 });
   }
-}
+});
 
 // POST /api/maintenance/vendors - Create new vendor
-export async function POST(request: NextRequest) {
+export const POST = withLogging(async (request: NextRequest) => {
   try {
     const authResult = await verifyAuth();
     if ('error' in authResult) {
@@ -94,10 +95,10 @@ export async function POST(request: NextRequest) {
     console.error('Create vendor error:', error);
     return NextResponse.json({ error: 'Failed to create vendor' }, { status: 500 });
   }
-}
+});
 
 // PUT /api/maintenance/vendors - Update vendor
-export async function PUT(request: NextRequest) {
+export const PUT = withLogging(async (request: NextRequest) => {
   try {
     const authResult = await verifyAuth();
     if ('error' in authResult) {
@@ -128,10 +129,10 @@ export async function PUT(request: NextRequest) {
     console.error('Update vendor error:', error);
     return NextResponse.json({ error: 'Failed to update vendor' }, { status: 500 });
   }
-}
+});
 
 // DELETE /api/maintenance/vendors - Delete vendor
-export async function DELETE(request: NextRequest) {
+export const DELETE = withLogging(async (request: NextRequest) => {
   try {
     const authResult = await verifyAuth();
     if ('error' in authResult) {
@@ -162,4 +163,4 @@ export async function DELETE(request: NextRequest) {
     console.error('Delete vendor error:', error);
     return NextResponse.json({ error: 'Failed to delete vendor' }, { status: 500 });
   }
-}
+});

@@ -3,10 +3,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { basicAuth } from '@/lib/auth/auth';
 import type { PaymentStatus } from '@/lib/core/types';
 import { getPayments, updatePayment } from '@/lib/firestore/payments';
+import { withLogging } from '@/lib/middleware/request-logger';
 
 // PUT /api/payments/[id]
 // Update payment status - used for marking payment events as paid
-export async function PUT(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export const PUT = withLogging(async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   try {
     // Check authentication
     const { user, error } = await basicAuth();
@@ -110,11 +111,11 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
       { status: 500 }
     );
   }
-}
+});
 
 // GET /api/payments/[id]
 // Get specific payment details
-export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export const GET = withLogging(async (request: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
   try {
     // Check authentication
     const { user, error } = await basicAuth();
@@ -160,4 +161,4 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       { status: 500 }
     );
   }
-}
+});

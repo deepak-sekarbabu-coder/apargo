@@ -4,8 +4,9 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { getFirebaseAdminApp } from '@/lib/firebase/firebase-admin';
 import { addExpense } from '@/lib/firestore/expenses';
+import { withLogging } from '@/lib/middleware/request-logger';
 
-export async function POST(request: NextRequest) {
+export const POST = withLogging(async (request: NextRequest) => {
   try {
     const body = await request.json();
     // Validate required fields (customize as needed)
@@ -62,4 +63,5 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+});
+
