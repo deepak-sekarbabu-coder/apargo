@@ -5,6 +5,7 @@ import Script from 'next/script';
 import ClientRoot from '@/components/core/client-root';
 import HeadMeta from '@/components/core/head-meta';
 import { SkipLink } from '@/components/ui/accessibility';
+import { NonceProvider } from '@/lib/core/nonce-provider';
 
 import './globals.css';
 
@@ -54,11 +55,16 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Get nonce from headers for CSP
+  const { headers } = await import('next/headers');
+  const headersList = await headers();
+  const nonce = headersList.get('x-nonce') || '';
+
   return (
     <html lang="en" suppressHydrationWarning={true}>
       <head>
@@ -70,6 +76,7 @@ export default function RootLayout({
         <Script
           id="extension-attr-cleanup"
           strategy="beforeInteractive"
+          nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: `(() => {
               const ATTRS = ['bis_skin_checked', 'data-new-gr-c-s-check-loaded', 'data-gr-ext-installed', 'data-new-gr-c-s-loaded', 'grammarly-extension', 'data-lt-installed'];
@@ -132,7 +139,9 @@ export default function RootLayout({
             })();`,
           }}
         />
-        <ClientRoot>{children}</ClientRoot>
+        <ClientRoot>
+          <NonceProvider nonce={nonce}>{children}</NonceProvider>
+        </ClientRoot>
       </body>
     </html>
   );

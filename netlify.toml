@@ -56,6 +56,8 @@ NPM_FLAGS = "--legacy-peer-deps --include=dev"
 # catch-all redirect but ensure it does NOT apply to /api/*, /_next/*, or /static/*.
 
 # Security headers
+# Note: Content-Security-Policy is now primarily handled by Next.js middleware (src/middleware.ts)
+# which generates unique nonces per request. The CSP below serves as a fallback for static assets.
 [[headers]]
   for = "/*"
   [headers.values]
@@ -63,7 +65,8 @@ NPM_FLAGS = "--legacy-peer-deps --include=dev"
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://apis.google.com https://www.gstatic.com https://accounts.google.com https://www.google.com https://www.recaptcha.net https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.gstatic.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.firebaseapp.com https://*.googleapis.com https://*.google.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com wss://*.firebaseio.com https://*.netlify.app; frame-ancestors 'self'; upgrade-insecure-requests;"
+    # Fallback CSP for static files (middleware handles dynamic pages with nonces)
+    Content-Security-Policy = "default-src 'self'; script-src 'self' https://apis.google.com https://www.gstatic.com https://accounts.google.com https://www.google.com https://www.recaptcha.net https://www.googletagmanager.com 'unsafe-eval'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://*.firebaseapp.com https://*.googleapis.com https://*.google.com https://firestore.googleapis.com https://identitytoolkit.googleapis.com wss://*.firebaseio.com; worker-src 'self' blob:; frame-ancestors 'self'; upgrade-insecure-requests;"
 
 # API headers
 [[headers]]
