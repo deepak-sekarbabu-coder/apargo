@@ -5,7 +5,6 @@ import * as RechartsPrimitive from 'recharts';
 import * as React from 'react';
 
 import { cn } from '@/lib/utils';
-import { useNonce } from '@/lib/core/nonce-provider';
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: '', dark: '.dark' } as const;
@@ -67,7 +66,6 @@ ChartContainer.displayName = 'Chart';
 
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(([, config]) => config.theme || config.color);
-  const nonce = useNonce();
 
   if (!colorConfig.length) {
     return null;
@@ -75,7 +73,6 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
 
   return (
     <style
-      nonce={nonce}
       dangerouslySetInnerHTML={{
         __html: Object.entries(THEMES)
           .map(
