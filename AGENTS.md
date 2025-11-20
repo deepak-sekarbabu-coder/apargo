@@ -6,7 +6,7 @@
 | ------------------------------- | ------------------------------------------------------------------ |
 | `pnpm install`                  | Install dependencies with pnpm                                     |
 | `pnpm run dev`                  | Start dev server with Turbopack (<http://localhost:3000>)          |
-| `pnpm run build`                | Production build with post-build cleanup                           |
+| `pnpm run build`                | Production build (runs pre/post-build scripts)                     |
 | `pnpm run start`                | Serve production build locally                                     |
 | `pnpm test`                     | Run all Jest tests                                                 |
 | `pnpm test -- --watch`          | Run tests in watch mode                                            |
@@ -16,6 +16,8 @@
 | `pnpm run lint:fix`             | Fix ESLint errors automatically                                    |
 | `pnpm run typecheck`            | Check TypeScript types (no emit)                                   |
 | `pnpm run format`               | Format code with Prettier                                          |
+| `pnpm run format:check`         | Check code formatting without modifying                            |
+| `pnpm run netlify-build`        | Netlify-optimized build (excludes routes, cleans .next)            |
 
 ## Architecture & Codebase Structure
 
@@ -23,13 +25,15 @@
 
 **Directory Layout:**
 
+- `src/actions/` – Server actions & API utilities
 - `src/app/` – Next.js App Router pages & server routes (`src/app/api/*` → `/api/**`)
-- `src/components/` – Reusable UI components organized by feature (admin, analytics, community, dashboard, maintenance, payment-events, ui)
+- `src/components/` – Reusable UI components organized by feature (admin, analytics, app, auth, community, core, dashboard, debug, dialogs, expense-management, fault-management, icons, layout, ledger, maintenance, monitoring, notifications, payment-events, ui)
 - `src/lib/` – Core logic & utilities (auth, core constants, firebase initialization, firestore data layer)
 - `src/hooks/` – Custom React hooks
 - `src/context/` – React context providers
+- `src/proxy.ts` – Proxy utilities
 - `public/` – Static assets & service workers (`sw-optimized.js`, `firebase-messaging-sw.js`)
-- `scripts/` – Node/TypeScript maintenance scripts (seeding, deployment checks, admin tasks)
+- `scripts/` – Node/TypeScript maintenance scripts (seeding, deployment checks, admin tasks, build optimization)
 - `tests/` – Jest unit test suites
 - `firebase/` – Firebase config & legacy messaging worker (v8, kept for reference only)
 
@@ -59,9 +63,10 @@
 
 **Imports & Formatting:**
 
-- Use sorted imports: `react` → `next` → `@/lib` → `@/components` → `@/hooks` → local imports
-- Prettier config: 2-space tabs, 100-char line width, single quotes, trailing commas (ES5), semicolons, sorted imports
+- Use sorted imports: `react` → `next` → `@/lib` → `@/components` → `@/hooks` → local imports (via `@trivago/prettier-plugin-sort-imports`)
+- Prettier config: 2-space indentation, 100-char line width, single quotes, trailing commas (ES5), semicolons, sorted imports
 - Format: `pnpm run format` (enforced pre-commit if git hooks exist)
+- Check formatting: `pnpm run format:check`
 
 **Naming & Naming Conventions:**
 

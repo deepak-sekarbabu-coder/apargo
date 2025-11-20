@@ -46,7 +46,7 @@
 
 ---
 
-### 1.1 Latest Features (v1.5.0)
+### 1.1 Latest Features (v1.0.0)
 
 This version introduces several major enhancements to the property management platform:
 
@@ -963,12 +963,3 @@ docker run -p 3000:3000 \\
 ---
 
 ### 🎉 You’re all set
-
-With the updated documentation you should now have:
-
-- A crystal-clear picture of the **routing model** and how to migrate any leftover `src/pages` files.
-- Full guidance on **environment variables**, **emulator usage**, and **service-worker build-time injection**.
-- Explicit instructions for **Docker** builds, **bundle analysis**, **TSX script execution**, and **manual SW cache busts**.
-- Updated references for the **custom-claim script**, **legacy messaging worker**, **fix-notifications-display** helper, and the caching strategies inside `sw-optimized.js`.
-
-If anything still feels fuzzy, open an issue or submit a PR – keeping the docs in sync with the code is a shared responsibility. Happy coding! 🚀
