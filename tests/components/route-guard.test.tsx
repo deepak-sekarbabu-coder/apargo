@@ -1,9 +1,11 @@
+import { useAuth } from '@/context/auth-context';
 import { render } from '@testing-library/react';
-import { useRouter } from 'next/navigation';
+
 import React from 'react';
 
+import { useRouter } from 'next/navigation';
+
 import { RouteGuard } from '@/components/core/route-guard';
-import { useAuth } from '@/context/auth-context';
 
 // Mock the hooks
 jest.mock('@/context/auth-context');

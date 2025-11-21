@@ -11,80 +11,80 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 function cleanupNextBuild(): void {
-    console.log('🧹 Post-build cleanup...');
+  console.log('🧹 Post-build cleanup...');
 
-    const cleanupPaths: string[] = [
-        '.next/cache/webpack',
-        '.next/cache/eslint',
-        '.next/static/**/*.map', // Remove source maps in production
-    ];
+  const cleanupPaths: string[] = [
+    '.next/cache/webpack',
+    '.next/cache/eslint',
+    '.next/static/**/*.map', // Remove source maps in production
+  ];
 
-    // Remove source maps if not needed
-    if (process.env.NODE_ENV === 'production') {
-        try {
-            const staticDir = '.next/static';
-            if (fs.existsSync(staticDir)) {
-                removeSourceMaps(staticDir);
-            }
-        } catch (error) {
-            const errorMessage = error instanceof Error ? error.message : String(error);
-            console.warn('Could not remove source maps:', errorMessage);
-        }
+  // Remove source maps if not needed
+  if (process.env.NODE_ENV === 'production') {
+    try {
+      const staticDir = '.next/static';
+      if (fs.existsSync(staticDir)) {
+        removeSourceMaps(staticDir);
+      }
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.warn('Could not remove source maps:', errorMessage);
     }
+  }
 
-    console.log('   ✅ Cleanup complete');
+  console.log('   ✅ Cleanup complete');
 }
 
 function removeSourceMaps(dir: string): void {
-    const files = fs.readdirSync(dir);
+  const files = fs.readdirSync(dir);
 
-    files.forEach(file => {
-        const filePath = path.join(dir, file);
-        const stat = fs.statSync(filePath);
+  files.forEach(file => {
+    const filePath = path.join(dir, file);
+    const stat = fs.statSync(filePath);
 
-        if (stat.isDirectory()) {
-            removeSourceMaps(filePath);
-        } else if (file.endsWith('.map')) {
-            try {
-                fs.unlinkSync(filePath);
-                console.log(`   🗑️  Removed: ${filePath}`);
-            } catch (error) {
-                console.warn(`   ⚠️  Could not remove: ${filePath}`);
-            }
-        }
-    });
+    if (stat.isDirectory()) {
+      removeSourceMaps(filePath);
+    } else if (file.endsWith('.map')) {
+      try {
+        fs.unlinkSync(filePath);
+        console.log(`   🗑️  Removed: ${filePath}`);
+      } catch (error) {
+        console.warn(`   ⚠️  Could not remove: ${filePath}`);
+      }
+    }
+  });
 }
 
 function optimizeServerlessBundle(): void {
-    console.log('⚡ Optimizing serverless bundle...');
+  console.log('⚡ Optimizing serverless bundle...');
 
-    // Create a minimal import file for Node.js optimizations
-    const importScript = `// Node.js optimizations for serverless
+  // Create a minimal import file for Node.js optimizations
+  const importScript = `// Node.js optimizations for serverless
 import('./src/lib/node-optimization.js');
 console.log('🚀 Serverless optimizations loaded');
 `;
 
-    const serverlessDir = '.next/standalone';
-    if (fs.existsSync(serverlessDir)) {
-        fs.writeFileSync(path.join(serverlessDir, 'optimize.js'), importScript);
-        console.log('   ✅ Serverless optimizations added');
-    }
+  const serverlessDir = '.next/standalone';
+  if (fs.existsSync(serverlessDir)) {
+    fs.writeFileSync(path.join(serverlessDir, 'optimize.js'), importScript);
+    console.log('   ✅ Serverless optimizations added');
+  }
 }
 
 function main(): void {
-    try {
-        cleanupNextBuild();
-        optimizeServerlessBundle();
-        console.log('✅ Post-build optimization complete');
-    } catch (error) {
-        console.error('❌ Post-build cleanup failed:', error);
-        // Don't fail the build for cleanup errors
-        process.exit(0);
-    }
+  try {
+    cleanupNextBuild();
+    optimizeServerlessBundle();
+    console.log('✅ Post-build optimization complete');
+  } catch (error) {
+    console.error('❌ Post-build cleanup failed:', error);
+    // Don't fail the build for cleanup errors
+    process.exit(0);
+  }
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {
-    main();
+  main();
 }
 
 export { cleanupNextBuild };

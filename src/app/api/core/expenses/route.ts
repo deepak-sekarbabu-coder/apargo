@@ -64,4 +64,3 @@ export const POST = withLogging(async (request: NextRequest) => {
     );
   }
 });
-

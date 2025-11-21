@@ -44,7 +44,6 @@ export function proxy(request: NextRequest) {
   return response;
 }
 
-
 export const config = {
   matcher: [
     /*
@@ -56,7 +55,8 @@ export const config = {
      * - public files (images, manifests, etc.)
      */
     {
-      source: '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|json|js)).*)',
+      source:
+        '/((?!api|_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|json|js)).*)',
       missing: [
         { type: 'header', key: 'next-router-prefetch' },
         { type: 'header', key: 'purpose', value: 'prefetch' },
