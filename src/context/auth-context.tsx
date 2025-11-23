@@ -146,10 +146,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               // Only create user if we're certain they don't exist
               if (shouldCreateUser) {
                 log.info('Creating new user for email:', firebaseUser.email);
+
+                // Optimize Google profile photo if available
+                let optimizedAvatar = firebaseUser.photoURL || undefined;
+                if (optimizedAvatar?.includes('googleusercontent.com')) {
+                  try {
+                    const { optimizeGoogleImage } = await import('@/lib/utils/image-optimization');
+                    optimizedAvatar = optimizeGoogleImage(optimizedAvatar, { size: 128, crop: true });
+                  } catch (error) {
+                    log.error('Error optimizing user avatar:', error);
+                  }
+                }
+
                 const newUser: Omit<User, 'id'> = {
                   name: firebaseUser.displayName || 'New User',
                   email: firebaseUser.email,
-                  avatar: firebaseUser.photoURL || undefined,
+                  avatar: optimizedAvatar,
                   role: 'user',
                   propertyRole: undefined,
                   apartment: '',
