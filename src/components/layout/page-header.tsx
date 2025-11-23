@@ -63,7 +63,7 @@ export function PageHeader(props: PageHeaderProps) {
   // Optionally could append contextual label, but requirement is to show consistent greeting across menus.
 
   return (
-    <header className="flex h-14 items-center gap-2 sm:gap-4 border-b bg-card px-3 sm:px-6">
+    <header className="flex h-12 xs:h-13 sm:h-14 items-center gap-1 xs:gap-2 sm:gap-3 md:gap-4 border-b bg-card px-2 xs:px-3 sm:px-4 md:px-6">
       <SidebarTrigger className="hidden" />
       {/* Mobile: Show home icon, Desktop: Show title */}
       <div className="flex-1 min-w-0">
@@ -72,17 +72,17 @@ export function PageHeader(props: PageHeaderProps) {
           variant="ghost"
           size="sm"
           onClick={onNavigateHome}
-          className="md:hidden p-2 h-8 w-8"
+          className="md:hidden p-1 h-7 w-7 xs:h-8 xs:w-8"
           aria-label="Go to Dashboard"
         >
-          <Home className="h-5 w-5" />
+          <Home className="h-4 w-4 xs:h-5 xs:w-5" />
         </Button>
         {/* Title for desktop */}
-        <h1 className="hidden md:block text-base sm:text-lg md:text-xl font-semibold truncate">
+        <h1 className="hidden md:block text-sm xs:text-base sm:text-lg md:text-xl font-semibold truncate">
           {title}
         </h1>
       </div>
-      <div className="flex items-center gap-1 sm:gap-2 md:gap-4 flex-shrink-0">
+      <div className="flex items-center gap-0.5 xs:gap-1 sm:gap-2 md:gap-4 flex-shrink-0">
         {user && <NotificationsPanel />}
         {user && (
           <AddExpenseDialog
@@ -92,24 +92,28 @@ export function PageHeader(props: PageHeaderProps) {
             isLoadingApartments={isLoadingApartments}
           >
             <Button
-              className="bg-accent hover:bg-accent/90 h-10 w-10 sm:h-8 sm:w-auto sm:px-3 rounded-full sm:rounded-md touch-manipulation"
+              className="bg-accent hover:bg-accent/90 h-8 w-8 xs:h-9 xs:w-9 sm:h-8 sm:w-auto sm:px-2 md:px-3 rounded-full sm:rounded-md touch-manipulation text-xs sm:text-sm"
               disabled={isLoadingApartments}
               aria-label="Add Expense"
             >
-              <PlusCircle className="h-5 w-5 sm:mr-2" />
-              <span className="hidden sm:inline ml-1 text-sm font-medium">Add Expense</span>
+              <PlusCircle className="h-4 w-4 xs:h-5 xs:w-5 sm:mr-1" />
+              <span className="hidden sm:inline ml-0.5 md:ml-1 text-xs md:text-sm font-medium">
+                Add
+              </span>
             </Button>
           </AddExpenseDialog>
         )}
         {user && (
           <AddPaymentDialog users={users} onAddPayment={onAddPayment}>
             <Button
-              className="bg-primary hover:bg-primary/90 h-10 w-10 sm:h-8 sm:w-auto sm:px-3 rounded-full sm:rounded-md touch-manipulation"
+              className="bg-primary hover:bg-primary/90 h-8 w-8 xs:h-9 xs:w-9 sm:h-8 sm:w-auto sm:px-2 md:px-3 rounded-full sm:rounded-md touch-manipulation text-xs sm:text-sm"
               disabled={isLoadingApartments}
               aria-label="Add Payment"
             >
-              <PlusCircle className="h-5 w-5 sm:mr-2" />
-              <span className="hidden sm:inline ml-1 text-sm font-medium">Add Payment</span>
+              <PlusCircle className="h-4 w-4 xs:h-5 xs:w-5 sm:mr-1" />
+              <span className="hidden sm:inline ml-0.5 md:ml-1 text-xs md:text-sm font-medium">
+                Pay
+              </span>
             </Button>
           </AddPaymentDialog>
         )}

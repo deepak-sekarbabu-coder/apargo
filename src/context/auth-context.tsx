@@ -152,7 +152,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 if (optimizedAvatar?.includes('googleusercontent.com')) {
                   try {
                     const { optimizeGoogleImage } = await import('@/lib/utils/image-optimization');
-                    optimizedAvatar = optimizeGoogleImage(optimizedAvatar, { size: 128, crop: true });
+                    optimizedAvatar = optimizeGoogleImage(optimizedAvatar, {
+                      size: 128,
+                      crop: true,
+                    });
                   } catch (error) {
                     log.error('Error optimizing user avatar:', error);
                   }

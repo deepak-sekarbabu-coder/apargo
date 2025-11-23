@@ -126,7 +126,7 @@ export function DashboardView({
   );
 
   return (
-    <div className="grid gap-6" suppressHydrationWarning>
+    <div className="grid gap-3 xs:gap-4 sm:gap-5 md:gap-6" suppressHydrationWarning>
       {/* Quick feature navigation grid */}
       <FeatureGrid
         onSelect={v => {
@@ -140,19 +140,19 @@ export function DashboardView({
 
       {/* Top summary cards - only show if summary stats are provided */}
       {summaryStats && (
-        <div className="grid grid-cols-2 gap-2 sm:gap-4">
+        <div className="grid grid-cols-2 gap-1.5 xs:gap-2 sm:gap-3 md:gap-4">
           <Card className="border-blue-100 dark:border-blue-800 bg-blue-50 dark:bg-blue-900/20">
-            <CardContent className="p-3 sm:p-4">
-              <p className="text-xs sm:text-sm text-muted-foreground">Total Apartments</p>
-              <div className="text-xl sm:text-2xl font-bold text-blue-700 dark:text-blue-400 mt-1">
+            <CardContent className="p-2 xs:p-3 sm:p-4">
+              <p className="text-xs text-muted-foreground">Total Apartments</p>
+              <div className="text-lg xs:text-xl sm:text-2xl font-bold text-blue-700 dark:text-blue-400 mt-1">
                 {apartmentsCount}
               </div>
             </CardContent>
           </Card>
           <Card className="border-yellow-100 dark:border-yellow-800 bg-yellow-50 dark:bg-yellow-900/20">
-            <CardContent className="p-3 sm:p-4">
-              <p className="text-xs sm:text-sm text-muted-foreground">Unpaid Bills</p>
-              <div className="text-xl sm:text-2xl font-bold text-amber-700 dark:text-amber-400 mt-1">
+            <CardContent className="p-2 xs:p-3 sm:p-4">
+              <p className="text-xs text-muted-foreground">Unpaid Bills</p>
+              <div className="text-lg xs:text-xl sm:text-2xl font-bold text-amber-700 dark:text-amber-400 mt-1">
                 {unpaidBillsCount}
               </div>
             </CardContent>
@@ -175,31 +175,31 @@ export function DashboardView({
       {/* Apartment Balances - only show if balance display is enabled */}
       {balanceDisplay && hasBalances && (
         <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg sm:text-xl">Apartment Balances</CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
+          <CardHeader className="pb-2 xs:pb-2.5 sm:pb-3">
+            <CardTitle className="text-base xs:text-lg sm:text-xl">Apartment Balances</CardTitle>
+            <CardDescription className="text-xs">
               Summary of amounts owed between apartments
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2 sm:space-y-3">
+          <CardContent className="space-y-1.5 xs:space-y-2 sm:space-y-3">
             {/* What you are owed */}
             {owedItems.map(({ apartmentId, apartmentName, formattedAmount }) => (
               <div
                 key={`owed-${apartmentId}`}
-                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 p-2 sm:p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"
+                className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-1.5 xs:gap-2 sm:gap-3 p-1.5 xs:p-2 sm:p-3 bg-green-50 dark:bg-green-900/20 rounded-lg"
               >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-green-100 dark:bg-green-800/30">
-                    <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
+                <div className="flex items-center gap-2 xs:gap-3">
+                  <div className="p-1.5 xs:p-2 rounded-full bg-green-100 dark:bg-green-800/30">
+                    <TrendingUp className="h-4 w-4 xs:h-5 xs:w-5 text-green-600 dark:text-green-400" />
                   </div>
-                  <div>
-                    <p className="font-medium">{apartmentName}</p>
-                    <p className="text-sm text-muted-foreground dark:text-green-200">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium truncate">{apartmentName}</p>
+                    <p className="text-xs text-muted-foreground dark:text-green-200">
                       owes your apartment
                     </p>
                   </div>
                 </div>
-                <span className="text-lg font-semibold text-green-700 dark:text-green-400">
+                <span className="text-base xs:text-lg font-semibold text-green-700 dark:text-green-400 flex-shrink-0">
                   {formattedAmount}
                 </span>
               </div>
@@ -209,20 +209,20 @@ export function DashboardView({
             {owesItems.map(({ apartmentId, apartmentName, formattedAmount }) => (
               <div
                 key={`owes-${apartmentId}`}
-                className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-3 p-2 sm:p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
+                className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-1.5 xs:gap-2 sm:gap-3 p-1.5 xs:p-2 sm:p-3 bg-red-50 dark:bg-red-900/20 rounded-lg"
               >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded-full bg-red-100 dark:bg-red-800/30">
-                    <TrendingDown className="h-5 w-5 text-red-600 dark:text-red-400" />
+                <div className="flex items-center gap-2 xs:gap-3">
+                  <div className="p-1.5 xs:p-2 rounded-full bg-red-100 dark:bg-red-800/30">
+                    <TrendingDown className="h-4 w-4 xs:h-5 xs:w-5 text-red-600 dark:text-red-400" />
                   </div>
-                  <div>
-                    <p className="font-medium">You owe {apartmentName}</p>
-                    <p className="text-sm text-muted-foreground dark:text-red-200">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium truncate">You owe {apartmentName}</p>
+                    <p className="text-xs text-muted-foreground dark:text-red-200">
                       for shared expenses
                     </p>
                   </div>
                 </div>
-                <span className="text-lg font-semibold text-red-700 dark:text-red-400">
+                <span className="text-base xs:text-lg font-semibold text-red-700 dark:text-red-400 flex-shrink-0">
                   {formattedAmount}
                 </span>
               </div>
@@ -231,19 +231,19 @@ export function DashboardView({
             {/* Net balance */}
             {netBalance.amount > 0 && (
               <div
-                className={`mt-3 sm:mt-4 p-3 sm:p-4 rounded-lg ${netBalance.isPositive ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20'}`}
+                className={`mt-2 xs:mt-2.5 sm:mt-3 md:mt-4 p-2 xs:p-2.5 sm:p-3 md:p-4 rounded-lg ${netBalance.isPositive ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20'}`}
               >
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                <div className="flex flex-col xs:flex-row xs:items-center xs:justify-between gap-1.5 xs:gap-2 sm:gap-3 md:gap-4">
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-sm sm:text-base">{netBalance.displayText}</p>
+                    <p className="text-sm font-medium">{netBalance.displayText}</p>
                     <p
-                      className={`text-xs sm:text-sm mt-1 ${netBalance.isPositive ? 'text-muted-foreground dark:text-green-200' : 'text-muted-foreground dark:text-red-200'}`}
+                      className={`text-xs mt-0.5 xs:mt-1 ${netBalance.isPositive ? 'text-muted-foreground dark:text-green-200' : 'text-muted-foreground dark:text-red-200'}`}
                     >
                       {netBalance.description}
                     </p>
                   </div>
                   <span
-                    className={`text-lg sm:text-xl font-bold flex-shrink-0 ${netBalance.isPositive ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}
+                    className={`text-base xs:text-lg sm:text-xl font-bold flex-shrink-0 ${netBalance.isPositive ? 'text-green-700 dark:text-green-400' : 'text-red-700 dark:text-red-400'}`}
                   >
                     {netBalance.formattedAmount}
                   </span>
@@ -256,12 +256,12 @@ export function DashboardView({
 
       {/* Expense Management Section - only show if expense management is enabled */}
       {expenseManagement && (
-        <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-2 xs:gap-3 sm:gap-4 md:gap-5 lg:grid-cols-2">
           <Card>
-            <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0 pb-2 sm:pb-3">
+            <CardHeader className="flex flex-col xs:flex-row xs:items-center xs:justify-between space-y-1.5 xs:space-y-0 pb-2 xs:pb-2.5 sm:pb-3">
               <div className="min-w-0 flex-1">
-                <CardTitle className="text-base sm:text-lg">Recent Expenses</CardTitle>
-                <CardDescription className="text-xs sm:text-sm">
+                <CardTitle className="text-sm xs:text-base sm:text-lg">Recent Expenses</CardTitle>
+                <CardDescription className="text-xs">
                   The last 2 expenses added to your apartment.
                 </CardDescription>
               </div>
@@ -270,7 +270,7 @@ export function DashboardView({
                   variant="outline"
                   size="sm"
                   onClick={onNavigateToExpenses}
-                  className="text-xs w-full sm:w-auto"
+                  className="text-xs w-full xs:w-auto mt-1.5 xs:mt-0"
                 >
                   View All
                 </Button>
@@ -293,46 +293,44 @@ export function DashboardView({
           </Card>
 
           <Card>
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base sm:text-lg">Account Summary</CardTitle>
-              <CardDescription className="text-xs sm:text-sm">
+            <CardHeader className="pb-2 xs:pb-2.5 sm:pb-3">
+              <CardTitle className="text-sm xs:text-base sm:text-lg">Account Summary</CardTitle>
+              <CardDescription className="text-xs">
                 Your personal balance status and account overview.
               </CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-3 sm:gap-4">
-              <div className="flex items-start gap-3 sm:gap-4 min-w-0">
-                <Bell className="h-5 sm:h-6 w-5 sm:w-6 text-accent flex-shrink-0 mt-0.5" />
-                <div className="grid gap-1 min-w-0 flex-1">
-                  <p className="text-xs sm:text-sm font-medium break-words">
+            <CardContent className="grid gap-2 xs:gap-2.5 sm:gap-3 md:gap-4">
+              <div className="flex items-start gap-2 xs:gap-3 sm:gap-4 min-w-0">
+                <Bell className="h-4 w-4 xs:h-5 xs:w-5 sm:h-6 sm:w-6 text-accent flex-shrink-0 mt-0.5" />
+                <div className="grid gap-0.5 xs:gap-1 min-w-0 flex-1">
+                  <p className="text-xs font-medium break-words">
                     Welcome to Apargo, {user?.name}!
                   </p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">
+                  <p className="text-xs text-muted-foreground">
                     Here is a summary of your account.
                   </p>
                 </div>
               </div>
               <Separator />
-              <div className="flex items-start gap-3 sm:gap-4 min-w-0">
+              <div className="flex items-start gap-2 xs:gap-3 sm:gap-4 min-w-0">
                 <Wallet
-                  className={`h-5 sm:h-6 w-5 sm:w-6 flex-shrink-0 mt-0.5 ${accountSummary.isSettled ? 'text-green-600 dark:text-green-400' : accountSummary.isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
+                  className={`h-4 w-4 xs:h-5 xs:w-5 sm:h-6 sm:w-6 flex-shrink-0 mt-0.5 ${accountSummary.isSettled ? 'text-green-600 dark:text-green-400' : accountSummary.isPositive ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
                 />
-                <div className="grid gap-1 min-w-0 flex-1">
-                  <p className="text-xs sm:text-sm font-medium break-words">
+                <div className="grid gap-0.5 xs:gap-1 min-w-0 flex-1">
+                  <p className="text-xs font-medium break-words">
                     Your balance is {accountSummary.formattedAmount}
                   </p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">
-                    {accountSummary.statusText}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{accountSummary.statusText}</p>
                 </div>
               </div>
               {showReminder && (
                 <>
                   <Separator />
-                  <div className="flex items-start gap-3 sm:gap-4 min-w-0">
-                    <TrendingUp className="h-5 sm:h-6 w-5 sm:w-6 text-blue-500 flex-shrink-0 mt-0.5" />
-                    <div className="grid gap-1 min-w-0 flex-1">
-                      <p className="text-xs sm:text-sm font-medium">Settle Up Reminder</p>
-                      <p className="text-xs sm:text-sm text-muted-foreground break-words">
+                  <div className="flex items-start gap-2 xs:gap-3 sm:gap-4 min-w-0">
+                    <TrendingUp className="h-4 w-4 xs:h-5 xs:w-5 sm:h-6 sm:w-6 text-blue-500 flex-shrink-0 mt-0.5" />
+                    <div className="grid gap-0.5 xs:gap-1 min-w-0 flex-1">
+                      <p className="text-xs font-medium">Settle Up Reminder</p>
+                      <p className="text-xs text-muted-foreground break-words">
                         Please pay your outstanding balance to keep the records updated.
                       </p>
                     </div>

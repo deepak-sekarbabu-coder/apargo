@@ -84,9 +84,9 @@ export function SidebarLayout({
           />
           <main
             id="main-content"
-            className="flex-1 p-3 sm:p-4 lg:p-6 bg-background overflow-x-hidden scrollable-container"
+            className="flex-1 p-2 xs:p-3 sm:p-4 md:p-5 lg:p-6 bg-background overflow-x-hidden scrollable-container"
           >
-            <div className="max-w-7xl mx-auto">{children}</div>
+            <div className="w-full max-w-7xl mx-auto px-0">{children}</div>
           </main>
         </div>
       </SidebarInset>

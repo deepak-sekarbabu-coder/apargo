@@ -186,34 +186,34 @@ export function MainContent({
 
   if (isLoadingData) {
     return (
-      <div className="grid gap-6">
-        <div className="flex flex-row overflow-x-auto gap-4 md:grid md:grid-cols-2 md:gap-4 lg:grid-cols-4">
+      <div className="grid gap-3 xs:gap-4 sm:gap-5 md:gap-6">
+        <div className="flex flex-row overflow-x-auto gap-1.5 xs:gap-2 sm:gap-3 md:gap-4 md:grid md:grid-cols-2 md:gap-4 lg:grid-cols-4">
           {[...Array(4)].map((_, i) => (
-            <Card key={i}>
+            <Card key={i} className="flex-shrink-0 xs:flex-shrink">
               <CardHeader>
-                <Skeleton className="h-4 w-2/3" />
+                <Skeleton className="h-3 xs:h-4 w-2/3" />
               </CardHeader>
               <CardContent>
-                <Skeleton className="h-8 w-1/2" />
+                <Skeleton className="h-6 xs:h-8 w-1/2" />
               </CardContent>
             </Card>
           ))}
         </div>
-        <div className="flex flex-row overflow-x-auto gap-4 lg:grid lg:grid-cols-2">
-          <Card>
+        <div className="flex flex-row overflow-x-auto gap-1.5 xs:gap-2 sm:gap-3 md:gap-4 lg:grid lg:grid-cols-2">
+          <Card className="flex-shrink-0 xs:flex-shrink">
             <CardHeader>
-              <Skeleton className="h-6 w-1/2" />
+              <Skeleton className="h-4 xs:h-5 sm:h-6 w-1/2" />
             </CardHeader>
             <CardContent>
-              <Skeleton className="h-40 w-full" />
+              <Skeleton className="h-32 xs:h-36 sm:h-40 w-full" />
             </CardContent>
           </Card>
-          <Card>
+          <Card className="flex-shrink-0 xs:flex-shrink">
             <CardHeader>
-              <Skeleton className="h-6 w-1/2" />
+              <Skeleton className="h-4 xs:h-5 sm:h-6 w-1/2" />
             </CardHeader>
             <CardContent>
-              <Skeleton className="h-40 w-full" />
+              <Skeleton className="h-32 xs:h-36 sm:h-40 w-full" />
             </CardContent>
           </Card>
         </div>

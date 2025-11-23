@@ -119,10 +119,10 @@ export function FeatureGrid({ onSelect, isAdmin }: FeatureGridProps) {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Quick Actions</h2>
-        <div className="flex items-center gap-2 sm:hidden">
+    <div className="space-y-3 sm:space-y-4">
+      <div className="flex items-center justify-between px-0">
+        <h2 className="text-base xs:text-lg sm:text-xl font-semibold">Quick Actions</h2>
+        <div className="flex items-center gap-2 md:hidden">
           <span className="text-xs text-muted-foreground">Swipe to navigate</span>
         </div>
       </div>
@@ -136,10 +136,10 @@ export function FeatureGrid({ onSelect, isAdmin }: FeatureGridProps) {
       >
         <div
           className={cn(
-            'grid grid-cols-2 sm:grid-cols-3 transition-transform duration-300 ease-out',
+            'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 transition-transform duration-300 ease-out',
             // widen columns when admin adds extra card
-            isAdmin ? 'md:grid-cols-6' : 'md:grid-cols-5',
-            'gap-2 sm:gap-3 touch-pan-x'
+            isAdmin ? 'lg:grid-cols-6' : '',
+            'gap-1.5 xs:gap-2 sm:gap-3 touch-pan-x'
           )}
           style={{
             transform: `translateX(-${currentIndex * 50}%)`,
@@ -159,23 +159,23 @@ export function FeatureGrid({ onSelect, isAdmin }: FeatureGridProps) {
             >
               <Card
                 className={cn(
-                  'h-full border border-border/60 hover:shadow-lg active:shadow-md transition-all duration-200 rounded-xl',
+                  'h-full border border-border/60 hover:shadow-lg active:shadow-md transition-all duration-200 rounded-lg xs:rounded-xl',
                   'bg-gradient-to-br from-background to-muted/40 hover:from-muted/20 hover:to-background/60',
                   'active:scale-95'
                 )}
               >
-                <CardContent className="p-2 sm:p-3 md:p-4 flex flex-col items-center gap-2 sm:gap-3 text-center">
+                <CardContent className="p-1.5 xs:p-2 sm:p-3 md:p-4 flex flex-col items-center gap-1.5 xs:gap-2 sm:gap-3 text-center">
                   <div
                     className={cn(
-                      'p-3 rounded-xl inline-flex items-center justify-center shrink-0',
+                      'p-2 xs:p-2.5 sm:p-3 rounded-lg xs:rounded-xl inline-flex items-center justify-center shrink-0',
                       f.color,
                       'group-hover:scale-110 transition-transform'
                     )}
                   >
                     {f.icon}
                   </div>
-                  <div className="space-y-1">
-                    <p className="text-sm font-semibold leading-tight">{f.label}</p>
+                  <div className="space-y-0.5 xs:space-y-1">
+                    <p className="text-xs xs:text-sm font-semibold leading-tight">{f.label}</p>
                     <p className="text-xs text-muted-foreground leading-snug line-clamp-2">
                       {f.description}
                     </p>
@@ -188,12 +188,12 @@ export function FeatureGrid({ onSelect, isAdmin }: FeatureGridProps) {
       </div>
 
       {/* Mobile pagination dots */}
-      <div className="flex justify-center gap-2 sm:hidden">
+      <div className="flex justify-center gap-1.5 xs:gap-2 md:hidden">
         {Array.from({ length: Math.ceil(features.length / 2) }).map((_, index) => (
           <div
             key={index}
             className={cn(
-              'w-2 h-2 rounded-full transition-colors',
+              'w-1.5 h-1.5 xs:w-2 xs:h-2 rounded-full transition-colors',
               index === currentIndex ? 'bg-primary' : 'bg-muted-foreground/30'
             )}
           />
