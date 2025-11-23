@@ -279,7 +279,7 @@ export function MaintenancePaymentStatus({
                         size="sm"
                         disabled={isUploading}
                         onClick={() => handleUpload(month)}
-                        className="flex items-center gap-2 flex-1 text-xs sm:text-sm h-8 sm:h-9"
+                        className="flex items-center gap-2 text-xs sm:text-sm h-8 sm:h-9"
                       >
                         <UploadCloud className="h-3 sm:h-4 w-3 sm:w-4" />
                         <span className="min-w-0 truncate">
