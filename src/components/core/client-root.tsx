@@ -10,6 +10,7 @@ import React, { useEffect } from 'react';
 // Ensure mobile alert override runs early on client initialization
 import '@/lib/monitoring/override-alert.client';
 
+import { CookieConsent } from '@/components/core/cookie-consent';
 import { FirebaseDebugPanel } from '@/components/debug/firebase-debug-panel';
 import { NotificationSystemTest } from '@/components/debug/notification-system-test';
 import { PollLoginNotification } from '@/components/notifications/poll-login-notification';
@@ -109,6 +110,7 @@ export default function ClientRoot({ children }: Props) {
         <AuthProvider>
           <ToastProvider>
             {children}
+            <CookieConsent />
             <PollLoginNotification />
             <ServiceWorkerRegister />
             {/* Debug components - remove in production */}
