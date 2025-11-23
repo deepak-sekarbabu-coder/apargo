@@ -60,3 +60,5 @@
 **Testing:** Jest with jsdom. Firebase modules mocked in `jest.setup.ts`. Minimum 80% line coverage enforced in CI.
 
 **Environment:** All `NEXT_PUBLIC_*` vars public; private vars never committed. Service-account (`apartgo.json`) base64-encoded in CI secrets. Emulator support via `NEXT_PUBLIC_FIREBASE_EMULATOR_HOST`.
+
+**Compression:** HTTP response compression (gzip/brotli) enabled by default. Firestore payload compression available via `@/lib/compression`.

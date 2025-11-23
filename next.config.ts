@@ -16,6 +16,10 @@ const nextConfig: NextConfig = {
   productionBrowserSourceMaps: true,
   poweredByHeader: false,
   compress: true,
+  onDemandEntries: {
+    maxInactiveAge: 60 * 1000,
+    pagesBufferLength: 5,
+  },
   generateEtags: false,
   trailingSlash: false,
 
@@ -125,6 +129,10 @@ const nextConfig: NextConfig = {
           {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()',
+          },
+          {
+            key: 'Accept-Encoding',
+            value: 'gzip, deflate, br',
           },
         ],
       },
