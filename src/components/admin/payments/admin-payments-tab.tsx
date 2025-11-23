@@ -128,7 +128,7 @@ export function AdminPaymentsTab({
                     <div className="flex gap-3 pt-2 border-t border-border/60">
                       <Button
                         size="sm"
-                        className="flex-1 h-11 items-center justify-center bg-green-600 hover:bg-green-700 text-white font-medium"
+                        className="flex-1 h-11 items-center justify-center bg-green-700 hover:bg-green-800 text-white font-medium"
                         onClick={() => onApprovePayment && onApprovePayment(payment.id)}
                         aria-label={`Approve payment ${payment.id}`}
                       >

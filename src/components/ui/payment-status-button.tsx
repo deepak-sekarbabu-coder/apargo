@@ -33,7 +33,7 @@ export function PaymentStatusButton({
         (disabled || isLoading) && !readOnly ? 'pointer-events-none opacity-50' : '',
         readOnly ? 'pointer-events-none' : '',
         isPaid
-          ? 'border-transparent bg-green-600 text-white hover:bg-green-700 dark:bg-green-600 dark:hover:bg-green-700'
+          ? 'border-transparent bg-green-700 text-white hover:bg-green-800 dark:bg-green-700 dark:hover:bg-green-800'
           : 'border-transparent bg-red-600 text-white hover:bg-red-700 dark:bg-red-600 dark:hover:bg-red-700',
         className
       )}

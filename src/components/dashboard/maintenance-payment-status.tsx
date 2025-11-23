@@ -262,7 +262,11 @@ export function MaintenancePaymentStatus({
 
                 {isMonthSelected && (
                   <div className="space-y-2 sm:space-y-3 mt-3 pt-3 border-t">
+                    <label htmlFor="receipt-upload" className="block text-sm font-medium">
+                      Upload Receipt
+                    </label>
                     <Input
+                      id="receipt-upload"
                       ref={fileInputRef}
                       type="file"
                       accept="image/*,application/pdf"

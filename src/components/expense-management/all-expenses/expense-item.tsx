@@ -340,7 +340,7 @@ export function ExpenseItem({
         {/* Apartment Payment Status - Hidden for no-split expenses */}
         {!isNoSplitExpense && (
           <div className="space-y-3">
-            <h4 className="text-sm font-medium text-foreground">Payment Status by Apartment</h4>
+            <h3 className="text-sm font-medium text-foreground">Payment Status by Apartment</h3>
             <div className="space-y-3">
               {expense.owedByApartments?.map(apartmentId => {
                 // Enable button if:
@@ -370,7 +370,7 @@ export function ExpenseItem({
                     {/* Apartment info row */}
                     <div className="flex items-center gap-2 min-w-0">
                       <div
-                        className={`h-2 w-2 rounded-full flex-shrink-0 transition-colors duration-300 ease-in-out ${isPaid ? 'bg-green-600 dark:bg-green-500' : 'bg-red-600 dark:bg-red-500'}`}
+                        className={`h-2 w-2 rounded-full flex-shrink-0 transition-colors duration-300 ease-in-out ${isPaid ? 'bg-green-700 dark:bg-green-600' : 'bg-red-600 dark:bg-red-500'}`}
                       />
                       <span className="text-xs sm:text-sm font-medium break-words flex-1">
                         {formatApartmentWithUsers(apartmentId, isCurrentUser)}

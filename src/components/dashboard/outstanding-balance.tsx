@@ -31,20 +31,20 @@ export function OutstandingBalance({ expenses, currentUserApartment }: Outstandi
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-full bg-red-100 dark:bg-red-800/30">
-              <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
+              <AlertTriangle className="h-5 w-5 text-red-700 dark:text-red-300" />
             </div>
             <div>
               <p className="font-medium text-red-800 dark:text-red-200">Total Outstanding Amount</p>
-              <p className="text-sm text-red-600 dark:text-red-300">
+              <p className="text-sm text-red-700 dark:text-red-400">
                 Amount still owed to your apartment from shared expenses
               </p>
             </div>
           </div>
           <div className="text-left sm:text-right">
-            <div className="text-2xl font-bold text-red-700 dark:text-red-400">
+            <div className="text-2xl font-bold text-red-800 dark:text-red-300">
               -₹{totalOutstanding.toFixed(2)}
             </div>
-            <p className="text-sm text-red-600 dark:text-red-300">Still owed</p>
+            <p className="text-sm text-red-700 dark:text-red-400">Still owed</p>
           </div>
         </div>
       </CardContent>
