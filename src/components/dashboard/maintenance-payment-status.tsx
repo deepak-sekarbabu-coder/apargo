@@ -1,6 +1,6 @@
 'use client';
 
-import { AlertCircle, CheckCircle2, Clock, UploadCloud } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Clock, X, UploadCloud } from 'lucide-react';
 
 import * as React from 'react';
 
@@ -295,13 +295,14 @@ export function MaintenancePaymentStatus({
                         </span>
                       </Button>
                       <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setSelectedMonth('')}
-                        className="text-xs sm:text-sm h-8 sm:h-9"
-                      >
-                        Cancel
-                      </Button>
+                         size="sm"
+                         variant="outline"
+                         onClick={() => setSelectedMonth('')}
+                         className="text-xs sm:text-sm h-8 sm:h-9"
+                       >
+                         <X className="h-4 w-4" />
+                         <span>Cancel</span>
+                       </Button>
                     </div>
                   </div>
                 )}

@@ -1,6 +1,6 @@
 'use client';
 
-import { Bell, CreditCard, Plus, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
+import { ArrowRight, Bell, CreditCard, Plus, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
 
 import * as React from 'react';
 
@@ -266,15 +266,16 @@ export function DashboardView({
                 </CardDescription>
               </div>
               {onNavigateToExpenses && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={onNavigateToExpenses}
-                  className="text-xs w-full xs:w-auto mt-1.5 xs:mt-0"
-                >
-                  View All
-                </Button>
-              )}
+                 <Button
+                   variant="outline"
+                   size="sm"
+                   onClick={onNavigateToExpenses}
+                   className="text-xs w-full xs:w-auto mt-1.5 xs:mt-0 gap-1.5 hover:bg-accent"
+                 >
+                   View All
+                   <ArrowRight className="h-3.5 w-3.5" />
+                 </Button>
+               )}
             </CardHeader>
             <CardContent>
               {ExpensesList && (
