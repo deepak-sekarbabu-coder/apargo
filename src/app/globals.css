@@ -347,9 +347,20 @@
 
   /* Skip links for keyboard navigation */
   .skip-link {
-    @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50;
+    @apply sr-only;
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+    z-index: 50;
+  }
+
+  .skip-link:focus {
+    position: static;
+    top: auto;
+    left: auto;
+    @apply not-sr-only absolute top-4 left-4 z-50;
     @apply bg-primary text-primary-foreground px-4 py-2 rounded-md font-medium;
-    @apply focus:ring-2 focus:ring-ring focus:ring-offset-2;
+    @apply ring-2 ring-ring ring-offset-2;
   }
 
   /* Enhanced scrollable areas */
