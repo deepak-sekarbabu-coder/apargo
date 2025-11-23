@@ -16,8 +16,6 @@ export function proxy(request: NextRequest) {
       '/api/_testing/debug-data',
       '/api/_testing/notification-debug',
       '/api/_testing/netlify-test',
-      '/api/core/payment-events/test',
-      '/api/core/payment-events/ping',
       '/api/admin/storage/stats',
       '/api/_testing/fix-notifications',
       '/api/core/payments',
