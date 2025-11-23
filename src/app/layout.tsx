@@ -69,7 +69,7 @@ export default function RootLayout({
         {/* Pre-hydration cleanup of extension-injected attributes (e.g. bis_skin_checked) to avoid hydration mismatches */}
         <Script
           id="extension-attr-cleanup"
-          strategy="beforeInteractive"
+          strategy="afterInteractive"
           dangerouslySetInnerHTML={{
             __html: `(() => {
               const ATTRS = ['bis_skin_checked', 'data-new-gr-c-s-check-loaded', 'data-gr-ext-installed', 'data-new-gr-c-s-loaded', 'grammarly-extension', 'data-lt-installed'];

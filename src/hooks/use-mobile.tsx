@@ -115,12 +115,15 @@ export function useSafeArea() {
 
   React.useEffect(() => {
     const updateSafeArea = () => {
-      const computedStyle = getComputedStyle(document.documentElement);
-      setSafeArea({
-        top: parseInt(computedStyle.getPropertyValue('--safe-area-inset-top') || '0', 10),
-        right: parseInt(computedStyle.getPropertyValue('--safe-area-inset-right') || '0', 10),
-        bottom: parseInt(computedStyle.getPropertyValue('--safe-area-inset-bottom') || '0', 10),
-        left: parseInt(computedStyle.getPropertyValue('--safe-area-inset-left') || '0', 10),
+      // Use requestAnimationFrame to avoid forced reflows
+      requestAnimationFrame(() => {
+        const computedStyle = getComputedStyle(document.documentElement);
+        setSafeArea({
+          top: parseInt(computedStyle.getPropertyValue('--safe-area-inset-top') || '0', 10),
+          right: parseInt(computedStyle.getPropertyValue('--safe-area-inset-right') || '0', 10),
+          bottom: parseInt(computedStyle.getPropertyValue('--safe-area-inset-bottom') || '0', 10),
+          left: parseInt(computedStyle.getPropertyValue('--safe-area-inset-left') || '0', 10),
+        });
       });
     };
 

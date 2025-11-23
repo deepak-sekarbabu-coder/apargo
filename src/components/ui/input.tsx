@@ -195,8 +195,11 @@ const Textarea = React.forwardRef<
     if (autoResize && textareaNode) {
       const textarea = textareaNode;
       const adjustHeight = () => {
-        textarea.style.height = 'auto';
-        textarea.style.height = `${textarea.scrollHeight}px`;
+        // Use requestAnimationFrame to avoid forced reflows
+        requestAnimationFrame(() => {
+          textarea.style.height = 'auto';
+          textarea.style.height = `${textarea.scrollHeight}px`;
+        });
       };
       textarea.addEventListener('input', adjustHeight);
       adjustHeight();

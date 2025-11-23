@@ -92,11 +92,14 @@ const DialogContent = React.forwardRef<
     // Handle body scroll prevention (only lock scroll on mobile to keep desktop PageUp/PageDown & wheel working)
     React.useEffect(() => {
       if (preventScroll && isMobile) {
-        const originalStyle = window.getComputedStyle(document.body).overflow;
-        document.body.style.overflow = 'hidden';
-        return () => {
-          document.body.style.overflow = originalStyle;
-        };
+        // Use requestAnimationFrame to avoid forced reflows
+        requestAnimationFrame(() => {
+          const originalStyle = window.getComputedStyle(document.body).overflow;
+          document.body.style.overflow = 'hidden';
+          return () => {
+            document.body.style.overflow = originalStyle;
+          };
+        });
       }
     }, [preventScroll, isMobile]);
 

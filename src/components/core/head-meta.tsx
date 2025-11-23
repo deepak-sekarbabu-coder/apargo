@@ -56,13 +56,10 @@ export default function HeadMeta() {
       {/* Privacy and cookie policy */}
       <meta name="privacy-policy" content="/privacy" />
       <meta name="cookie-policy" content="/cookies" />
-      {/* Preconnect to required origins for performance */}
+      {/* Preconnect to required origins for performance - keep only the most critical */}
       <link rel="preconnect" href="https://firestore.googleapis.com" />
-      <link rel="preconnect" href="https://www.gstatic.com" />
       <link rel="preconnect" href="https://firebase.googleapis.com" />
-      <link rel="preconnect" href="https://unicorndev-b532a.firebaseapp.com" />
-      <link rel="dns-prefetch" href="https://unicorndev-b532a.firebaseapp.com" />
-      <link rel="preconnect" href="https://apis.google.com" />
+      <link rel="preconnect" href="https://www.gstatic.com" />
       <link rel="dns-prefetch" href="https://apis.google.com" />
       
       {/* Cookie Consent Banner */}

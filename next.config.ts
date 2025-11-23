@@ -23,9 +23,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: true, // This is a good default to keep explicitly
 
   // New recommended defaults
-  /*
   experimental: {
-    // Previous experimental flags
     optimizeCss: true,
     optimizePackageImports: [
       '@radix-ui/react-accordion',
@@ -55,14 +53,10 @@ const nextConfig: NextConfig = {
     ],
     optimisticClientCache: true,
     webVitalsAttribution: ['CLS', 'LCP'],
-    // Removed `instrumentationHook` and `typedRoutes` per Next.js/Turbopack
-    // warnings: these options are no longer needed/supported. See
-    // https://nextjs.org/docs/messages/invalid-next-config
   },
-  */
 
   images: {
-    formats: ['image/webp', 'image/avif'],
+    formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 31536000, // 1 year
@@ -131,6 +125,51 @@ const nextConfig: NextConfig = {
           {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()',
+          },
+        ],
+      },
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/:path*(.png|.jpg|.jpeg|.gif|.ico|.svg|.webp|.avif)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/:path*(.woff|.woff2|.ttf|.eot)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
+        source: '/:path*(.css|.js)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
           },
         ],
       },
