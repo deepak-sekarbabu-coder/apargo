@@ -1,6 +1,6 @@
 import { getMessaging, getToken } from 'firebase/messaging';
 
-import { app } from '../firebase/firebase-client';
+import { firebaseApp } from '../firebase/firebase-client';
 import { updateUser } from '../firestore/users';
 
 export const registerServiceWorker = async () => {
@@ -30,10 +30,10 @@ export const requestNotificationPermission = async (userId: string) => {
 
   try {
     const registration = await registerServiceWorker();
-    if (!registration) {
+    if (!registration || !firebaseApp) {
       return;
     }
-    const messaging = getMessaging(app);
+    const messaging = getMessaging(firebaseApp);
     const permission = await Notification.requestPermission();
 
     if (permission === 'granted') {

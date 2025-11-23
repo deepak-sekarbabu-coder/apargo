@@ -15,7 +15,7 @@ NPM_FLAGS = "--legacy-peer-deps --include=dev"
   NEXT_PHASE = "phase-production-build"
   
   # Reduce build size
-  GENERATE_SOURCEMAP = "false"
+  GENERATE_SOURCEMAP = "true"
   NEXT_TELEMETRY_DISABLED = "1"
   
   # Firebase environment variables (set these in Netlify UI)

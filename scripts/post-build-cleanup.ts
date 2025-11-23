@@ -19,8 +19,8 @@ function cleanupNextBuild(): void {
     '.next/static/**/*.map', // Remove source maps in production
   ];
 
-  // Remove source maps if not needed
-  if (process.env.NODE_ENV === 'production') {
+  // Remove source maps only if explicitly disabled (keep for debugging)
+  if (process.env.NODE_ENV === 'production' && process.env.REMOVE_SOURCE_MAPS === 'true') {
     try {
       const staticDir = '.next/static';
       if (fs.existsSync(staticDir)) {

@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
   },
   serverExternalPackages: ['firebase-admin'],
   // output: 'standalone',
-  productionBrowserSourceMaps: false,
+  productionBrowserSourceMaps: true,
   poweredByHeader: false,
   compress: true,
   generateEtags: false,
