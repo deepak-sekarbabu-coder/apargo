@@ -16,7 +16,7 @@ export default function HeadMeta() {
   const handleCookieConsent = (choice: 'accepted' | 'rejected') => {
     setCookieConsent(choice);
     localStorage.setItem('cookie-consent', choice);
-    
+
     if (choice === 'rejected') {
       // Clear existing third-party cookies
       document.cookie.split(';').forEach(cookie => {
@@ -38,10 +38,7 @@ export default function HeadMeta() {
       <meta name="theme-color" content="#ffffff" />
       <meta name="mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-      <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1, viewport-fit=cover"
-      />
+      <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
       {/* Enhanced mobile optimization */}
       <meta name="mobile-web-app-capable" content="yes" />
       <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -60,7 +57,7 @@ export default function HeadMeta() {
       <link rel="preconnect" href="https://firebase.googleapis.com" />
       <link rel="preconnect" href="https://www.gstatic.com" />
       <link rel="dns-prefetch" href="https://apis.google.com" />
-      
+
       {/* Cookie Consent Banner */}
       {cookieConsent === null && (
         <div
@@ -81,8 +78,8 @@ export default function HeadMeta() {
           }}
         >
           <p style={{ margin: 0, fontSize: '14px', flex: 1, minWidth: '200px' }}>
-            We use Firebase services for authentication and data storage. These may use cookies. 
-            By continuing, you agree to our use of essential cookies for app functionality.
+            We use Firebase services for authentication and data storage. These may use cookies. By
+            continuing, you agree to our use of essential cookies for app functionality.
           </p>
           <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
             <button

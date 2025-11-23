@@ -1,7 +1,9 @@
+import type { Auth } from 'firebase/auth';
+
 import { useEffect, useState } from 'react';
 
 interface LazyAuthState {
-  auth: any;
+  auth: Auth | null;
   loading: boolean;
   error: Error | null;
 }
@@ -24,14 +26,14 @@ export function useLazyFirebaseAuth() {
         // Dynamically import Firebase Auth to avoid blocking critical rendering
         const { getAuth } = await import('firebase/auth');
         const { app } = await import('@/lib/firebase/firebase');
-        
+
         const auth = getAuth(app);
         setAuthState(prev => ({ ...prev, auth, loading: false }));
       } catch (error) {
-        setAuthState(prev => ({ 
-          ...prev, 
-          loading: false, 
-          error: error instanceof Error ? error : new Error('Failed to load Firebase Auth')
+        setAuthState(prev => ({
+          ...prev,
+          loading: false,
+          error: error instanceof Error ? error : new Error('Failed to load Firebase Auth'),
         }));
       }
     };

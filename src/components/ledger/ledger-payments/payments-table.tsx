@@ -13,6 +13,9 @@ import {
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { ArrowUpDown, Check, Download, Eye, PlusCircle, Trash2, X } from 'lucide-react';
+import AutoSizer from 'react-virtualized-auto-sizer';
+// Virtualized list component for mobile using react-window
+import { VariableSizeList as List } from 'react-window';
 
 import * as React from 'react';
 
@@ -271,7 +274,6 @@ const PaymentCard = React.memo(
 
 PaymentCard.displayName = 'PaymentCard';
 
-// Virtualized list component for mobile
 const VirtualizedPaymentList = ({
   payments,
   users,
@@ -291,61 +293,76 @@ const VirtualizedPaymentList = ({
   isDeleting: boolean;
   setDeleteId: (id: string | null) => void;
 }) => {
-  const [visiblePayments, setVisiblePayments] = React.useState<Payment[]>(payments.slice(0, 20));
-  const [loadedCount, setLoadedCount] = React.useState(20);
-  const listRef = React.useRef<HTMLDivElement>(null);
+  const listRef = React.useRef<List>(null);
+  const sizeMap = React.useRef<{ [index: number]: number }>({});
 
-  // Reset when payments change
+  // Reset cache when payments change
   React.useEffect(() => {
-    setVisiblePayments(payments.slice(0, 20));
-    setLoadedCount(20);
+    if (listRef.current) {
+      listRef.current.resetAfterIndex(0);
+    }
   }, [payments]);
 
-  // Intersection Observer for infinite scroll
-  React.useEffect(() => {
-    if (!listRef.current || loadedCount >= payments.length) return;
+  const getItemSize = (index: number) => {
+    return sizeMap.current[index] || 200; // Default estimate
+  };
 
-    const observer = new IntersectionObserver(
-      entries => {
-        if (entries[0].isIntersecting && loadedCount < payments.length) {
-          const nextCount = Math.min(loadedCount + 20, payments.length);
-          setVisiblePayments(payments.slice(0, nextCount));
-          setLoadedCount(nextCount);
-        }
-      },
-      { threshold: 1.0 }
+  const setItemSize = (index: number, size: number) => {
+    if (sizeMap.current[index] !== size) {
+      sizeMap.current[index] = size;
+      if (listRef.current) {
+        listRef.current.resetAfterIndex(index);
+      }
+    }
+  };
+
+  const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
+    const payment = payments[index];
+    const rowRef = React.useRef<HTMLDivElement>(null);
+
+    React.useEffect(() => {
+      if (rowRef.current) {
+        setItemSize(index, rowRef.current.getBoundingClientRect().height + 16); // +16 for gap
+      }
+    }, [index]);
+
+    return (
+      <div style={style}>
+        <div ref={rowRef} className="pb-4">
+          <PaymentCard
+            payment={payment}
+            users={users}
+            currentUser={currentUser}
+            onApprovePayment={onApprovePayment}
+            onRejectPayment={onRejectPayment}
+            columnVisibility={columnVisibility}
+            isDeleting={isDeleting}
+            setDeleteId={setDeleteId}
+          />
+        </div>
+      </div>
     );
-
-    const sentinel = listRef.current;
-    observer.observe(sentinel);
-
-    return () => observer.unobserve(sentinel);
-  }, [loadedCount, payments]);
+  };
 
   if (payments.length === 0) {
     return <div className="text-center text-muted-foreground py-8">No payments found.</div>;
   }
 
   return (
-    <div className="space-y-4">
-      {visiblePayments.map(payment => (
-        <PaymentCard
-          key={payment.id}
-          payment={payment}
-          users={users}
-          currentUser={currentUser}
-          onApprovePayment={onApprovePayment}
-          onRejectPayment={onRejectPayment}
-          columnVisibility={columnVisibility}
-          isDeleting={isDeleting}
-          setDeleteId={setDeleteId}
-        />
-      ))}
-      {loadedCount < payments.length && (
-        <div ref={listRef} className="py-4 text-center">
-          <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
-        </div>
-      )}
+    <div className="h-[calc(100vh-200px)] w-full">
+      <AutoSizer>
+        {({ height, width }) => (
+          <List
+            ref={listRef}
+            height={height}
+            width={width}
+            itemCount={payments.length}
+            itemSize={getItemSize}
+          >
+            {Row}
+          </List>
+        )}
+      </AutoSizer>
     </div>
   );
 };

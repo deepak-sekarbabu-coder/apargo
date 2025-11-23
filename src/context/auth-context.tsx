@@ -1,13 +1,16 @@
 'use client';
 
+import type { Auth, User as FirebaseUser } from 'firebase/auth';
+
 import React, { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 
 import { useRouter } from 'next/navigation';
 
 import { shouldClearSession } from '@/lib/auth/auth-utils';
 import { User } from '@/lib/core/types';
-import { useLazyFirebaseAuth } from '@/hooks/use-lazy-firebase-auth';
 import { addUser, getUserByEmail } from '@/lib/firestore/users';
+
+import { useLazyFirebaseAuth } from '@/hooks/use-lazy-firebase-auth';
 
 import log from '../lib/core/logger';
 
@@ -22,7 +25,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-async function setSessionCookie(firebaseUser: any) {
+async function setSessionCookie(firebaseUser: FirebaseUser) {
   const idToken = await firebaseUser.getIdToken();
 
   // Use an absolute URL with the current origin to ensure it works in both
@@ -64,14 +67,19 @@ async function clearSessionCookie() {
 }
 
 // Helper function to handle authentication errors and cleanup
-async function handleAuthError(error: unknown, firebaseUser: any, signOut: Function) {
+async function handleAuthError(
+  error: unknown,
+  firebaseUser: FirebaseUser | null,
+  auth: Auth | null,
+  signOut: (auth: Auth) => Promise<void>
+) {
   log.error('Authentication error:', error);
 
   // Use the utility function to determine if we should clear the session
   if (shouldClearSession(error)) {
     await clearSessionCookie();
-    if (firebaseUser) {
-      await signOut(firebaseUser);
+    if (firebaseUser && auth) {
+      await signOut(auth);
     }
     return true; // Indicates cleanup was performed
   }
@@ -83,7 +91,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const { auth: lazyAuth, loading: authLoading, error: authError } = useLazyFirebaseAuth();
+  const { auth: lazyAuth, loading: authLoading } = useLazyFirebaseAuth();
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -92,16 +100,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       try {
         // Dynamically import Firebase Auth functions
-        const [
-          { browserLocalPersistence, onAuthStateChanged, setPersistence },
-          { signInWithEmailAndPassword, signInWithPopup, signOut, GoogleAuthProvider }
-        ] = await Promise.all([
-          import('firebase/auth'),
-          import('firebase/auth')
-        ]);
+        const { browserLocalPersistence, onAuthStateChanged, setPersistence, signOut } =
+          await import('firebase/auth');
 
         await setPersistence(lazyAuth, browserLocalPersistence);
-        const unsubscribe = onAuthStateChanged(lazyAuth, async (firebaseUser: any) => {
+        const unsubscribe = onAuthStateChanged(lazyAuth, async firebaseUser => {
           // Only log errors below, remove debug logs
           if (firebaseUser && firebaseUser.email) {
             try {
@@ -168,7 +171,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               router.replace('/dashboard');
             } catch (error) {
               log.error('Authentication error:', error);
-              await handleAuthError(error, firebaseUser, signOut);
+              await handleAuthError(error, firebaseUser, lazyAuth, signOut);
               setUser(null);
             }
           } else {
@@ -197,7 +200,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (email: string, password: string): Promise<void> => {
     if (!lazyAuth) throw new Error('Firebase Auth not loaded');
-    
+
     try {
       const { signInWithEmailAndPassword } = await import('firebase/auth');
       await signInWithEmailAndPassword(lazyAuth, email, password);
@@ -209,7 +212,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const loginWithGoogle = async (): Promise<void> => {
     if (!lazyAuth) throw new Error('Firebase Auth not loaded');
-    
+
     try {
       const { signInWithPopup, GoogleAuthProvider } = await import('firebase/auth');
       const provider = new GoogleAuthProvider();
@@ -226,7 +229,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = async () => {
     if (!lazyAuth) return;
-    
+
     try {
       const { signOut } = await import('firebase/auth');
       await signOut(lazyAuth);
@@ -244,7 +247,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const value = { user, loading: loading || authLoading, login, loginWithGoogle, logout, updateUser };
+  const value = {
+    user,
+    loading: loading || authLoading,
+    login,
+    loginWithGoogle,
+    logout,
+    updateUser,
+  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };

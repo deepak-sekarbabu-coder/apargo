@@ -139,7 +139,6 @@ function testSortingLogic(): void {
 
 // Run all tests
 
-
 describe('Fault Dashboard Pagination Logic', () => {
   it('runs pagination helper without throwing', () => {
     expect(() => testPaginationLogic()).not.toThrow();

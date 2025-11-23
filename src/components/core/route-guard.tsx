@@ -8,7 +8,6 @@ import { useRouter } from 'next/navigation';
 
 import log from '@/lib/core/logger';
 
-
 interface RouteGuardProps {
   children: React.ReactNode;
   requiredRole?: 'admin' | 'user';

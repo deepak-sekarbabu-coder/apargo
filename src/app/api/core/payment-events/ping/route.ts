@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Simple health check endpoint
     return NextResponse.json({
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
+
     // Echo back the received payload for testing
     return NextResponse.json({
       status: 'ok',

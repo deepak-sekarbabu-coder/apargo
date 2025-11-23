@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Test endpoint for development and debugging
     return NextResponse.json({
@@ -26,14 +26,14 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
+
     // Test endpoint that can validate payment event payloads
     const { test, payload } = body;
-    
+
     if (test === 'validate') {
       // Simple validation test
       const isValid = payload && typeof payload === 'object' && payload.id;
-      
+
       return NextResponse.json({
         status: 'ok',
         timestamp: new Date().toISOString(),
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
         payload: payload,
       });
     }
-    
+
     return NextResponse.json({
       status: 'ok',
       timestamp: new Date().toISOString(),

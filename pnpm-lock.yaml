@@ -119,6 +119,12 @@ importers:
       react-hook-form:
         specifier: ^7.66.1
         version: 7.66.1(react@18.3.1)
+      react-virtualized-auto-sizer:
+        specifier: 1.0.24
+        version: 1.0.24(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-window:
+        specifier: 1.8.10
+        version: 1.8.10(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       recharts:
         specifier: ^2.15.4
         version: 2.15.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -165,6 +171,12 @@ importers:
       '@types/react-dom':
         specifier: ^18.3.7
         version: 18.3.7(@types/react@18.3.27)
+      '@types/react-virtualized-auto-sizer':
+        specifier: ^1.0.8
+        version: 1.0.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@types/react-window':
+        specifier: ^2.0.0
+        version: 2.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       babel-jest:
         specifier: ^30.2.0
         version: 30.2.0(@babel/core@7.28.5)
@@ -2119,6 +2131,14 @@ packages:
     peerDependencies:
       '@types/react': ^18.0.0
 
+  '@types/react-virtualized-auto-sizer@1.0.8':
+    resolution: {integrity: sha512-keJpNyhiwfl2+N12G1ocCVA5ZDBArbPLe/S90X3kt7fam9naeHdaYYWbpe2sHczp70JWJ+2QLhBE8kLvLuVNjA==}
+    deprecated: This is a stub types definition. react-virtualized-auto-sizer provides its own type definitions, so you do not need this installed.
+
+  '@types/react-window@2.0.0':
+    resolution: {integrity: sha512-E8hMDtImEpMk1SjswSvqoSmYvk7GEtyVaTa/GJV++FdDNuMVVEzpAClyJ0nqeKYBrMkGiyH6M1+rPLM0Nu1exQ==}
+    deprecated: This is a stub types definition. react-window provides its own type definitions, so you do not need this installed.
+
   '@types/react@18.3.27':
     resolution: {integrity: sha512-cisd7gxkzjBKU2GgdYrTdtQx1SORymWyaAFhaxQPK9bYO9ot3Y5OikQRvY0VYQtvwjeQnizCINJAenh/V7MK2w==}
 
@@ -3542,6 +3562,9 @@ packages:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
 
+  memoize-one@5.2.1:
+    resolution: {integrity: sha512-zYiwtZUcYyXKo/np96AGZAckk+FWWsUdJ3cHGGmld7+AhvcWmQyGCYUh1hc4Q/pkOhb65dQR/pqCyK0cOaHz4Q==}
+
   merge-stream@2.0.0:
     resolution: {integrity: sha512-abv/qOcuPfk3URPfDzmZU1LKmuw8kT+0nIHvKrKgFrwifol/doWcdA4ZqsWQ8ENrFKkd67Mfpo/LovbIUsbt3w==}
 
@@ -3941,6 +3964,19 @@ packages:
     peerDependencies:
       react: '>=16.6.0'
       react-dom: '>=16.6.0'
+
+  react-virtualized-auto-sizer@1.0.24:
+    resolution: {integrity: sha512-3kCn7N9NEb3FlvJrSHWGQ4iVl+ydQObq2fHMn12i5wbtm74zHOPhz/i64OL3c1S1vi9i2GXtZqNqUJTQ+BnNfg==}
+    peerDependencies:
+      react: ^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0
+      react-dom: ^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0
+
+  react-window@1.8.10:
+    resolution: {integrity: sha512-Y0Cx+dnU6NLa5/EvoHukUD0BklJ8qITCtVEPY1C/nL8wwoZ0b5aEw8Ff1dOVHw7fCzMt55XfJDd8S8W8LCaUCg==}
+    engines: {node: '>8.0.0'}
+    peerDependencies:
+      react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
 
   react@18.3.1:
     resolution: {integrity: sha512-wS+hAgJShR0KhEvPJArfuPVN1+Hz1t0Y6n5jLrGQbkb4urgPE/0Rve+1kMB1v/oWgHgm4WIcV+i7F2pTVj+2iQ==}
@@ -6606,6 +6642,20 @@ snapshots:
     dependencies:
       '@types/react': 18.3.27
 
+  '@types/react-virtualized-auto-sizer@1.0.8(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      react-virtualized-auto-sizer: 1.0.24(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+    transitivePeerDependencies:
+      - react
+      - react-dom
+
+  '@types/react-window@2.0.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      react-window: 1.8.10(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+    transitivePeerDependencies:
+      - react
+      - react-dom
+
   '@types/react@18.3.27':
     dependencies:
       '@types/prop-types': 15.7.15
@@ -8462,6 +8512,8 @@ snapshots:
 
   math-intrinsics@1.1.0: {}
 
+  memoize-one@5.2.1: {}
+
   merge-stream@2.0.0: {}
 
   merge2@1.4.1: {}
@@ -8851,6 +8903,18 @@ snapshots:
       dom-helpers: 5.2.1
       loose-envify: 1.4.0
       prop-types: 15.8.1
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
+  react-virtualized-auto-sizer@1.0.24(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+
+  react-window@1.8.10(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      '@babel/runtime': 7.28.4
+      memoize-one: 5.2.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 

@@ -67,8 +67,6 @@ describe('Expense Splitting Logic', () => {
   });
 
   test('should handle cleaning expense correctly', () => {
-
-
     const expenseAmount = 300;
     const payingApartmentId = 'T1';
     const isCleaningExpense = true;
@@ -106,7 +104,6 @@ describe('Expense Splitting Logic', () => {
 
   test('should prevent expense creation when apartments array is empty', () => {
     const apartments: Apartment[] = [];
-
 
     // This should trigger the validation error
     if (!apartments || apartments.length === 0) {
