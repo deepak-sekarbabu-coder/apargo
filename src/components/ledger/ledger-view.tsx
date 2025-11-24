@@ -277,18 +277,20 @@ export function LedgerView({ payments, users }: LedgerViewProps) {
                 {/* Payment Summary Cards */}
                 {filterType === 'payment-events' && (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <div className="bg-[hsl(var(--payment-event-bg))] p-4 rounded-lg border border-[hsl(var(--payment-event-border))]">
                       <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium text-blue-900">Payment Events</p>
-                        <div className="text-2xl font-bold text-blue-600">
+                        <p className="text-sm font-medium text-[hsl(var(--payment-event-label))]">
+                          Payment Events
+                        </p>
+                        <div className="text-2xl font-bold text-[hsl(var(--payment-event-count))]">
                           {filteredPaymentsWithType.length}
                         </div>
                       </div>
-                      <p className="text-xs text-blue-700 mt-1">
+                      <p className="text-xs text-[hsl(var(--payment-event-label))] mt-1">
                         {filterMonth !== 'all' &&
                           `for ${format(new Date(filterMonth + '-01'), 'MMMM yyyy')}`}
                       </p>
-                      <p className="text-sm font-medium text-blue-800 mt-2">
+                      <p className="text-sm font-medium text-[hsl(var(--payment-event-amount))] mt-2">
                         Total: ₹{filteredPaymentsWithType.reduce((sum, p) => sum + p.amount, 0)}
                       </p>
                     </div>
@@ -297,18 +299,20 @@ export function LedgerView({ payments, users }: LedgerViewProps) {
 
                 {filterType === 'regular' && (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+                    <div className="bg-[hsl(var(--payment-regular-bg))] p-4 rounded-lg border border-[hsl(var(--payment-regular-border))]">
                       <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium text-green-900">Regular Payments</p>
-                        <div className="text-2xl font-bold text-green-600">
+                        <p className="text-sm font-medium text-[hsl(var(--payment-regular-label))]">
+                          Regular Payments
+                        </p>
+                        <div className="text-2xl font-bold text-[hsl(var(--payment-regular-count))]">
                           {filteredPaymentsWithType.length}
                         </div>
                       </div>
-                      <p className="text-xs text-green-700 mt-1">
+                      <p className="text-xs text-[hsl(var(--payment-regular-label))] mt-1">
                         {filterMonth !== 'all' &&
                           `for ${format(new Date(filterMonth + '-01'), 'MMMM yyyy')}`}
                       </p>
-                      <p className="text-sm font-medium text-green-800 mt-2">
+                      <p className="text-sm font-medium text-[hsl(var(--payment-regular-amount))] mt-2">
                         Total: ₹{filteredPaymentsWithType.reduce((sum, p) => sum + p.amount, 0)}
                       </p>
                     </div>
@@ -318,14 +322,16 @@ export function LedgerView({ payments, users }: LedgerViewProps) {
                 {/* All payments summary */}
                 {filterType === 'all' && (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="bg-gray-50 p-4 rounded-lg border">
+                    <div className="bg-[hsl(var(--payment-summary-bg))] p-4 rounded-lg border border-[hsl(var(--payment-summary-border))]">
                       <div className="flex items-center justify-between">
-                        <p className="text-sm font-medium text-gray-900">Total Payments</p>
-                        <div className="text-2xl font-bold text-gray-600">
+                        <p className="text-sm font-medium text-[hsl(var(--payment-summary-label))]">
+                          Total Payments
+                        </p>
+                        <div className="text-2xl font-bold text-[hsl(var(--payment-summary-count))]">
                           {filteredPaymentsWithType.length}
                         </div>
                       </div>
-                      <p className="text-sm font-medium text-gray-800 mt-2">
+                      <p className="text-sm font-medium text-[hsl(var(--payment-summary-amount))] mt-2">
                         Amount: ₹{filteredPaymentsWithType.reduce((sum, p) => sum + p.amount, 0)}
                       </p>
                     </div>

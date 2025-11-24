@@ -1,6 +1,6 @@
 'use client';
 
-import { AlertCircle, CheckCircle2, Clock, X, UploadCloud } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Clock, UploadCloud, X } from 'lucide-react';
 
 import * as React from 'react';
 
@@ -191,10 +191,10 @@ export function MaintenancePaymentStatus({
   // If there are no unpaid months, show success message
   if (unpaidMonths.length === 0) {
     return (
-      <Card className="border-green-200 bg-green-50/40">
+      <Card className="border-[hsl(var(--maintenance-paid-border))] bg-[hsl(var(--maintenance-paid-bg))]">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-sm md:text-base">
-            <CheckCircle2 className="h-5 w-5 text-green-600" />
+            <CheckCircle2 className="h-5 w-5 text-[hsl(var(--maintenance-paid-text))]" />
             Monthly Maintenance
           </CardTitle>
           <CardDescription className="text-xs md:text-sm">All payments up to date</CardDescription>
@@ -212,10 +212,10 @@ export function MaintenancePaymentStatus({
   }
 
   return (
-    <Card className="border-amber-200 bg-amber-50/40">
+    <Card className="border-[hsl(var(--maintenance-unpaid-border))] bg-[hsl(var(--maintenance-unpaid-bg))]">
       <CardHeader className="pb-3">
         <CardTitle className="flex items-center gap-2 text-sm sm:text-base">
-          <Clock className="h-4 sm:h-5 w-4 sm:w-5 text-amber-600 flex-shrink-0" />
+          <Clock className="h-4 sm:h-5 w-4 sm:w-5 text-[hsl(var(--maintenance-unpaid-text))] flex-shrink-0" />
           <span className="break-words">Monthly Maintenance</span>
         </CardTitle>
         <CardDescription className="text-xs sm:text-sm mt-1">
@@ -232,7 +232,7 @@ export function MaintenancePaymentStatus({
             return (
               <div
                 key={month}
-                className={`p-2 sm:p-3 rounded-lg border ${isCurrentMonth ? 'border-amber-300 bg-amber-100/50' : 'border-gray-200 bg-white'}`}
+                className={`p-2 sm:p-3 rounded-lg border ${isCurrentMonth ? 'border-[hsl(var(--maintenance-unpaid-border))] bg-[hsl(var(--maintenance-unpaid-bg))]/70' : 'border-border bg-card'}`}
               >
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 sm:gap-3 mb-2">
                   <div className="min-w-0 flex-1">
@@ -295,14 +295,14 @@ export function MaintenancePaymentStatus({
                         </span>
                       </Button>
                       <Button
-                         size="sm"
-                         variant="outline"
-                         onClick={() => setSelectedMonth('')}
-                         className="text-xs sm:text-sm h-8 sm:h-9"
-                       >
-                         <X className="h-4 w-4" />
-                         <span>Cancel</span>
-                       </Button>
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setSelectedMonth('')}
+                        className="text-xs sm:text-sm h-8 sm:h-9"
+                      >
+                        <X className="h-4 w-4" />
+                        <span>Cancel</span>
+                      </Button>
                     </div>
                   </div>
                 )}

@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { SidebarTrigger } from '@/components/ui/sidebar';
+import { ThemeSwitch } from '@/components/ui/theme-switch';
 
 interface PageHeaderProps {
   view: View;
@@ -77,6 +78,10 @@ export function PageHeader(props: PageHeaderProps) {
         >
           <Home className="h-4 w-4 xs:h-5 xs:w-5" />
         </Button>
+        {/* Theme Switch for mobile */}
+        <div className="md:hidden inline-flex items-center ml-1">
+          <ThemeSwitch />
+        </div>
         {/* Title for desktop */}
         <h1 className="hidden md:block text-sm xs:text-base sm:text-lg md:text-xl font-semibold truncate">
           {title}

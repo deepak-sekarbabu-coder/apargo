@@ -37,6 +37,34 @@
     --sidebar-accent-foreground: 222.2 47.4% 11.2%;
     --sidebar-border: 214.3 31.8% 91.4%;
     --sidebar-ring: 202 70% 55%;
+    /* Maintenance Payment Status Colors - Light Mode */
+    --maintenance-unpaid-bg: 39 100% 97.3%;
+    --maintenance-unpaid-border: 39 96% 86.9%;
+    --maintenance-unpaid-text: 38 92% 50%;
+    --maintenance-paid-bg: 160 84% 96.3%;
+    --maintenance-paid-border: 160 80% 74%;
+    --maintenance-paid-text: 160 64% 34%;
+    --maintenance-pending-bg: 217 91% 96.1%;
+    --maintenance-pending-border: 217 88% 86%;
+    --maintenance-pending-text: 217 92% 40%;
+    /* Payment Summary Card Colors - Light Mode */
+    --payment-summary-bg: 0 0% 97.3%;
+    --payment-summary-border: 0 0% 86.3%;
+    --payment-summary-label: 0 0% 20%;
+    --payment-summary-count: 0 0% 40%;
+    --payment-summary-amount: 0 0% 26%;
+    /* Event Cards - Light Mode */
+    --payment-event-bg: 217 91% 96.1%;
+    --payment-event-border: 217 88% 86%;
+    --payment-event-label: 217 92% 20%;
+    --payment-event-count: 217 92% 30%;
+    --payment-event-amount: 217 92% 25%;
+    /* Regular Cards - Light Mode */
+    --payment-regular-bg: 160 84% 96.3%;
+    --payment-regular-border: 160 80% 74%;
+    --payment-regular-label: 160 64% 20%;
+    --payment-regular-count: 160 64% 30%;
+    --payment-regular-amount: 160 64% 26%;
   }
   .dark {
     --background: 222.2 84% 4.9%;
@@ -71,6 +99,34 @@
     --sidebar-accent-foreground: 210 40% 98%;
     --sidebar-border: 217.2 32.6% 17.5%;
     --sidebar-ring: 202 70% 55%;
+    /* Maintenance Payment Status Colors - Dark Mode */
+    --maintenance-unpaid-bg: 38 96% 18.4%;
+    --maintenance-unpaid-border: 38 100% 40%;
+    --maintenance-unpaid-text: 38 96% 64%;
+    --maintenance-paid-bg: 160 80% 14.9%;
+    --maintenance-paid-border: 160 70% 40%;
+    --maintenance-paid-text: 160 70% 64%;
+    --maintenance-pending-bg: 217 91% 14.7%;
+    --maintenance-pending-border: 217 90% 46%;
+    --maintenance-pending-text: 217 91% 72%;
+    /* Payment Summary Card Colors - Dark Mode */
+    --payment-summary-bg: 217.2 32.6% 13.5%;
+    --payment-summary-border: 217.2 32.6% 25%;
+    --payment-summary-label: 210 40% 85%;
+    --payment-summary-count: 210 40% 70%;
+    --payment-summary-amount: 210 40% 90%;
+    /* Event Cards - Dark Mode */
+    --payment-event-bg: 217 91% 14.7%;
+    --payment-event-border: 217 90% 46%;
+    --payment-event-label: 217 91% 72%;
+    --payment-event-count: 217 91% 65%;
+    --payment-event-amount: 217 91% 60%;
+    /* Regular Cards - Dark Mode */
+    --payment-regular-bg: 160 80% 14.9%;
+    --payment-regular-border: 160 70% 40%;
+    --payment-regular-label: 160 70% 64%;
+    --payment-regular-count: 160 70% 55%;
+    --payment-regular-amount: 160 70% 50%;
   }
 }
 
