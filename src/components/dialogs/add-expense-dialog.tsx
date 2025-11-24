@@ -55,7 +55,7 @@ const ACCEPTED_FILE_TYPES = [
 ];
 
 const expenseSchema = z.object({
-  description: z.string().min(1, 'Description is required'),
+  description: z.string().min(3, 'Description must be at least 3 characters long').trim(),
   amount: z.coerce.number().min(0.01, 'Amount must be greater than 0'),
   categoryId: z.string().min(1, 'Please select a category'),
   paid: z.boolean().default(false),

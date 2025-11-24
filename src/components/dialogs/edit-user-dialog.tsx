@@ -46,14 +46,15 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 
 const userSchema = z.object({
-  name: z.string().min(1, 'Full name is required'),
-  email: z.string().email('Invalid email address'),
+  name: z.string().min(3, 'Full name must be at least 3 characters long').trim(),
+  email: z.string().email('Invalid email address').min(5, 'Email must be at least 5 characters long').trim(),
   phone: z
     .string()
     .optional()
+    .transform(val => val?.replace(/[\s\-]/g, ''))
     .refine(
-      val => !val || /^(\+91[\s\-]?)?[6-9]\d{9}$/.test(val.replace(/[\s\-]/g, '')),
-      'Please enter a valid Indian phone number (e.g., +91 98765 43210)'
+      val => !val || /^(\+91)?[6-9]\d{9}$/.test(val),
+      'Please enter a valid 10-digit Indian mobile number, optionally with a +91 prefix'
     ),
   // Include 'incharge' because the `User` type allows it in the codebase
   // (this keeps the form schema aligned with `src/lib/types.ts`).

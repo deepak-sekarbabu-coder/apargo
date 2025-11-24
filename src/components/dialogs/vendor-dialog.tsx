@@ -52,33 +52,20 @@ const SERVICE_TYPES = [
 ] as const;
 
 const vendorSchema = z.object({
-  name: z.string().min(1, 'Vendor name is required'),
+  name: z.string().min(3, 'Vendor name must be at least 3 characters long').trim(),
   serviceType: z.enum(SERVICE_TYPES),
   phone: z
     .string()
     .optional()
+    .transform(val => val?.replace(/[\s\-]/g, ''))
     .refine(
-      val => !val || /^(\+91[\s\-]?)?[6-9]\d{9}$/.test(val.replace(/[\s\-]/g, '')),
-      'Please enter a valid Indian phone number (e.g., +91 98765 43210)'
+      val => !val || /^(\+91)?[6-9]\d{9}$/.test(val),
+      'Please enter a valid 10-digit Indian mobile number, optionally with a +91 prefix'
     ),
-  email: z.string().email('Invalid email format').optional().or(z.literal('')),
-  address: z.string().optional(),
-  rating: z
-    .union([z.string(), z.coerce.number()])
-    .optional()
-    .refine(
-      val =>
-        !val ||
-        val === '' ||
-        (typeof val === 'string' && val.trim() === '') ||
-        (typeof val === 'number' && val >= 1 && val <= 5) ||
-        (typeof val === 'string' &&
-          !isNaN(parseFloat(val)) &&
-          parseFloat(val) >= 1 &&
-          parseFloat(val) <= 5),
-      'Rating must be between 1 and 5'
-    ),
-  notes: z.string().optional(),
+  email: z.string().email('Invalid email format').optional(),
+  address: z.string().max(100, 'Address must be at most 100 characters long').optional(),
+  rating: z.coerce.number().min(1).max(5).optional(),
+  notes: z.string().max(500, 'Notes must be at most 500 characters long').optional(),
   isActive: z.boolean(),
 });
 

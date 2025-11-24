@@ -37,7 +37,7 @@ import { useToast } from '@/hooks/use-toast';
 // Updated import path
 
 const categorySchema = z.object({
-  name: z.string().min(1, 'Category name is required'),
+  name: z.string().min(3, 'Category name must be at least 3 characters long').trim(),
   icon: z.string().min(1, 'An icon is required'),
   noSplit: z.boolean().optional(),
   // Payment Event Configuration
@@ -49,6 +49,23 @@ const categorySchema = z.object({
     .max(28, 'Day must be between 1-28')
     .optional(),
   autoGenerate: z.boolean().optional(),
+}).superRefine((data, ctx) => {
+    if (data.isPaymentEvent) {
+        if (!data.monthlyAmount || data.monthlyAmount <= 0) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['monthlyAmount'],
+                message: 'Monthly amount is required and must be positive when payment event is enabled',
+            });
+        }
+        if (!data.dayOfMonth) {
+            ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                path: ['dayOfMonth'],
+                message: 'Day of month is required when payment event is enabled',
+            });
+        }
+    }
 });
 
 type CategoryFormValues = z.infer<typeof categorySchema>;

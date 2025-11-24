@@ -58,21 +58,31 @@ const STATUS_OPTIONS = [
 ] as const;
 
 const taskSchema = z.object({
-  title: z.string().min(1, 'Title is required'),
-  description: z.string().optional(),
+  title: z.string().min(3, 'Title must be at least 3 characters long').trim(),
+  description: z.string().max(500, 'Description must be at most 500 characters long').optional(),
   category: z.enum(MAINTENANCE_CATEGORIES),
   vendorId: z
     .string()
     .optional()
     .nullable()
     .transform(val => val || undefined),
-  scheduledDate: z.string().min(1, 'Scheduled date is required'),
+  scheduledDate: z.string().refine(val => !isNaN(Date.parse(val)), {
+    message: 'Scheduled date must be a valid date',
+  }),
   dueDate: z.string().optional(),
   status: z.enum(STATUS_OPTIONS),
-  costEstimate: z.coerce.number().min(0).optional(),
-  actualCost: z.coerce.number().min(0).optional(),
-  notes: z.string().optional(),
+  costEstimate: z.coerce.number().min(0, 'Cost estimate must be a positive number').optional(),
+  actualCost: z.coerce.number().min(0, 'Actual cost must be a positive number').optional(),
+  notes: z.string().max(500, 'Notes must be at most 500 characters long').optional(),
   recurrence: z.enum(RECURRENCE_OPTIONS),
+}).refine(data => {
+    if (data.dueDate && data.scheduledDate) {
+        return new Date(data.dueDate) > new Date(data.scheduledDate);
+    }
+    return true;
+}, {
+    message: 'Due date must be after scheduled date',
+    path: ['dueDate'],
 });
 
 type TaskFormValues = z.infer<typeof taskSchema>;

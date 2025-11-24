@@ -42,14 +42,15 @@ import { useApartments } from '@/hooks/use-apartments';
 import { useToast } from '@/hooks/use-toast';
 
 const userSchema = z.object({
-  name: z.string().min(1, 'Full name is required'),
-  email: z.string().email('Invalid email address'),
+  name: z.string().min(3, 'Full name must be at least 3 characters long').trim(),
+  email: z.string().email('Invalid email address').min(5, 'Email must be at least 5 characters long').trim(),
   phone: z
     .string()
     .optional()
+    .transform(val => val?.replace(/[\s\-]/g, ''))
     .refine(
-      val => !val || /^(\+91[\s\-]?)?[6-9]\d{9}$/.test(val.replace(/[\s\-]/g, '')),
-      'Please enter a valid Indian phone number (e.g., +91 98765 43210)'
+      val => !val || /^(\+91)?[6-9]\d{9}$/.test(val),
+      'Please enter a valid 10-digit Indian mobile number, optionally with a +91 prefix'
     ),
   role: z.enum(['user', 'admin', 'incharge']),
   propertyRole: z.enum(['tenant', 'owner']).optional(),
