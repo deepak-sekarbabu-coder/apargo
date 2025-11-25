@@ -27,10 +27,10 @@ const mockUseSafeAreaFn = jest.fn(() => ({
 }));
 
 jest.mock('@/hooks/use-mobile', () => ({
-  useIsMobile: mockUseIsMobileFn,
-  useDeviceInfo: mockUseDeviceInfoFn,
-  useBreakpoint: mockUseBreakpointFn,
-  useSafeArea: mockUseSafeAreaFn,
+  useIsMobile: () => mockUseIsMobileFn(),
+  useDeviceInfo: () => mockUseDeviceInfoFn(),
+  useBreakpoint: () => mockUseBreakpointFn(),
+  useSafeArea: () => mockUseSafeAreaFn(),
 }));
 
 // Mock data
@@ -130,7 +130,7 @@ describe('PaymentsTable', () => {
       isTablet: false,
       isDesktop: true,
       isTouchDevice: false,
-      orientation: 'landscape',
+      orientation: 'portrait' as const,
       viewport: { width: 1024, height: 768 },
       devicePixelRatio: 1,
     });
