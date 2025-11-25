@@ -5,8 +5,6 @@ import React, { useState } from 'react';
 import { getLogger } from '@/lib/core/logger';
 import type { Category, Payment, User } from '@/lib/core/types';
 
-const logger = getLogger('Component');
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -16,6 +14,8 @@ import { useToast } from '@/hooks/use-toast';
 
 import { PaymentEventHistory } from './payment-event-history';
 import { usePaymentEvents } from './use-payment-events';
+
+const logger = getLogger('Component');
 
 interface AdminPaymentEventsTabProps {
   payments: Payment[];

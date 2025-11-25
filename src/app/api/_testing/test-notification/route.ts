@@ -2,8 +2,8 @@ import { getFirestore } from 'firebase-admin/firestore';
 
 import { NextResponse } from 'next/server';
 
-import { getLogger } from '@/lib/core/logger';
 import { getApartmentIds } from '@/lib/core/apartment-constants';
+import { getLogger } from '@/lib/core/logger';
 import { getFirebaseAdminApp } from '@/lib/firebase/firebase-admin';
 
 const logger = getLogger('API');

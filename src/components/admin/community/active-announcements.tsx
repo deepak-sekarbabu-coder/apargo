@@ -6,11 +6,11 @@ import { getLogger } from '@/lib/core/logger';
 import { AnnouncementNotification } from '@/lib/core/types';
 import { deleteAnnouncement, listenToActiveAnnouncements } from '@/lib/firestore/announcements';
 
-const logger = getLogger('Component');
-
 import { AnnouncementCard } from './announcement-card';
 import { AnnouncementsEmpty } from './announcements-empty';
 import { AnnouncementsLoading } from './announcements-loading';
+
+const logger = getLogger('Component');
 
 export function ActiveAnnouncements() {
   const [announcements, setAnnouncements] = React.useState<AnnouncementNotification[]>([]);

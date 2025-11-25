@@ -12,6 +12,7 @@
  * 4. Run: validateImageOptimization()
  */
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function validateImageOptimization() {
   console.log('🔍 Validating Image Optimization...\n');
 
@@ -119,6 +120,7 @@ function validateImageOptimization() {
 /**
  * Compare image sizes before and after optimization
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function compareImageSizes() {
   console.log('📏 Image Size Comparison:\n');
 
@@ -150,6 +152,7 @@ function compareImageSizes() {
 /**
  * Benchmark image loading performance
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 async function benchmarkImageLoading() {
   console.log('⏱️  Benchmarking Image Loading Performance...\n');
 

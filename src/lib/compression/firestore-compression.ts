@@ -5,6 +5,13 @@
  */
 import { compressData, decompressData } from './index';
 
+type CompressionMetadata = {
+  compressed: true;
+  algorithm: 'gzip';
+  originalSize: number;
+  compressedSize: number;
+};
+
 /**
  * Wraps a document for storage with optional compression
  * Large objects (>1KB) are automatically compressed
@@ -32,7 +39,7 @@ export const decompressDocumentFromStorage = async (
 
   const { data, ...rest } = doc;
   if (typeof data === 'string') {
-    const decompressed = await decompressData(data, metadata as any);
+    const decompressed = await decompressData(data, metadata as CompressionMetadata);
     if (typeof decompressed === 'object' && decompressed !== null) {
       return { ...rest, ...decompressed };
     }

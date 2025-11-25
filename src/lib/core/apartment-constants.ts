@@ -1,5 +1,4 @@
 // src/lib/apartment-constants.ts
-
 import { getLogger } from './logger';
 
 const logger = getLogger('Core');

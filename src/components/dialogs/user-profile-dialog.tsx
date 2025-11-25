@@ -66,8 +66,7 @@ const createProfileSchema = (apartments: string[]) =>
         `Max file size is 5MB.`
       )
       .refine(
-        files =>
-          !files || files.length === 0 || ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
+        files => !files || files.length === 0 || ACCEPTED_IMAGE_TYPES.includes(files?.[0]?.type),
         'Only .jpg, .jpeg, .png and .webp formats are supported.'
       ),
     apartment: z.enum(
@@ -91,10 +90,7 @@ export function UserProfileDialog({ children, user, onUpdateUser }: UserProfileD
   const [apartments, setApartments] = React.useState<string[]>([]);
   const { toast } = useToast();
   const { isMobile } = useDeviceInfo();
-  const profileSchema = React.useMemo(
-    () => createProfileSchema(apartments),
-    [apartments]
-  );
+  const profileSchema = React.useMemo(() => createProfileSchema(apartments), [apartments]);
 
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),

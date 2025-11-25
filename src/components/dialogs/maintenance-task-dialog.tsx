@@ -9,8 +9,6 @@ import * as React from 'react';
 import { getLogger } from '@/lib/core/logger';
 import { MaintenanceTask, Vendor } from '@/lib/core/types';
 
-const logger = getLogger('Component');
-
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -41,6 +39,8 @@ import { Textarea } from '@/components/ui/textarea';
 
 import { useToast } from '@/hooks/use-toast';
 
+const logger = getLogger('Component');
+
 const MAINTENANCE_CATEGORIES = [
   'elevator',
   'water_tank',
@@ -60,33 +60,38 @@ const STATUS_OPTIONS = [
   'skipped',
 ] as const;
 
-const taskSchema = z.object({
-  title: z.string().min(3, 'Title must be at least 3 characters long').trim(),
-  description: z.string().max(500, 'Description must be at most 500 characters long').optional(),
-  category: z.enum(MAINTENANCE_CATEGORIES),
-  vendorId: z
-    .string()
-    .optional()
-    .nullable()
-    .transform(val => val || undefined),
-  scheduledDate: z.string().refine(val => !isNaN(Date.parse(val)), {
-    message: 'Scheduled date must be a valid date',
-  }),
-  dueDate: z.string().optional(),
-  status: z.enum(STATUS_OPTIONS),
-  costEstimate: z.coerce.number().min(0, 'Cost estimate must be a positive number').optional(),
-  actualCost: z.coerce.number().min(0, 'Actual cost must be a positive number').optional(),
-  notes: z.string().max(500, 'Notes must be at most 500 characters long').optional(),
-  recurrence: z.enum(RECURRENCE_OPTIONS),
-}).refine(data => {
-    if (data.dueDate && data.scheduledDate) {
+const taskSchema = z
+  .object({
+    title: z.string().min(3, 'Title must be at least 3 characters long').trim(),
+    description: z.string().max(500, 'Description must be at most 500 characters long').optional(),
+    category: z.enum(MAINTENANCE_CATEGORIES),
+    vendorId: z
+      .string()
+      .optional()
+      .nullable()
+      .transform(val => val || undefined),
+    scheduledDate: z.string().refine(val => !isNaN(Date.parse(val)), {
+      message: 'Scheduled date must be a valid date',
+    }),
+    dueDate: z.string().optional(),
+    status: z.enum(STATUS_OPTIONS),
+    costEstimate: z.coerce.number().min(0, 'Cost estimate must be a positive number').optional(),
+    actualCost: z.coerce.number().min(0, 'Actual cost must be a positive number').optional(),
+    notes: z.string().max(500, 'Notes must be at most 500 characters long').optional(),
+    recurrence: z.enum(RECURRENCE_OPTIONS),
+  })
+  .refine(
+    data => {
+      if (data.dueDate && data.scheduledDate) {
         return new Date(data.dueDate) > new Date(data.scheduledDate);
+      }
+      return true;
+    },
+    {
+      message: 'Due date must be after scheduled date',
+      path: ['dueDate'],
     }
-    return true;
-}, {
-    message: 'Due date must be after scheduled date',
-    path: ['dueDate'],
-});
+  );
 
 type TaskFormValues = z.infer<typeof taskSchema>;
 

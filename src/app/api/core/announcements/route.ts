@@ -4,8 +4,8 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { getLogger } from '@/lib/core/logger';
 import { getApartmentIds } from '@/lib/core/apartment-constants';
+import { getLogger } from '@/lib/core/logger';
 import type { User } from '@/lib/core/types';
 import {
   getFirebaseAdminApp,

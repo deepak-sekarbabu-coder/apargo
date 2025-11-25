@@ -14,8 +14,6 @@ import {
   NotificationListener,
 } from '@/lib/notifications/notification-listener';
 
-const logger = getLogger('Component');
-
 import { NotificationItem } from '@/components/notifications/notification-item';
 import { Button, type ButtonProps } from '@/components/ui/button';
 import {
@@ -26,6 +24,8 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
+
+const logger = getLogger('Component');
 
 interface NotificationsPanelProps {
   className?: string;

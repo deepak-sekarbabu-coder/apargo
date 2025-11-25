@@ -47,7 +47,11 @@ const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/web
 
 const userSchema = z.object({
   name: z.string().min(3, 'Full name must be at least 3 characters long').trim(),
-  email: z.string().email('Invalid email address').min(5, 'Email must be at least 5 characters long').trim(),
+  email: z
+    .string()
+    .email('Invalid email address')
+    .min(5, 'Email must be at least 5 characters long')
+    .trim(),
   phone: z
     .string()
     .optional()

@@ -10,8 +10,6 @@ import { getLogger } from '@/lib/core/logger';
 import { MaintenanceTask, Vendor } from '@/lib/core/types';
 import { deleteVendor } from '@/lib/firestore/vendors';
 
-const logger = getLogger('Component');
-
 import { MaintenanceTaskDialog } from '@/components/dialogs/maintenance-task-dialog';
 import { VendorDialog } from '@/components/dialogs/vendor-dialog';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -23,6 +21,8 @@ import { toast } from '@/hooks/use-toast';
 
 import { MaintenanceDashboard } from './maintenance-dashboard/maintenance-dashboard';
 import { VendorList } from './vendors/vendor-list';
+
+const logger = getLogger('Component');
 
 function MaintenanceViewContent() {
   const { user } = useAuth();

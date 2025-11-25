@@ -13,8 +13,8 @@ import {
   where,
 } from 'firebase/firestore';
 
-import type { Notification } from '@/lib/core/types';
 import { getLogger } from '@/lib/core/logger';
+import type { Notification } from '@/lib/core/types';
 import { db } from '@/lib/firebase/firebase';
 
 const logger = getLogger('Notifications');

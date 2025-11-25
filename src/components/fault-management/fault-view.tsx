@@ -10,8 +10,6 @@ import type { Fault, FaultSeverity, FaultStatus, User } from '@/lib/core/types';
 import { deleteFault, getFaults, updateFault } from '@/lib/firestore/faults';
 import { getUsers } from '@/lib/firestore/users';
 
-const logger = getLogger('Component');
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
@@ -19,6 +17,8 @@ import { useToast } from '@/hooks/use-toast';
 
 import { FaultDashboard } from './fault-dashboard/fault-dashboard';
 import { FaultManagement } from './management/fault-management';
+
+const logger = getLogger('Component');
 
 export function FaultView() {
   const { user } = useAuth();

@@ -9,8 +9,6 @@ import { getLogger } from '@/lib/core/logger';
 import { Poll } from '@/lib/core/types';
 import { voteOnPoll } from '@/lib/firestore/polls';
 
-const logger = getLogger('Component');
-
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -22,6 +20,8 @@ import {
 } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+
+const logger = getLogger('Component');
 
 export function PollLoginNotification() {
   const { user } = useAuth();

@@ -42,7 +42,7 @@ const AvatarImage = React.forwardRef<
       // Only optimize Google images to avoid unnecessary processing
       if (src.includes('googleusercontent.com')) {
         try {
-          const { optimizeGoogleImage, generateGoogleImageSrcSet, getAvatarSizes } = await import(
+          const { optimizeGoogleImage, generateGoogleImageSrcSet } = await import(
             '@/lib/utils/image-optimization'
           );
 

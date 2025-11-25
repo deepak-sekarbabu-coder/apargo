@@ -9,8 +9,6 @@ import * as React from 'react';
 import { getLogger } from '@/lib/core/logger';
 import { Vendor } from '@/lib/core/types';
 
-const logger = getLogger('Component');
-
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import {
@@ -41,6 +39,8 @@ import { Spinner } from '@/components/ui/spinner';
 import { Textarea } from '@/components/ui/textarea';
 
 import { useToast } from '@/hooks/use-toast';
+
+const logger = getLogger('Component');
 
 const SERVICE_TYPES = [
   'elevator',

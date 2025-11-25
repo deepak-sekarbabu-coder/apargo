@@ -2,14 +2,14 @@
  * Example implementations of compression in Firestore operations
  * These examples show how to integrate compression into data operations
  */
-import type { Expense } from '../core/types';
 import { getLogger } from '../core/logger';
+import type { Expense } from '../core/types';
 import {
   compressDocumentForStorage,
   compressionStats,
   decompressDocumentFromStorage,
 } from './firestore-compression';
-import { compressData, decompressData, shouldCompress } from './index';
+import { compressData, shouldCompress } from './index';
 
 const logger = getLogger('Compression');
 

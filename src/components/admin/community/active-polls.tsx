@@ -8,11 +8,11 @@ import { getLogger } from '@/lib/core/logger';
 import { Poll } from '@/lib/core/types';
 import { deletePoll, listenToPolls } from '@/lib/firestore/polls';
 
-const logger = getLogger('Component');
-
 import { PollCard } from './poll-card';
 import { PollsEmpty } from './polls-empty';
 import { PollsLoading } from './polls-loading';
+
+const logger = getLogger('Component');
 
 export function ActivePolls() {
   const { user } = useAuth();

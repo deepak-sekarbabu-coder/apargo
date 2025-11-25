@@ -9,8 +9,6 @@ import {
   healthMonitor,
 } from '@/lib/firebase/firebase-health-monitor';
 
-const logger = getLogger('Component');
-
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -20,6 +18,8 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { ScrollArea } from '@/components/ui/scroll-area';
+
+const logger = getLogger('Component');
 
 interface FirebaseDebugPanelProps {
   className?: string;

@@ -1,7 +1,6 @@
 /**
  * Utility functions for optimizing images, particularly for external sources like Google
  */
-
 import { getLogger } from '../core/logger';
 
 const logger = getLogger('ImageOptimization');
@@ -52,7 +51,7 @@ export function optimizeGoogleImage(
     return url;
   }
 
-  const { size = 64, crop = true, quality = 90 } = options;
+  const { size = 64, crop = true } = options;
 
   try {
     // Remove any existing size parameters
@@ -62,8 +61,7 @@ export function optimizeGoogleImage(
     // Format: =s{size}-c for square cropped images
     const sizeParam = crop ? `=s${size}-c` : `=s${size}`;
 
-    // Add quality parameter if possible
-    // Note: Google's image service may ignore quality in some cases
+    // Construct params
     const params = `${sizeParam}`;
 
     // Construct the optimized URL

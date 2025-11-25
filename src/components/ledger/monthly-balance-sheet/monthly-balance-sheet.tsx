@@ -21,8 +21,6 @@ import { getLogger } from '@/lib/core/logger';
 import type { Payment } from '@/lib/core/types';
 import { aggregateBalanceSheets } from '@/lib/expense-management/balance-utils';
 
-const logger = getLogger('Component');
-
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -36,6 +34,8 @@ import {
 } from '@/components/ui/table';
 
 import { useIsMobile } from '@/hooks/use-mobile';
+
+const logger = getLogger('Component');
 
 interface MonthlyBalanceSheetProps {
   payments: Payment[];

@@ -3,7 +3,6 @@
  * Uses native compression APIs (gzip via pako library)
  * Reduces bandwidth for large document transfers
  */
-
 import { getLogger } from '../core/logger';
 
 const logger = getLogger('Compression');
@@ -99,6 +98,7 @@ export const decompressData = async (
  * Firestore doesn't need to store this metadata
  */
 export const stripCompressionMetadata = (obj: Record<string, unknown>): Record<string, unknown> => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { _compression, ...rest } = obj;
   return rest;
 };

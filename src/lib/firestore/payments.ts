@@ -1,6 +1,6 @@
 // Removed unused imports
-import type { Apartment, Category, Payment, User } from '../core/types';
 import { getLogger } from '../core/logger';
+import type { Apartment, Category, Payment, User } from '../core/types';
 import { type QuerySnapshot, database } from '../database';
 import { computeApprovedExpensePaymentDeltas } from '../payments/payments';
 import { getApartments } from './apartments';

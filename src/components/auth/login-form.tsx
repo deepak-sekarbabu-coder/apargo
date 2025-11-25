@@ -21,7 +21,11 @@ import { InstallButton } from '../ui/install-button';
 // Updated import path
 
 const loginSchema = z.object({
-  email: z.string().email('Invalid email address').min(5, { message: 'Email must be at least 5 characters long' }).trim(),
+  email: z
+    .string()
+    .email('Invalid email address')
+    .min(5, { message: 'Email must be at least 5 characters long' })
+    .trim(),
   password: z
     .string()
     .min(8, { message: 'Password must be at least 8 characters long' })

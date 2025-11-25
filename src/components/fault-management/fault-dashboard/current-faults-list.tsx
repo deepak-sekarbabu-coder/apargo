@@ -10,10 +10,10 @@ import { getLogger } from '@/lib/core/logger';
 import type { Fault } from '@/lib/core/types';
 import { deleteFault, getFaults, updateFault } from '@/lib/firestore/faults';
 
-const logger = getLogger('Component');
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
+const logger = getLogger('Component');
 
 export function CurrentFaultsList() {
   const { user, loading: authLoading } = useAuth();

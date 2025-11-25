@@ -1,7 +1,7 @@
 import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from 'firebase/firestore';
 
-import type { Fault } from '../core/types';
 import { getLogger } from '../core/logger';
+import type { Fault } from '../core/types';
 import { db } from '../firebase/firebase';
 
 const logger = getLogger('Firestore');

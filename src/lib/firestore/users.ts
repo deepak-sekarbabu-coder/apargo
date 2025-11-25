@@ -1,5 +1,5 @@
-import type { User } from '../core/types';
 import { getLogger } from '../core/logger';
+import type { User } from '../core/types';
 import { type QuerySnapshot, database } from '../database';
 import { removeUndefined } from './firestore-utils';
 

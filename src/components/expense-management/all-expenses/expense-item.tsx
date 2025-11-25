@@ -16,8 +16,6 @@ import {
 } from '@/lib/expense-management/expense-utils';
 import { updateExpense } from '@/lib/firestore/expenses';
 
-const logger = getLogger('Component');
-
 import { CategoryIcon } from '@/components/icons/category-icon';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -32,6 +30,8 @@ import {
 import { PaymentStatusButton } from '@/components/ui/payment-status-button';
 
 import { useToast } from '@/hooks/use-toast';
+
+const logger = getLogger('Component');
 
 interface ExpenseItemProps {
   expense: Expense;

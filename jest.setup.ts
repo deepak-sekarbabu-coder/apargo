@@ -98,6 +98,40 @@ jest.mock('firebase/messaging', () => ({
   onMessage: jest.fn(() => jest.fn()),
 }));
 
+// Mock jsPDF and jspdf-autotable
+jest.mock('jspdf', () => ({
+  __esModule: true,
+  default: jest.fn().mockImplementation(() => {
+    const mockDoc = {
+      text: jest.fn().mockReturnThis(),
+      setFontSize: jest.fn().mockReturnThis(),
+      setFont: jest.fn().mockReturnThis(),
+      setTextColor: jest.fn().mockReturnThis(),
+      setDrawColor: jest.fn().mockReturnThis(),
+      setLineWidth: jest.fn().mockReturnThis(),
+      line: jest.fn().mockReturnThis(),
+      rect: jest.fn().mockReturnThis(),
+      autoTable: jest.fn().mockReturnThis(),
+      save: jest.fn().mockReturnThis(),
+      internal: {
+        pageSize: {
+          getWidth: jest.fn(() => 210),
+          getHeight: jest.fn(() => 297),
+        },
+      },
+      getPageHeight: jest.fn(() => 297),
+      getPageWidth: jest.fn(() => 210),
+      lastAutoTable: { finalY: 50 },
+    };
+    return mockDoc;
+  }),
+}));
+
+jest.mock('jspdf-autotable', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}));
+
 // Mock browser globals that might be used in Firebase code
 global.window = {
   ...global.window,

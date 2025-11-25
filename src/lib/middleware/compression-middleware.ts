@@ -2,7 +2,7 @@
  * Compression monitoring middleware for API responses
  * Tracks compression ratios and enforces bandwidth optimization
  */
-import { type NextRequest, NextResponse } from 'next/server';
+import { type NextRequest } from 'next/server';
 
 interface CompressionMetrics {
   timestamp: Date;
@@ -117,7 +117,6 @@ export const withCompressionMonitoring =
     const gzipEnabled = acceptEncoding.includes('gzip');
 
     // Try to get response size
-    const contentType = response.headers.get('content-type') || 'application/json';
     const contentLength = response.headers.get('content-length');
 
     if (contentLength) {

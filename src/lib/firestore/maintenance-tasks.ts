@@ -16,8 +16,8 @@ import {
   where,
 } from 'firebase/firestore';
 
-import type { MaintenanceTask } from '../core/types';
 import { getLogger } from '../core/logger';
+import type { MaintenanceTask } from '../core/types';
 import { db } from '../firebase/firebase';
 import {
   createRecurringTaskFromCompleted,

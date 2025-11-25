@@ -9,13 +9,13 @@ import type { Payment, User } from '@/lib/core/types';
 import { addPayment, updatePayment } from '@/lib/firestore/payments';
 import { uploadImage } from '@/lib/storage/storage';
 
-const logger = getLogger('Component');
-
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { PaymentStatusButton } from '@/components/ui/payment-status-button';
+
+const logger = getLogger('Component');
 
 interface MaintenancePaymentStatusProps {
   user: User | null;

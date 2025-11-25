@@ -183,6 +183,7 @@ export function ExpensesList({
 
   // Initialize React Table (for consistency, though not strictly needed for this layout)
   const columns: ColumnDef<Expense>[] = [];
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const table = useReactTable({
     data: relevantExpenses,
     columns,

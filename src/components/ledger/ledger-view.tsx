@@ -9,8 +9,6 @@ import type { BalanceSheet, Payment, User } from '@/lib/core/types';
 import { addPayment, deletePayment, updatePayment } from '@/lib/firestore/payments';
 import { uploadImage } from '@/lib/storage/storage';
 
-const logger = getLogger('Component');
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -26,6 +24,8 @@ import { usePaymentFilters } from '@/hooks/use-payment-filters';
 
 import { PaymentsTable } from './ledger-payments/payments-table';
 import { MonthlyBalanceSheet } from './monthly-balance-sheet/monthly-balance-sheet';
+
+const logger = getLogger('Component');
 
 interface LedgerViewProps {
   payments: Payment[];
