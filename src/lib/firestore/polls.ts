@@ -5,6 +5,7 @@ import {
   doc,
   getDoc,
   onSnapshot,
+  orderBy,
   query,
   updateDoc,
   where,
@@ -16,9 +17,9 @@ import { removeUndefined } from './firestore-utils';
 
 export const listenToPolls = (cb: (polls: Poll[]) => void, activeOnly = false) => {
   const pollsCol = collection(db, 'polls');
-  let q = query(pollsCol);
+  let q = query(pollsCol, orderBy('createdAt', 'desc'));
   if (activeOnly) {
-    q = query(pollsCol, where('isActive', '==', true));
+    q = query(pollsCol, where('isActive', '==', true), orderBy('createdAt', 'desc'));
   }
   return onSnapshot(q, snapshot => {
     cb(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }) as Poll));

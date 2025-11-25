@@ -89,6 +89,14 @@
       "fields": [{ "fieldPath": "isActive", "order": "ASC" }]
     },
     {
+      "collectionGroup": "polls",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "isActive", "order": "ASC" },
+        { "fieldPath": "createdAt", "order": "DESC" }
+      ]
+    },
+    {
       "collectionGroup": "notifications",
       "queryScope": "COLLECTION",
       "fields": [
