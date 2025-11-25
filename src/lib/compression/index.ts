@@ -4,6 +4,10 @@
  * Reduces bandwidth for large document transfers
  */
 
+import { getLogger } from '../core/logger';
+
+const logger = getLogger('Compression');
+
 // Compression state manager
 type CompressionMetadata = {
   compressed: true;
@@ -58,7 +62,7 @@ export const compressData = async (
       _compression: metadata,
     };
   } catch (error) {
-    console.warn('Compression failed, storing uncompressed:', error);
+    logger.warn('Compression failed, storing uncompressed:', error);
     return { data };
   }
 };
@@ -85,7 +89,7 @@ export const decompressData = async (
     const jsonStr = new TextDecoder().decode(decompressed);
     return JSON.parse(jsonStr);
   } catch (error) {
-    console.error('Decompression failed:', error);
+    logger.error('Decompression failed:', error);
     return compressedData;
   }
 };

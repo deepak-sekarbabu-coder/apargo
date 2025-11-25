@@ -6,7 +6,10 @@ import * as z from 'zod';
 
 import * as React from 'react';
 
+import { getLogger } from '@/lib/core/logger';
 import { MaintenanceTask, Vendor } from '@/lib/core/types';
+
+const logger = getLogger('Component');
 
 import { Button } from '@/components/ui/button';
 import {
@@ -207,7 +210,7 @@ export function MaintenanceTaskDialog({
         description: `Failed to ${editingTask ? 'update' : 'create'} task. Please try again.`,
         variant: 'destructive',
       });
-      console.error('Error submitting task:', error);
+      logger.error('Error submitting task:', error);
     } finally {
       setLoading(false);
     }

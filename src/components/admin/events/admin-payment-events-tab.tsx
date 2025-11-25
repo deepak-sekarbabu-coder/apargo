@@ -2,7 +2,10 @@ import { PlusCircle } from 'lucide-react';
 
 import React, { useState } from 'react';
 
+import { getLogger } from '@/lib/core/logger';
 import type { Category, Payment, User } from '@/lib/core/types';
+
+const logger = getLogger('Component');
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -96,7 +99,7 @@ export function AdminPaymentEventsTab({ payments, users, categories }: AdminPaym
                       description: errorMessage,
                       variant: 'destructive',
                     });
-                    console.error('Error generating payment events:', error);
+                    logger.error('Error generating payment events:', error);
                   } finally {
                     // Slight delay so user sees completion state
                     setTimeout(() => {

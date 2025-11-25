@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { adminAuth } from '@/lib/auth/auth';
+import { getLogger } from '@/lib/core/logger';
 import * as firestoreAdmin from '@/lib/firestore/firestore-admin';
+
+const logger = getLogger('API');
 
 // GET /api/payment-events/summary?monthYear=YYYY-MM
 // Get payment event summary for admin dashboard
@@ -33,7 +36,7 @@ export async function GET(request: NextRequest) {
       summary,
     });
   } catch (error) {
-    console.error('Error getting payment event summary:', error);
+    logger.error('Error getting payment event summary:', error);
     return NextResponse.json(
       {
         error: 'Failed to get payment event summary',

@@ -6,12 +6,15 @@ import { Bell, BellOff } from 'lucide-react';
 
 import { useEffect, useRef, useState } from 'react';
 
+import { getLogger } from '@/lib/core/logger';
 import type { Notification } from '@/lib/core/types';
 import { db } from '@/lib/firebase/firebase';
 import {
   AdminNotificationListener,
   NotificationListener,
 } from '@/lib/notifications/notification-listener';
+
+const logger = getLogger('Component');
 
 import { NotificationItem } from '@/components/notifications/notification-item';
 import { Button, type ButtonProps } from '@/components/ui/button';
@@ -60,7 +63,7 @@ export function NotificationsPanel({ className }: NotificationsPanelProps) {
             setConnectionError(null);
           },
           (error: Error) => {
-            console.error('Admin notification listener error:', error);
+            logger.error('Admin notification listener error:', error);
             setConnectionError('Failed to load notifications. Retrying...');
           }
         );
@@ -85,15 +88,15 @@ export function NotificationsPanel({ className }: NotificationsPanelProps) {
       return;
     }
 
-    console.log('🔔 Setting up robust notification listener for apartment:', apartment);
+    logger.debug('Setting up robust notification listener for apartment:', apartment);
 
     // Setup the robust notification listener
     const listener = new NotificationListener({
       apartment,
       onNotifications: (notifications: Notification[]) => {
         if (apartment === 'T2') {
-          console.log(
-            `🔍 NotificationsPanel received ${notifications.length} notifications for T2:`,
+          logger.debug(
+            `NotificationsPanel received ${notifications.length} notifications for T2:`,
             notifications.map(n => ({ id: n.id, title: n.title, isRead: n.isRead }))
           );
         }
@@ -102,14 +105,14 @@ export function NotificationsPanel({ className }: NotificationsPanelProps) {
           0
         );
         if (apartment === 'T2') {
-          console.log(`🔍 T2 unread count:`, unread);
+          logger.debug(`T2 unread count:`, unread);
         }
         setNotifications(notifications);
         setUnreadCount(unread);
         setConnectionError(null);
       },
       onError: (error: Error) => {
-        console.error('Notification listener error:', error);
+        logger.error('Notification listener error:', error);
         setConnectionError('Connection issues detected. Retrying...');
       },
       retryDelay: 2000,
@@ -139,7 +142,7 @@ export function NotificationsPanel({ className }: NotificationsPanelProps) {
       const notification = notifications.find(n => n.id === notificationId);
       if (!notification) return;
 
-      console.log(`🔍 Marking notification as read for ${user.apartment}:`, {
+      logger.debug(`Marking notification as read for ${user.apartment}:`, {
         notificationId,
         notificationType: notification.type,
         currentIsRead: notification.isRead,
@@ -155,12 +158,12 @@ export function NotificationsPanel({ className }: NotificationsPanelProps) {
           const currentData = currentDoc.data();
           const currentIsRead = currentData.isRead;
 
-          console.log(`🔍 Current isRead map:`, currentIsRead);
+          logger.debug(`Current isRead map:`, currentIsRead);
 
           if (typeof currentIsRead === 'object' && currentIsRead !== null) {
             // Update the specific apartment in the isRead map
             const updatedIsRead = { ...currentIsRead, [user.apartment]: true };
-            console.log(`🔍 Updating isRead map:`, updatedIsRead);
+            logger.debug(`Updating isRead map:`, updatedIsRead);
 
             await updateDoc(notificationRef, {
               isRead: updatedIsRead,
@@ -168,7 +171,7 @@ export function NotificationsPanel({ className }: NotificationsPanelProps) {
           } else {
             // Fallback: create new isRead map
             const updatedIsRead = { [user.apartment]: true };
-            console.log(`🔍 Creating new isRead map:`, updatedIsRead);
+            logger.debug(`Creating new isRead map:`, updatedIsRead);
 
             await updateDoc(notificationRef, {
               isRead: updatedIsRead,
@@ -182,9 +185,9 @@ export function NotificationsPanel({ className }: NotificationsPanelProps) {
         });
       }
 
-      console.log(`✅ Successfully marked notification as read for ${user.apartment}`);
+      logger.debug(`Successfully marked notification as read for ${user.apartment}`);
     } catch (error) {
-      console.error('Error marking notification as read:', error);
+      logger.error('Error marking notification as read:', error);
     }
   };
 
@@ -192,7 +195,7 @@ export function NotificationsPanel({ className }: NotificationsPanelProps) {
     if (!user || !user.apartment) return;
 
     try {
-      console.log(`🔍 Marking all notifications as read for ${user.apartment}`);
+      logger.debug(`Marking all notifications as read for ${user.apartment}`);
 
       // Process each notification individually to handle isRead maps correctly
       const unreadNotifications = notifications.filter(n => !n.isRead);
@@ -229,9 +232,9 @@ export function NotificationsPanel({ className }: NotificationsPanelProps) {
         }
       }
 
-      console.log(`✅ Successfully marked all notifications as read for ${user.apartment}`);
+      logger.debug(`Successfully marked all notifications as read for ${user.apartment}`);
     } catch (error) {
-      console.error('Error marking all as read:', error);
+      logger.error('Error marking all as read:', error);
     }
   };
 

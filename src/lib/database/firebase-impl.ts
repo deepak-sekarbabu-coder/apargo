@@ -1,5 +1,6 @@
 import type { WithFieldValue } from 'firebase/firestore';
 
+import { getLogger } from '../core/logger';
 import type {
   CollectionReference,
   DatabaseService,
@@ -11,6 +12,8 @@ import type {
   Subscription,
   WhereFilter,
 } from './interfaces';
+
+const logger = getLogger('Database');
 
 // Initialization
 let firestoreModule: typeof import('firebase/firestore') | undefined;
@@ -30,7 +33,7 @@ const initPromise = (async () => {
       db = adminFirestore.getFirestore(firebaseAdmin.getFirebaseAdminApp());
       isInitialized = true;
     } catch (error) {
-      console.error('Failed to initialize Firebase Admin Firestore:', error);
+      logger.error('Failed to initialize Firebase Admin Firestore:', error);
     }
   } else {
     // Client-side: initialize asynchronously
@@ -40,7 +43,7 @@ const initPromise = (async () => {
       db = clientDb;
       isInitialized = true;
     } catch (error) {
-      console.error('Failed to initialize Firebase Client Firestore:', error);
+      logger.error('Failed to initialize Firebase Client Firestore:', error);
     }
   }
 })();
@@ -320,7 +323,7 @@ export class FirebaseDatabaseService implements DatabaseService {
     if (typeof window === 'undefined') {
       // Server-side: Admin SDK doesn't support real-time subscriptions
       // Return a no-op subscription for SSR compatibility
-      console.warn('Real-time subscriptions are not supported on the server-side');
+      logger.warn('Real-time subscriptions are not supported on the server-side');
       return new FirebaseSubscription(() => {});
     } else {
       // Client-side: Client SDK

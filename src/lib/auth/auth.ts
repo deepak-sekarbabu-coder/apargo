@@ -5,10 +5,13 @@ import * as React from 'react';
 
 import { cookies } from 'next/headers';
 
+import { getLogger } from '../core/logger';
 import type { User } from '../core/types';
 import { app } from '../firebase/firebase';
 import { getFirebaseAdminApp } from '../firebase/firebase-admin';
 import { getUserByEmail } from '../firestore/users';
+
+const logger = getLogger('Auth');
 
 export const auth = getAuth(app);
 
@@ -53,7 +56,7 @@ export async function basicAuth(): Promise<{ user?: User; error?: string }> {
 
     return { user };
   } catch (error) {
-    console.error('Basic auth verification error:', error);
+    logger.error('Basic auth verification error:', error);
     return { error: 'Invalid session' };
   }
 }
@@ -82,7 +85,7 @@ export async function adminAuth(): Promise<{ user?: User; error?: string }> {
 
     return { user };
   } catch (error) {
-    console.error('Admin auth verification error:', error);
+    logger.error('Admin auth verification error:', error);
     return { error: 'Invalid session or admin access required' };
   }
 }

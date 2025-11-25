@@ -1,7 +1,10 @@
 import { getMessaging, getToken } from 'firebase/messaging';
 
+import { getLogger } from '../core/logger';
 import { firebaseApp } from '../firebase/firebase-client';
 import { updateUser } from '../firestore/users';
+
+const logger = getLogger('Notifications');
 
 export const registerServiceWorker = async () => {
   if ('serviceWorker' in navigator) {
@@ -22,7 +25,7 @@ export const requestNotificationPermission = async (userId: string) => {
 
   // Ensure you have a valid VAPID key before proceeding.
   if (!VAPID_KEY || VAPID_KEY === 'YOUR_VAPID_KEY_HERE') {
-    console.warn(
+    logger.warn(
       'VAPID key not set. Push notifications will not work. Please set NEXT_PUBLIC_FIREBASE_VAPID_KEY in your environment variables.'
     );
     return;
@@ -48,6 +51,6 @@ export const requestNotificationPermission = async (userId: string) => {
       }
     }
   } catch (error) {
-    console.error('Error requesting notification permission:', error);
+    logger.error('Error requesting notification permission:', error);
   }
 };

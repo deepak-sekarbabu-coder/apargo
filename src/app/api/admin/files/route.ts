@@ -1,9 +1,12 @@
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getLogger } from '@/lib/core/logger';
 import { getUserByEmail } from '@/lib/firestore/users';
 import { withLogging } from '@/lib/middleware/request-logger';
 import { storageService } from '@/lib/storage/storage-enhanced';
+
+const logger = getLogger('API');
 
 // Helper function to verify admin role
 async function verifyAdminRole(request: NextRequest): Promise<{
@@ -41,7 +44,7 @@ async function verifyAdminRole(request: NextRequest): Promise<{
 
     return { isValid: false, error: 'Admin access required' };
   } catch (error) {
-    console.error('Auth verification error:', error);
+    logger.error('Auth verification error:', error);
     return { isValid: false, error: 'Authentication verification failed' };
   }
 }
@@ -85,7 +88,7 @@ export const GET = withLogging(async (request: NextRequest) => {
       count: files.length,
     });
   } catch (error) {
-    console.error('Admin files list API error:', error);
+    logger.error('Admin files list API error:', error);
     return NextResponse.json({ error: 'Failed to retrieve files' }, { status: 500 });
   }
 });
@@ -127,7 +130,7 @@ export const DELETE = withLogging(async (request: NextRequest) => {
       failedCount: result.failed.length,
     });
   } catch (error) {
-    console.error('Admin files delete API error:', error);
+    logger.error('Admin files delete API error:', error);
     return NextResponse.json({ error: 'Failed to delete files' }, { status: 500 });
   }
 });

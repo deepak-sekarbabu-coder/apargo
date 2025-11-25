@@ -1,11 +1,14 @@
 // Removed unused imports
 import type { Apartment, Category, Payment, User } from '../core/types';
+import { getLogger } from '../core/logger';
 import { type QuerySnapshot, database } from '../database';
 import { computeApprovedExpensePaymentDeltas } from '../payments/payments';
 import { getApartments } from './apartments';
 import { getCategories } from './categories';
 import { applyDeltasToBalanceSheets } from './expenses';
 import { getUsers } from './users';
+
+const logger = getLogger('Firestore');
 
 // Helper function to validate category
 const validateCategory = async (categoryId: string): Promise<Category> => {
@@ -52,7 +55,7 @@ const createApartmentPayment = async (
 ): Promise<Payment | null> => {
   const monthlyAmount = typeof category.monthlyAmount === 'number' ? category.monthlyAmount : 0;
   if (monthlyAmount <= 0) {
-    console.warn(
+    logger.warn(
       `Skipping payment event for category ${category.name} with invalid amount: ${monthlyAmount}`
     );
     return null;
@@ -73,7 +76,7 @@ const createApartmentPayment = async (
     const createdPayment = await addPayment(paymentEventData);
     return createdPayment;
   } catch (error) {
-    console.error(`Failed to create payment event for apartment ${apartment.id}:`, error);
+    logger.error(`Failed to create payment event for apartment ${apartment.id}:`, error);
     return null;
   }
 };
@@ -127,7 +130,7 @@ export const addPayment = async (payment: Omit<Payment, 'id' | 'createdAt'>): Pr
       }
     }
   } catch (e) {
-    console.error('Error updating balanceSheets after addPayment:', e);
+    logger.error('Error updating balanceSheets after addPayment:', e);
   }
   return { id: docRef.id, ...newPayment } as Payment;
 };
@@ -164,7 +167,7 @@ export const updatePayment = async (id: string, payment: Partial<Payment>): Prom
       }
     }
   } catch (e) {
-    console.error('Error updating balanceSheets after updatePayment:', e);
+    logger.error('Error updating balanceSheets after updatePayment:', e);
   }
 };
 
@@ -198,7 +201,7 @@ export const deletePayment = async (id: string): Promise<void> => {
         }
       }
     } catch (e) {
-      console.error('Error updating balanceSheets before deletePayment:', e);
+      logger.error('Error updating balanceSheets before deletePayment:', e);
     }
   }
   await paymentDoc.delete();
@@ -254,7 +257,7 @@ export const generatePaymentEvents = async (
   for (const apartment of apartments) {
     const apartmentMembers = allUsers.filter(user => user.apartment === apartment.id);
     if (apartmentMembers.length === 0) {
-      console.warn(
+      logger.warn(
         `No members found for apartment ${apartment.id}, skipping payment event generation`
       );
       continue;
@@ -263,7 +266,7 @@ export const generatePaymentEvents = async (
     const firstMember = apartmentMembers[0];
 
     if (await checkExistingPayment(apartment.id, monthYear, category.name)) {
-      console.log(`Payment event already exists for apartment ${apartment.id} in ${monthYear}`);
+      logger.debug(`Payment event already exists for apartment ${apartment.id} in ${monthYear}`);
       continue;
     }
 
@@ -296,7 +299,7 @@ export const generateAllPaymentEvents = async (monthYear: string): Promise<Payme
       const payments = await generatePaymentEvents(category.id, monthYear);
       allCreatedPayments.push(...payments);
     } catch (error) {
-      console.error(`Failed to generate payment events for category ${category.name}:`, error);
+      logger.error(`Failed to generate payment events for category ${category.name}:`, error);
     }
   }
 

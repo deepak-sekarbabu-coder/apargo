@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { basicAuth } from '@/lib/auth/auth';
+import { getLogger } from '@/lib/core/logger';
 import type { PaymentStatus } from '@/lib/core/types';
 import { getPayments, updatePayment } from '@/lib/firestore/payments';
 import { withLogging } from '@/lib/middleware/request-logger';
+
+const logger = getLogger('API');
 
 // PUT /api/payments/[id]
 // Update payment status - used for marking payment events as paid
@@ -103,7 +106,7 @@ export const PUT = withLogging(
         payment: updatedPayment,
       });
     } catch (error) {
-      console.error('Error updating payment:', error);
+      logger.error('Error updating payment:', error);
       return NextResponse.json(
         {
           error: 'Failed to update payment',
@@ -155,7 +158,7 @@ export const GET = withLogging(
         payment,
       });
     } catch (error) {
-      console.error('Error getting payment:', error);
+      logger.error('Error getting payment:', error);
       return NextResponse.json(
         {
           error: 'Failed to get payment',

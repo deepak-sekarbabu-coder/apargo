@@ -1,6 +1,9 @@
 // Server-side Firestore utilities using Firebase Admin SDK
 // This file should only be imported in API routes and server components
+import { getLogger } from '../core/logger';
 import { getFirebaseAdminApp } from '../firebase/firebase-admin';
+
+const logger = getLogger('Firestore');
 
 // Import types (these don't cause bundling issues)
 type Payment = {
@@ -50,7 +53,7 @@ export const testFirestoreConnection = async (): Promise<{ success: boolean; err
 
     return { success: true };
   } catch (error) {
-    console.error('❌ Firestore connection test failed:', error);
+    logger.error('Firestore connection test failed:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -112,7 +115,7 @@ export const getPaymentEvents = async (
 
     return paymentEvents;
   } catch (error) {
-    console.error('❌ getPaymentEvents failed:', error);
+    logger.error('getPaymentEvents failed:', error);
     throw error;
   }
 };
@@ -148,7 +151,7 @@ export const getApartmentsAdmin = async (): Promise<Apartment[]> => {
         }) as Apartment
     );
   } catch (error) {
-    console.error('❌ getApartmentsAdmin failed:', error);
+    logger.error('getApartmentsAdmin failed:', error);
     throw error;
   }
 };

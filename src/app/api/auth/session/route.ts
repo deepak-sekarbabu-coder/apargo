@@ -8,8 +8,11 @@ import {
   isAuthUserNotFoundError,
   isInvalidTokenError,
 } from '@/lib/auth/auth-utils';
+import { getLogger } from '@/lib/core/logger';
 import { firebaseManager } from '@/lib/firebase/firebase-connection-manager';
 import { withLogging } from '@/lib/middleware/request-logger';
+
+const logger = getLogger('API');
 
 async function createSession(request: NextRequest) {
   try {
@@ -42,8 +45,8 @@ async function createSession(request: NextRequest) {
 
       return NextResponse.json({ status: 'success' });
     } catch (adminError: unknown) {
-      console.error('Firebase Admin SDK Error:', adminError);
-      console.error('Error code:', (adminError as { code?: string })?.code);
+      logger.error('Firebase Admin SDK Error:', adminError);
+      logger.error('Error code:', (adminError as { code?: string })?.code);
 
       // Handle specific authentication errors
       if (isAuthUserNotFoundError(adminError) || isInvalidTokenError(adminError)) {
@@ -59,7 +62,7 @@ async function createSession(request: NextRequest) {
       // Fallback: Set a simple cookie with the idToken for development
       // This is NOT secure for production but allows development to continue
       if (process.env.NODE_ENV === 'development') {
-        console.warn('Using development fallback for session cookie');
+        logger.warn('Using development fallback for session cookie');
         const cookieStore = await cookies();
         cookieStore.set('session', idToken, {
           maxAge: expiresIn,
@@ -84,7 +87,7 @@ async function createSession(request: NextRequest) {
       throw adminError;
     }
   } catch (error: unknown) {
-    console.error('SESSION_CREATION_ERROR:', error);
+    logger.error('SESSION_CREATION_ERROR:', error);
     // Ensure a helpful message is returned, including the error code if available
     const err = error as { code?: string; message?: string };
     const errorMessage = err.code
@@ -103,7 +106,7 @@ async function deleteSession() {
     cookieStore.delete('user-role'); // Also delete the user-role cookie
     return NextResponse.json({ status: 'success' });
   } catch (error) {
-    console.error('Session cookie deletion failed:', error);
+    logger.error('Session cookie deletion failed:', error);
     return NextResponse.json(
       { status: 'error', message: 'Failed to delete session.' },
       { status: 500 }

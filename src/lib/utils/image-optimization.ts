@@ -2,6 +2,10 @@
  * Utility functions for optimizing images, particularly for external sources like Google
  */
 
+import { getLogger } from '../core/logger';
+
+const logger = getLogger('ImageOptimization');
+
 interface GoogleImageOptions {
   /**
    * Size in pixels for square images (default: 64)
@@ -71,7 +75,7 @@ export function optimizeGoogleImage(
 
     return optimizedUrl;
   } catch (error) {
-    console.error('Error optimizing Google image URL:', error);
+    logger.error('Error optimizing Google image URL:', error);
     return url;
   }
 }
@@ -108,7 +112,7 @@ export function generateGoogleImageSrcSet(
 
     return srcSetParts.join(', ');
   } catch (error) {
-    console.error('Error generating Google image srcSet:', error);
+    logger.error('Error generating Google image srcSet:', error);
     return undefined;
   }
 }

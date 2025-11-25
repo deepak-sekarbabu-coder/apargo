@@ -3,6 +3,7 @@ import { getAuth } from 'firebase-admin/auth';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getLogger } from '@/lib/core/logger';
 import { getFirebaseAdminApp } from '@/lib/firebase/firebase-admin';
 import {
   addMaintenanceTask,
@@ -15,6 +16,8 @@ import {
 } from '@/lib/firestore/maintenance-tasks';
 import { getUserByEmail } from '@/lib/firestore/users';
 import { withLogging } from '@/lib/middleware/request-logger';
+
+const logger = getLogger('API');
 
 // Helper function to verify authentication and get user
 async function verifyAuth() {
@@ -36,7 +39,7 @@ async function verifyAuth() {
 
     return { user };
   } catch (error) {
-    console.error('Auth verification error:', error);
+    logger.error('Auth verification error:', error);
     if (
       error instanceof Error &&
       error.message.includes('Firebase Admin SDK has not been initialized')
@@ -92,7 +95,7 @@ export const GET = withLogging(async (request: NextRequest) => {
       tasks,
     });
   } catch (error) {
-    console.error('Get maintenance tasks error:', error);
+    logger.error('Get maintenance tasks error:', error);
     return NextResponse.json({ error: 'Failed to fetch maintenance tasks' }, { status: 500 });
   }
 });
@@ -130,7 +133,7 @@ export const POST = withLogging(async (request: NextRequest) => {
       task: newTask,
     });
   } catch (error) {
-    console.error('Create maintenance task error:', error);
+    logger.error('Create maintenance task error:', error);
     return NextResponse.json({ error: 'Failed to create maintenance task' }, { status: 500 });
   }
 });
@@ -157,7 +160,7 @@ export const PUT = withLogging(async (request: NextRequest) => {
       message: 'Task updated successfully',
     });
   } catch (error) {
-    console.error('Update maintenance task error:', error);
+    logger.error('Update maintenance task error:', error);
     return NextResponse.json({ error: 'Failed to update maintenance task' }, { status: 500 });
   }
 });
@@ -190,7 +193,7 @@ export const DELETE = withLogging(async (request: NextRequest) => {
       message: 'Task deleted successfully',
     });
   } catch (error) {
-    console.error('Delete maintenance task error:', error);
+    logger.error('Delete maintenance task error:', error);
     return NextResponse.json({ error: 'Failed to delete maintenance task' }, { status: 500 });
   }
 });

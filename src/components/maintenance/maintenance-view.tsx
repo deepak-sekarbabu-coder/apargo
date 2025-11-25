@@ -6,8 +6,11 @@ import { LayoutDashboard, Store } from 'lucide-react';
 
 import React, { useCallback, useEffect, useState } from 'react';
 
+import { getLogger } from '@/lib/core/logger';
 import { MaintenanceTask, Vendor } from '@/lib/core/types';
 import { deleteVendor } from '@/lib/firestore/vendors';
+
+const logger = getLogger('Component');
 
 import { MaintenanceTaskDialog } from '@/components/dialogs/maintenance-task-dialog';
 import { VendorDialog } from '@/components/dialogs/vendor-dialog';
@@ -111,7 +114,7 @@ function MaintenanceViewContent() {
       await deleteVendor(vendor.id);
       // Visual feedback handled by VendorList component toast
     } catch (error) {
-      console.error('Error deleting vendor:', error);
+      logger.error('Error deleting vendor:', error);
       toast({
         title: 'Error',
         description: 'Failed to delete vendor. Please try again.',

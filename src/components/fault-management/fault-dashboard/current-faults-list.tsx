@@ -6,8 +6,11 @@ import React, { useEffect, useState } from 'react';
 
 import Image from 'next/image';
 
+import { getLogger } from '@/lib/core/logger';
 import type { Fault } from '@/lib/core/types';
 import { deleteFault, getFaults, updateFault } from '@/lib/firestore/faults';
+
+const logger = getLogger('Component');
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,7 +31,7 @@ export function CurrentFaultsList() {
 
       setFaults(currentFaults);
     } catch (err) {
-      console.error('❌ Error fetching faults:', err);
+      logger.error('Error fetching faults:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to load faults';
       setError(errorMessage);
     } finally {

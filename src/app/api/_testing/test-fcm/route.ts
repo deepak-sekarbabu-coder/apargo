@@ -3,6 +3,7 @@ import { getAuth } from 'firebase-admin/auth';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getLogger } from '@/lib/core/logger';
 import { getFirebaseAdminApp } from '@/lib/firebase/firebase-admin';
 import { getUserByEmail } from '@/lib/firestore/users';
 import {
@@ -10,12 +11,14 @@ import {
   testFCMConfiguration,
 } from '@/lib/notifications/fcm-admin';
 
+const logger = getLogger('API');
+
 async function verifySessionCookie(sessionCookie: string) {
   try {
     const adminApp = getFirebaseAdminApp();
     return await getAuth(adminApp).verifySessionCookie(sessionCookie);
   } catch (error) {
-    console.error('Error verifying session cookie:', error);
+    logger.error('Error verifying session cookie:', error);
     throw error;
   }
 }
@@ -91,7 +94,7 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   } catch (error) {
-    console.error('Error in FCM test:', error);
+    logger.error('Error in FCM test:', error);
     return NextResponse.json(
       {
         error: 'Internal server error',

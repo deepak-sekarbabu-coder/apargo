@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getLogger } from '@/lib/core/logger';
+
+const logger = getLogger('API');
+
 export async function GET() {
   try {
     // Test endpoint for development and debugging
@@ -11,7 +15,7 @@ export async function GET() {
       message: 'Payment events test endpoint is working',
     });
   } catch (error) {
-    console.error('Test endpoint error:', error);
+    logger.error('Test endpoint error:', error);
     return NextResponse.json(
       {
         status: 'error',
@@ -51,7 +55,7 @@ export async function POST(request: NextRequest) {
       received: body,
     });
   } catch (error) {
-    console.error('Test POST endpoint error:', error);
+    logger.error('Test POST endpoint error:', error);
     return NextResponse.json(
       {
         status: 'error',

@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { basicAuth } from '@/lib/auth/auth';
+import { getLogger } from '@/lib/core/logger';
 import * as firestoreAdmin from '@/lib/firestore/firestore-admin';
+
+const logger = getLogger('API');
 
 // GET /api/payment-events?monthYear=YYYY-MM&apartmentId=optional
 // Get payment events with optional filtering
@@ -48,7 +51,7 @@ export async function GET(request: NextRequest) {
       count: paymentEvents.length,
     });
   } catch (error) {
-    console.error('Error getting payment events:', error);
+    logger.error('Error getting payment events:', error);
     return NextResponse.json(
       {
         error: 'Failed to get payment events',

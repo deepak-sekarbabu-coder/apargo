@@ -4,9 +4,12 @@ import { Download, RefreshCw, Smartphone, Wifi, WifiOff } from 'lucide-react';
 
 import * as React from 'react';
 
+import { getLogger } from '@/lib/core/logger';
 import { cn } from '@/lib/utils';
 
 import { useDeviceInfo } from '@/hooks/use-mobile';
+
+const logger = getLogger('Component');
 
 // Types for PWA events
 interface BeforeInstallPromptEvent extends Event {
@@ -72,7 +75,7 @@ export function usePWAInstall() {
       }
       return false;
     } catch (error) {
-      console.error('Error installing app:', error);
+      logger.error('Error installing app:', error);
       return false;
     }
   };
@@ -179,7 +182,7 @@ export function useServiceWorker() {
           });
         })
         .catch(error => {
-          console.error('Service worker registration failed:', error);
+          logger.error('Service worker registration failed:', error);
         });
 
       // Listen for controlling worker changes

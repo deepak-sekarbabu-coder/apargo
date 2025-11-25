@@ -1,7 +1,10 @@
 // API endpoint to test fault creation
 import { NextResponse } from 'next/server';
 
+import { getLogger } from '@/lib/core/logger';
 import { addFault } from '@/lib/firestore/faults';
+
+const logger = getLogger('API:TestFault');
 
 export async function POST() {
   return createTestFault();
@@ -31,7 +34,7 @@ async function createTestFault() {
       fault: result,
     });
   } catch (error) {
-    console.error('❌ Test API: Error creating test fault:', error);
+    logger.error('❌ Test API: Error creating test fault:', error);
     return NextResponse.json(
       {
         success: false,

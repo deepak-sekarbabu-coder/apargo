@@ -2,7 +2,10 @@
 // devices with the app's toast UI. This ensures any stray alert() calls
 // (legacy code, third-party libs, or unexpected errors) surface as
 // accessible, responsive toasts instead of blocking native dialogs.
+import { getLogger } from '@/lib/core/logger';
 import { toast } from '@/hooks/use-toast';
+
+const logger = getLogger('Monitoring');
 
 // Define a custom window type to avoid using 'any'
 interface CustomWindow extends Window {
@@ -55,6 +58,6 @@ if (typeof window !== 'undefined') {
     }
   } catch (err) {
     // No-op on any unexpected error to avoid breaking the app
-    console.warn('override-alert: failed to initialize mobile alert override', err);
+    logger.warn('override-alert: failed to initialize mobile alert override', err);
   }
 }

@@ -3,12 +3,15 @@
  * These examples show how to integrate compression into data operations
  */
 import type { Expense } from '../core/types';
+import { getLogger } from '../core/logger';
 import {
   compressDocumentForStorage,
   compressionStats,
   decompressDocumentFromStorage,
 } from './firestore-compression';
 import { compressData, decompressData, shouldCompress } from './index';
+
+const logger = getLogger('Compression');
 
 /**
  * Example 1: Compress large expense data before storage
@@ -104,12 +107,12 @@ export const decompressExpensesBatch = async (
  */
 export const logCompressionStats = (): void => {
   const stats = compressionStats.getStats();
-  console.log('=== Firestore Compression Stats ===');
-  console.log(`Operations: ${stats.operationCount}`);
-  console.log(`Original Total: ${stats.totalOriginal} bytes`);
-  console.log(`Compressed Total: ${stats.totalCompressed} bytes`);
-  console.log(`Savings: ${stats.savings} bytes (${stats.savingsPercent}%)`);
-  console.log(`Avg Compression Ratio: ${stats.avgCompressionRatio}%`);
+  logger.debug('=== Firestore Compression Stats ===');
+  logger.debug(`Operations: ${stats.operationCount}`);
+  logger.debug(`Original Total: ${stats.totalOriginal} bytes`);
+  logger.debug(`Compressed Total: ${stats.totalCompressed} bytes`);
+  logger.debug(`Savings: ${stats.savings} bytes (${stats.savingsPercent}%)`);
+  logger.debug(`Avg Compression Ratio: ${stats.avgCompressionRatio}%`);
 };
 
 /**
@@ -156,7 +159,7 @@ export const smartCompress = async (
       }
     }
   } catch (error) {
-    console.warn('Smart compression failed:', error);
+    logger.warn('Smart compression failed:', error);
   }
 
   // Fallback to uncompressed

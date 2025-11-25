@@ -17,8 +17,11 @@ import { VariableSizeList as List } from 'react-window';
 
 import * as React from 'react';
 
+import { getLogger } from '@/lib/core/logger';
 import type { Payment } from '@/lib/core/types';
 import { aggregateBalanceSheets } from '@/lib/expense-management/balance-utils';
+
+const logger = getLogger('Component');
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -288,7 +291,7 @@ export function MonthlyBalanceSheet({ payments }: MonthlyBalanceSheetProps) {
       // Save the PDF
       doc.save(`balance-sheets-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
     } catch (error) {
-      console.error('Failed to generate PDF:', error);
+      logger.error('Failed to generate PDF:', error);
       // Could show a toast notification here if needed
     }
   }, [payments]);

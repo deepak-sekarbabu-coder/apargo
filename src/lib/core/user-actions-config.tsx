@@ -2,7 +2,10 @@ import { Check, Pencil, Trash2, X } from 'lucide-react';
 
 import React from 'react';
 
+import { getLogger } from './logger';
 import type { User } from './types';
+
+const logger = getLogger('Core');
 
 /**
  * Configuration system for user management actions.
@@ -109,7 +112,7 @@ userActionRegistry.register({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   handler: (_user: User) => {
     // This will be overridden by the parent component
-    console.warn('Approve handler not implemented');
+    logger.warn('Approve handler not implemented');
   },
   condition: user => !user.isApproved,
   priority: 100,
@@ -134,7 +137,7 @@ userActionRegistry.register({
   icon: X,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   handler: (_user: User) => {
-    console.warn('Reject handler not implemented');
+    logger.warn('Reject handler not implemented');
   },
   condition: user => !user.isApproved,
   priority: 90,
@@ -160,7 +163,7 @@ userActionRegistry.register({
   icon: Pencil,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   handler: (_user: User) => {
-    console.warn('Edit handler not implemented');
+    logger.warn('Edit handler not implemented');
   },
   condition: user => !!user.isApproved,
   priority: 80,
@@ -175,7 +178,7 @@ userActionRegistry.register({
   icon: Trash2,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   handler: (_user: User) => {
-    console.warn('Delete handler not implemented');
+    logger.warn('Delete handler not implemented');
   },
   condition: user => !!user.isApproved,
   priority: 70,

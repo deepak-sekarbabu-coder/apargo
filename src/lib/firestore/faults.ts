@@ -1,7 +1,10 @@
 import { addDoc, collection, deleteDoc, doc, getDocs, updateDoc } from 'firebase/firestore';
 
 import type { Fault } from '../core/types';
+import { getLogger } from '../core/logger';
 import { db } from '../firebase/firebase';
+
+const logger = getLogger('Firestore');
 
 export const getFaults = async (): Promise<Fault[]> => {
   const faultsCol = collection(db, 'faults');
@@ -24,7 +27,7 @@ export const addFault = async (
 
     return { id: docRef.id, ...newFault } as Fault;
   } catch (error) {
-    console.error('❌ Error in addFault:', error);
+    logger.error('Error in addFault:', error);
     throw error;
   }
 };

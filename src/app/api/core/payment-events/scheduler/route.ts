@@ -1,9 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { adminAuth } from '@/lib/auth/auth';
+import { getLogger } from '@/lib/core/logger';
 import { getCategories } from '@/lib/firestore/categories';
 import * as firestoreAdmin from '@/lib/firestore/firestore-admin';
 import { generatePaymentEvents } from '@/lib/firestore/payments';
+
+const logger = getLogger('API');
 
 // POST /api/payment-events/scheduler
 // Automated scheduler endpoint for generating monthly payment events
@@ -127,7 +130,7 @@ export async function POST(request: NextRequest) {
           eventsCreated: createdPayments.length,
         });
       } catch (error) {
-        console.error(
+        logger.error(
           `[Scheduler] Failed to generate payment events for category ${category.name}:`,
           error
         );
@@ -151,7 +154,7 @@ export async function POST(request: NextRequest) {
       triggerDay: currentDay,
     });
   } catch (error) {
-    console.error('[Scheduler] Error in automated payment event generation:', error);
+    logger.error('[Scheduler] Error in automated payment event generation:', error);
     return NextResponse.json(
       {
         error: 'Automated payment event generation failed',
@@ -221,7 +224,7 @@ export async function GET() {
         .slice(0, 5), // Next 5 upcoming generations
     });
   } catch (error) {
-    console.error('Error getting scheduler status:', error);
+    logger.error('Error getting scheduler status:', error);
     return NextResponse.json(
       {
         error: 'Failed to get scheduler status',

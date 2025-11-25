@@ -6,7 +6,10 @@ import * as z from 'zod';
 
 import * as React from 'react';
 
+import { getLogger } from '@/lib/core/logger';
 import { Vendor } from '@/lib/core/types';
+
+const logger = getLogger('Component');
 
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -92,7 +95,7 @@ export function VendorDialog({ open, onOpenChange, onSubmit, editingVendor }: Ve
       phone: '',
       email: '',
       address: '',
-      rating: '',
+      rating: undefined,
       notes: '',
       isActive: true,
     },
@@ -107,7 +110,7 @@ export function VendorDialog({ open, onOpenChange, onSubmit, editingVendor }: Ve
         phone: editingVendor.phone || '',
         email: editingVendor.email || '',
         address: editingVendor.address || '',
-        rating: editingVendor.rating ? String(editingVendor.rating) : '',
+        rating: editingVendor.rating || undefined,
         notes: editingVendor.notes || '',
         isActive: editingVendor.isActive,
       });
@@ -118,7 +121,7 @@ export function VendorDialog({ open, onOpenChange, onSubmit, editingVendor }: Ve
         phone: '',
         email: '',
         address: '',
-        rating: '',
+        rating: undefined,
         notes: '',
         isActive: true,
       });
@@ -144,12 +147,7 @@ export function VendorDialog({ open, onOpenChange, onSubmit, editingVendor }: Ve
       if (data.address && data.address.trim()) {
         vendorData.address = data.address.trim();
       }
-      if (data.rating && typeof data.rating === 'string' && data.rating.trim()) {
-        const ratingNum = parseFloat(data.rating);
-        if (ratingNum > 0 && ratingNum <= 5) {
-          vendorData.rating = ratingNum;
-        }
-      } else if (typeof data.rating === 'number' && data.rating > 0 && data.rating <= 5) {
+      if (data.rating && typeof data.rating === 'number' && data.rating > 0 && data.rating <= 5) {
         vendorData.rating = data.rating;
       }
       if (data.notes && data.notes.trim()) {
@@ -170,7 +168,7 @@ export function VendorDialog({ open, onOpenChange, onSubmit, editingVendor }: Ve
         description: `Failed to ${editingVendor ? 'update' : 'create'} vendor. Please try again.`,
         variant: 'destructive',
       });
-      console.error('Error submitting vendor:', error);
+      logger.error('Error submitting vendor:', error);
     } finally {
       setLoading(false);
     }

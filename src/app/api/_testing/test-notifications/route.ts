@@ -4,15 +4,18 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
+import { getLogger } from '@/lib/core/logger';
 import { getFirebaseAdminApp } from '@/lib/firebase/firebase-admin';
 import { getUserByEmail } from '@/lib/firestore/users';
+
+const logger = getLogger('API');
 
 async function verifySessionCookie(sessionCookie: string) {
   try {
     const adminApp = getFirebaseAdminApp();
     return await getAuth(adminApp).verifySessionCookie(sessionCookie);
   } catch (error) {
-    console.error('Error verifying session cookie:', error);
+    logger.error('Error verifying session cookie:', error);
     throw error;
   }
 }
@@ -114,7 +117,7 @@ export async function POST() {
       notificationsCreated: results,
     });
   } catch (error) {
-    console.error('Error creating test notifications:', error);
+    logger.error('Error creating test notifications:', error);
     return NextResponse.json(
       {
         error: 'Internal server error',

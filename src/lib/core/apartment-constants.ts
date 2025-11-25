@@ -1,5 +1,9 @@
 // src/lib/apartment-constants.ts
 
+import { getLogger } from './logger';
+
+const logger = getLogger('Core');
+
 const APARTMENT_COUNT_ENV = process.env.NEXT_PUBLIC_APP_APARTMENT_COUNT;
 const DEFAULT_COUNT = 7;
 
@@ -19,7 +23,7 @@ const getApartmentCount = (): number => {
     if (!isNaN(parsedCount) && parsedCount > 0) {
       return parsedCount;
     }
-    console.warn(
+    logger.warn(
       `Invalid NEXT_PUBLIC_APP_APARTMENT_COUNT value: "${APARTMENT_COUNT_ENV}". Falling back to default count: ${DEFAULT_COUNT}.`
     );
   }

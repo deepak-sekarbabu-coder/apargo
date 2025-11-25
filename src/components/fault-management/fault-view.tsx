@@ -5,9 +5,12 @@ import { LayoutDashboard, Wrench } from 'lucide-react';
 
 import React, { useCallback, useEffect, useState } from 'react';
 
+import { getLogger } from '@/lib/core/logger';
 import type { Fault, FaultSeverity, FaultStatus, User } from '@/lib/core/types';
 import { deleteFault, getFaults, updateFault } from '@/lib/firestore/faults';
 import { getUsers } from '@/lib/firestore/users';
+
+const logger = getLogger('Component');
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -47,7 +50,7 @@ export function FaultView() {
       setFaults(transformedFaults);
       setUsers(allUsers);
     } catch (err) {
-      console.error('❌ Error fetching data:', err);
+      logger.error('Error fetching data:', err);
       const errorMessage = err instanceof Error ? err.message : 'Failed to load data';
       setError(errorMessage);
     } finally {
@@ -78,7 +81,7 @@ export function FaultView() {
         description: 'The fault has been updated successfully.',
       });
     } catch (error) {
-      console.error('Error updating fault:', error);
+      logger.error('Error updating fault:', error);
       toast({
         title: 'Update Failed',
         description: 'Failed to update fault. Please try again.',
@@ -106,7 +109,7 @@ export function FaultView() {
         description: 'The fault has been deleted successfully.',
       });
     } catch (error) {
-      console.error('Error deleting fault:', error);
+      logger.error('Error deleting fault:', error);
       toast({
         title: 'Delete Failed',
         description: 'Failed to delete fault. Please try again.',

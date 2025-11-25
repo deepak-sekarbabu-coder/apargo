@@ -1,6 +1,10 @@
 import { App, cert, getApps, initializeApp } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 
+import { getLogger } from '../core/logger';
+
+const logger = getLogger('Firebase');
+
 // This is the service account JSON object. In a production environment, you'd
 // want to load this from a secure source or environment variables.
 // Check for both IDX and standard environment variables
@@ -77,7 +81,7 @@ function initializeFirebaseAdmin(): App | null {
     }
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    console.error('Firebase Admin SDK initialization failed:', errorMessage);
+    logger.error('Firebase Admin SDK initialization failed:', errorMessage);
     initializationError = errorMessage;
     // We don't re-throw here to avoid crashing the server on build,
     // but the app will not function correctly without a successful initialization.
@@ -102,7 +106,7 @@ const getFirebaseAdminApp = (): App => {
   if ((isBuildTime || isStaticGeneration) && !hasCredentials()) {
     // During build time with no credentials, return a mock app
     // This prevents build failures, but the app won't work at runtime without credentials
-    console.warn('Firebase Admin not available during build time - using mock app');
+    logger.warn('Firebase Admin not available during build time - using mock app');
     return {} as App; // Mock app
   }
 
@@ -112,8 +116,8 @@ const getFirebaseAdminApp = (): App => {
   if (!app) {
     // Provide more context about why initialization failed
     const errorDetails = initializationError || 'Unknown initialization error';
-    console.error('Firebase Admin initialization failed:', errorDetails);
-    console.error('Environment check:', {
+    logger.error('Firebase Admin initialization failed:', errorDetails);
+    logger.error('Environment check:', {
       hasProjectId: !!process.env.FIREBASE_PROJECT_ID,
       hasPrivateKey: !!process.env.FIREBASE_PRIVATE_KEY,
       hasClientEmail: !!process.env.FIREBASE_CLIENT_EMAIL,
@@ -130,7 +134,7 @@ const getFirebaseAdminApp = (): App => {
     // This will throw if the app is not properly initialized
     getAuth(app);
   } catch (error) {
-    console.error('Firebase Admin Auth service is not available:', error);
+    logger.error('Firebase Admin Auth service is not available:', error);
     throw new Error('Firebase Admin Auth service is not properly configured');
   }
 

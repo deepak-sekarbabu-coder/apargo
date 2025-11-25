@@ -2,9 +2,12 @@ import { getAuth } from 'firebase-admin/auth';
 
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getLogger } from '@/lib/core/logger';
 import { getFirebaseAdminApp } from '@/lib/firebase/firebase-admin';
 import { addExpense } from '@/lib/firestore/expenses';
 import { withLogging } from '@/lib/middleware/request-logger';
+
+const logger = getLogger('API');
 
 export const POST = withLogging(async (request: NextRequest) => {
   try {
@@ -57,7 +60,7 @@ export const POST = withLogging(async (request: NextRequest) => {
     });
     return NextResponse.json({ status: 'success', expense });
   } catch (error) {
-    console.error('ADD_EXPENSE_ERROR:', error);
+    logger.error('ADD_EXPENSE_ERROR:', error);
     return NextResponse.json(
       { status: 'error', message: 'Failed to add expense.' },
       { status: 500 }

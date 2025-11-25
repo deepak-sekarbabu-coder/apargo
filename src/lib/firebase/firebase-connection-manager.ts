@@ -4,7 +4,10 @@
  */
 import type { App } from 'firebase-admin/app';
 
+import { getLogger } from '../core/logger';
 import { getFirebaseAdminApp } from './firebase-admin';
+
+const logger = getLogger('Firebase');
 
 class FirebaseConnectionManager {
   private static instance: FirebaseConnectionManager;
@@ -43,7 +46,7 @@ class FirebaseConnectionManager {
         // Only delete if we're sure no connections are active
         this.app = null;
       } catch (error) {
-        console.warn('Error cleaning up Firebase app:', error);
+        logger.warn('Error cleaning up Firebase app:', error);
       }
     }
   }

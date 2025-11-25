@@ -2,11 +2,14 @@
 
 import { useEffect, useState } from 'react';
 
+import { getLogger } from '@/lib/core/logger';
 import {
   type ConnectionHealth,
   diagnostics,
   healthMonitor,
 } from '@/lib/firebase/firebase-health-monitor';
+
+const logger = getLogger('Component');
 
 import { Button } from '@/components/ui/button';
 import {
@@ -50,7 +53,7 @@ export function FirebaseDebugPanel({ className }: FirebaseDebugPanelProps) {
       await navigator.clipboard.writeText(diagnosticReport);
       alert('Diagnostic report copied to clipboard!');
     } catch (error) {
-      console.error('Failed to copy to clipboard:', error);
+      logger.error('Failed to copy to clipboard:', error);
     }
   };
 

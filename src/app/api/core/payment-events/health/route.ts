@@ -1,8 +1,11 @@
 import { NextResponse } from 'next/server';
 
 import { basicAuth } from '@/lib/auth/auth';
+import { getLogger } from '@/lib/core/logger';
 import { isFirebaseAdminAvailable } from '@/lib/firebase/firebase-admin';
 import * as firestoreAdmin from '@/lib/firestore/firestore-admin';
+
+const logger = getLogger('API');
 
 // GET /api/payment-events/health
 // Health check for payment events functionality
@@ -68,7 +71,7 @@ export async function GET() {
           healthCheck.errors.push(`Firestore connectivity test failed: ${connectivityTest.error}`);
         }
       } catch (firestoreError) {
-        console.error('Firestore test failed:', firestoreError);
+        logger.error('Firestore test failed:', firestoreError);
         healthCheck.errors.push(
           `Firestore error: ${firestoreError instanceof Error ? firestoreError.message : 'Unknown error'}`
         );

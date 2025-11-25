@@ -1,7 +1,10 @@
 import { getFirestore } from 'firebase-admin/firestore';
 import { getMessaging } from 'firebase-admin/messaging';
 
+import { getLogger } from '../core/logger';
 import { getFirebaseAdminApp } from '../firebase/firebase-admin';
+
+const logger = getLogger('Notifications');
 
 export interface FCMNotificationPayload {
   title: string;
@@ -91,7 +94,7 @@ async function processResponse(
         const errorCode = resp.error?.code || 'unknown';
         const errorMessage = resp.error?.message || 'Unknown error';
 
-        console.error(
+        logger.error(
           `FCM delivery failed for user ${user?.name} (${user?.apartment}): ${errorCode} - ${errorMessage}`
         );
         result.errors.push(`Failed for ${user?.name}: ${errorCode}`);
@@ -118,7 +121,7 @@ async function removeInvalidToken(userId: string) {
       fcmToken: null,
     })
     .catch(err => {
-      console.error('Error removing invalid FCM token:', err);
+      logger.error('Error removing invalid FCM token:', err);
     });
 }
 
@@ -144,7 +147,7 @@ export async function sendPushNotificationToApartments(
 
     if (fcmTokens.length === 0) {
       result.errors.push('No FCM tokens found for specified apartments');
-      console.warn('No FCM tokens found for apartments:', apartmentIds);
+      logger.warn('No FCM tokens found for apartments:', apartmentIds);
       return result;
     }
 
@@ -165,7 +168,7 @@ export async function sendPushNotificationToApartments(
 
     return result;
   } catch (error) {
-    console.error('Error sending push notifications:', error);
+    logger.error('Error sending push notifications:', error);
     result.errors.push(error instanceof Error ? error.message : 'Unknown error');
     return result;
   }
@@ -220,7 +223,7 @@ export async function testFCMConfiguration(): Promise<{
 
     return result;
   } catch (error) {
-    console.error('Error testing FCM configuration:', error);
+    logger.error('Error testing FCM configuration:', error);
     result.errors.push(error instanceof Error ? error.message : 'Unknown error');
     return result;
   }

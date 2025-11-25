@@ -1,4 +1,5 @@
 import type { BalanceSheet, Expense } from '../core/types';
+import { getLogger } from '../core/logger';
 import { type DatabaseService, type QuerySnapshot, database } from '../database';
 import {
   calculateDeltaChanges,
@@ -6,6 +7,8 @@ import {
   getBalanceDocId,
   removeUndefined,
 } from './firestore-utils';
+
+const logger = getLogger('Firestore');
 
 const updateBalanceSheets = async (
   deltas: ReturnType<typeof calculateDeltaChanges>
@@ -66,7 +69,7 @@ async function createNewBalanceSheet(
       openingBalance = prevData.closingBalance;
     }
   } catch (err) {
-    console.warn(`Could not fetch previous month balance sheet for continuity check: ${err}`);
+    logger.warn(`Could not fetch previous month balance sheet for continuity check: ${err}`);
   }
 
   const newSheet: BalanceSheet = {
@@ -160,7 +163,7 @@ async function updateBalanceSheetsForExpense(expense: Expense) {
     const { monthYear, deltas } = computeExpenseDeltas(expense);
     await applyDeltasToBalanceSheets(deltas, monthYear);
   } catch (err) {
-    console.error('Error updating balanceSheets after addExpense:', err);
+    logger.error('Error updating balanceSheets after addExpense:', err);
   }
 }
 
@@ -201,7 +204,7 @@ export const updateExpense = async (id: string, expense: Partial<Expense>): Prom
     const deltaCalc = calculateDeltaChanges(oldExpense, newExpense);
     await updateBalanceSheets(deltaCalc);
   } catch (err) {
-    console.error('Error updating balanceSheets after updateExpense:', err);
+    logger.error('Error updating balanceSheets after updateExpense:', err);
   }
 };
 
@@ -222,7 +225,7 @@ export const deleteExpense = async (id: string): Promise<void> => {
     });
     await applyDeltasToBalanceSheets(neg, monthYear);
   } catch (err) {
-    console.error('Error updating balanceSheets before deleteExpense:', err);
+    logger.error('Error updating balanceSheets before deleteExpense:', err);
   }
 
   await expenseDoc.delete();

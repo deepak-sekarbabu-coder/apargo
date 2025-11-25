@@ -4,6 +4,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getLogger } from '@/lib/core/logger';
 import { getApartmentIds } from '@/lib/core/apartment-constants';
 import type { User } from '@/lib/core/types';
 import {
@@ -12,6 +13,8 @@ import {
   isFirebaseAdminAvailable,
 } from '@/lib/firebase/firebase-admin';
 import { sendPushNotificationToApartments } from '@/lib/notifications/fcm-admin';
+
+const logger = getLogger('API');
 
 // Add a simple GET endpoint for testing
 export async function GET() {
@@ -26,13 +29,13 @@ async function verifySessionCookie(sessionCookie: string) {
     const adminApp = getFirebaseAdminApp();
     return await getAuth(adminApp).verifySessionCookie(sessionCookie);
   } catch (error) {
-    console.error('Error verifying session cookie:', error);
+    logger.error('Error verifying session cookie:', error);
     throw error;
   }
 }
 
 export async function POST(request: NextRequest) {
-  console.log('📢 Announcement API called');
+  logger.debug('Announcement API called');
 
   try {
     // Get session cookie from request
@@ -42,7 +45,7 @@ export async function POST(request: NextRequest) {
       const cookieStore = await cookies();
       sessionCookie = cookieStore.get('session')?.value;
     } catch (cookieError) {
-      console.log('❌ Error accessing cookies:', cookieError);
+      logger.debug('Error accessing cookies:', cookieError);
       // Fallback: try to get from headers
       const cookieHeader = request.headers.get('cookie');
       if (cookieHeader) {
@@ -51,17 +54,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    console.log('Session cookie present:', !!sessionCookie);
+    logger.debug('Session cookie present:', !!sessionCookie);
 
     if (!sessionCookie) {
-      console.log('❌ No session cookie found');
+      logger.debug('No session cookie found');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Ensure Firebase Admin is initialized before any admin-only operation
     if (!isFirebaseAdminAvailable()) {
       const initErr = getInitializationError();
-      console.error('Firebase Admin not initialized:', initErr);
+      logger.error('Firebase Admin not initialized:', initErr);
       return NextResponse.json(
         {
           error: 'Server configuration error',
@@ -75,9 +78,9 @@ export async function POST(request: NextRequest) {
     let decodedToken;
     try {
       decodedToken = await verifySessionCookie(sessionCookie);
-      console.log('✅ Session verified for user:', decodedToken.email);
+      logger.debug('Session verified for user:', decodedToken.email);
     } catch (error) {
-      console.log('❌ Session verification failed:', error);
+      logger.debug('Session verification failed:', error);
       return NextResponse.json({ error: 'Invalid session' }, { status: 401 });
     }
 
@@ -86,9 +89,9 @@ export async function POST(request: NextRequest) {
     try {
       adminApp = getFirebaseAdminApp();
       adminDb = getFirestore(adminApp);
-      console.log('✅ Firebase Admin initialized');
+      logger.debug('Firebase Admin initialized');
     } catch (error) {
-      console.log('❌ Firebase Admin initialization failed:', error);
+      logger.debug('Firebase Admin initialization failed:', error);
       return NextResponse.json(
         {
           error: 'Server configuration error',
@@ -102,17 +105,17 @@ export async function POST(request: NextRequest) {
     const userQuery = await usersRef.where('email', '==', decodedToken.email!).get();
 
     if (userQuery.empty) {
-      console.log('❌ User not found in Firestore');
+      logger.debug('User not found in Firestore');
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
     const userDoc = userQuery.docs[0];
     const user = { id: userDoc.id, ...userDoc.data() } as User;
 
-    console.log('User found:', !!user, 'Role:', user?.role);
+    logger.debug('User found:', !!user, 'Role:', user?.role);
 
     if (!user || user.role !== 'admin') {
-      console.log('❌ Admin access denied');
+      logger.debug('Admin access denied');
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }
 
@@ -120,20 +123,20 @@ export async function POST(request: NextRequest) {
     let requestData;
     try {
       requestData = await request.json();
-      console.log('📝 Request data parsed:', {
+      logger.debug('Request data parsed:', {
         title: requestData.title,
         messageLength: requestData.message?.length,
         priority: requestData.priority,
       });
     } catch (error) {
-      console.log('❌ Failed to parse request body:', error);
+      logger.debug('Failed to parse request body:', error);
       return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
     }
 
     const { title, message, expiresAt, priority = 'medium' } = requestData;
 
     if (!title || !message) {
-      console.log('❌ Missing required fields:', { title: !!title, message: !!message });
+      logger.debug('Missing required fields:', { title: !!title, message: !!message });
       return NextResponse.json({ error: 'Title and message are required' }, { status: 400 });
     }
 
@@ -211,7 +214,7 @@ export async function POST(request: NextRequest) {
     try {
       notificationResult = await adminDb.collection('notifications').add(notificationData);
     } catch (err) {
-      console.error('Failed to write announcement to Firestore:', err);
+      logger.error('Failed to write announcement to Firestore:', err);
       return NextResponse.json({ error: 'Failed to persist announcement' }, { status: 500 });
     }
 
@@ -236,7 +239,7 @@ export async function POST(request: NextRequest) {
         },
       });
     } catch (err) {
-      console.error('FCM push failed for announcement:', err);
+      logger.error('FCM push failed for announcement:', err);
       // Continue — we already wrote the notification; report FCM failure in response
       fcmResult.errors.push({ message: String(err) });
     }
@@ -257,8 +260,8 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('❌ Error creating announcement:', error);
-    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+    logger.error('Error creating announcement:', error);
+    logger.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
 
     // Ensure we always return JSON, never HTML
     const errorResponse = {

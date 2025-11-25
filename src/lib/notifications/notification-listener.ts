@@ -14,7 +14,10 @@ import {
 } from 'firebase/firestore';
 
 import type { Notification } from '@/lib/core/types';
+import { getLogger } from '@/lib/core/logger';
 import { db } from '@/lib/firebase/firebase';
+
+const logger = getLogger('Notifications');
 
 interface NotificationListenerOptions {
   apartment: string;
@@ -48,7 +51,7 @@ export class NotificationListener {
 
   start(): void {
     if (this.isActive) {
-      console.warn('NotificationListener already active');
+      logger.warn('NotificationListener already active');
       return;
     }
 
@@ -66,7 +69,7 @@ export class NotificationListener {
   private setupListeners(): void {
     if (!this.isActive) return;
 
-    console.log('🔔 Setting up notification listeners for apartment:', this.apartment);
+    logger.debug('Setting up notification listeners for apartment:', this.apartment);
 
     // Use separate queries since unified query with mixed types is not supported
     this.setupFallbackListeners();
@@ -142,16 +145,16 @@ export class NotificationListener {
     this.emitNotifications();
 
     if (source) {
-      console.log(`🔔 ${source} query updated:`, snapshot.size, 'notifications');
+      logger.debug(`${source} query updated:`, snapshot.size, 'notifications');
       if (this.apartment === 'T2') {
-        console.log(`🔍 T2 ${source} map size:`, targetMap.size);
-        console.log(
-          `🔍 T2 total notifications:`,
+        logger.debug(`T2 ${source} map size:`, targetMap.size);
+        logger.debug(
+          `T2 total notifications:`,
           this.stringNotifications.size + this.arrayNotifications.size
         );
       }
     } else {
-      console.log('🔔 Unified query updated:', snapshot.size, 'notifications');
+      logger.debug('Unified query updated:', snapshot.size, 'notifications');
     }
   }
 
@@ -174,12 +177,12 @@ export class NotificationListener {
     );
 
     if (this.apartment === 'T2') {
-      console.log(
-        `🔍 Emitting ${notifications.length} notifications for T2:`,
+      logger.debug(
+        `Emitting ${notifications.length} notifications for T2:`,
         notifications.map(n => ({ id: n.id, title: n.title, isRead: n.isRead }))
       );
-      console.log(
-        `🔍 String map: ${this.stringNotifications.size}, Array map: ${this.arrayNotifications.size}`
+      logger.debug(
+        `String map: ${this.stringNotifications.size}, Array map: ${this.arrayNotifications.size}`
       );
     }
 
@@ -188,7 +191,7 @@ export class NotificationListener {
 
   private handleError(error: unknown, source?: string): void {
     const errorMessage = source ? `${source} listener error` : 'Notification listener error';
-    console.error(`🚫 ${errorMessage}:`, error);
+    logger.error(`${errorMessage}:`, error);
 
     const errorType = this.classifyError(error);
 
@@ -220,7 +223,7 @@ export class NotificationListener {
   }
 
   private handleIdleTimeout(): void {
-    console.log('🔄 Detected idle timeout, restarting listener immediately');
+    logger.debug('Detected idle timeout, restarting listener immediately');
     if (this.isActive) {
       this.cleanup();
       setTimeout(() => {
@@ -246,8 +249,8 @@ export class NotificationListener {
     this.currentRetries++;
     const delay = this.calculateRetryDelay(this.currentRetries, this.retryDelay);
 
-    console.log(
-      `🔄 Retrying notification listener in ${delay}ms (attempt ${this.currentRetries}/${this.maxRetries})`
+    logger.debug(
+      `Retrying notification listener in ${delay}ms (attempt ${this.currentRetries}/${this.maxRetries})`
     );
 
     this.retryTimeout = setTimeout(() => {
@@ -263,7 +266,7 @@ export class NotificationListener {
   }
 
   private handleMaxRetriesReached(): void {
-    console.error('🚫 Max retries reached for notification listener');
+    logger.error('Max retries reached for notification listener');
     this.stop();
   }
 
@@ -272,7 +275,7 @@ export class NotificationListener {
     this.keepAliveInterval = setInterval(
       () => {
         if (this.isActive) {
-          console.log('🔄 Refreshing notification listeners to prevent idle timeout');
+          logger.debug('Refreshing notification listeners to prevent idle timeout');
           this.cleanup();
           this.setupListeners();
         }
@@ -304,7 +307,7 @@ export class NotificationListener {
     data: Omit<Notification, 'id'>
   ): void {
     if (apartmentId === 'T2') {
-      console.log(`🔍 Processing notification for T2 (${source}):`, {
+      logger.debug(`Processing notification for T2 (${source}):`, {
         id: docId,
         title: data.title,
         type: data.type,
@@ -317,7 +320,7 @@ export class NotificationListener {
 
   private logExpiredNotification(apartmentId: string, docId: string): void {
     if (apartmentId === 'T2') {
-      console.log(`🔍 Filtering out expired notification:`, docId);
+      logger.debug(`Filtering out expired notification:`, docId);
     }
   }
 
@@ -328,13 +331,13 @@ export class NotificationListener {
   ): void {
     if (apartmentId === 'T2') {
       if (data.type === 'announcement' && typeof data.isRead === 'object' && data.isRead !== null) {
-        console.log(`🔍 T2 isRead processing:`, {
+        logger.debug(`T2 isRead processing:`, {
           isReadObject: data.isRead,
           apartmentKey: apartmentId,
           isReadForUser,
         });
       } else {
-        console.log(`🔍 T2 simple isRead:`, { isRead: data.isRead, isReadForUser });
+        logger.debug(`T2 simple isRead:`, { isRead: data.isRead, isReadForUser });
       }
     }
   }
@@ -345,7 +348,7 @@ export class NotificationListener {
     notification: Notification
   ): void {
     if (apartmentId === 'T2') {
-      console.log(`🔍 Added notification to T2 ${source} map:`, {
+      logger.debug(`Added notification to T2 ${source} map:`, {
         id: notification.id,
         title: notification.title,
         isRead: notification.isRead,
@@ -371,7 +374,7 @@ export class NotificationListener {
       try {
         unsubscribe();
       } catch (error) {
-        console.warn('Error unsubscribing from notification listener:', error);
+        logger.warn('Error unsubscribing from notification listener:', error);
       }
     });
     this.unsubscribes = [];
@@ -435,7 +438,7 @@ export class AdminNotificationListener {
       announcementsQuery,
       snapshot => this.handleAdminSnapshot(snapshot),
       error => {
-        console.error('🚫 Admin notification listener error:', error);
+        logger.error('Admin notification listener error:', error);
         if (this.onError) {
           this.onError(error);
         }

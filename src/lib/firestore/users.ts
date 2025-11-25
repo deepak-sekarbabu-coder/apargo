@@ -1,6 +1,9 @@
 import type { User } from '../core/types';
+import { getLogger } from '../core/logger';
 import { type QuerySnapshot, database } from '../database';
 import { removeUndefined } from './firestore-utils';
+
+const logger = getLogger('Firestore');
 
 export const getUsers = async (apartment?: string): Promise<User[]> => {
   const usersCollection = database.collection<User>('users');
@@ -38,7 +41,7 @@ export const getUserByEmail = async (email: string): Promise<User | null> => {
     const userData = { id: doc.id, ...doc.data() } as User;
     return userData;
   } catch (error) {
-    console.error('Error querying user by email:', error);
+    logger.error('Error querying user by email:', error);
     throw error;
   }
 };

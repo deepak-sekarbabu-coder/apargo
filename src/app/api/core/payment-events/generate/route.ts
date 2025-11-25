@@ -4,12 +4,15 @@ import { getFirestore as getAdminFirestore } from 'firebase-admin/firestore';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getLogger } from '@/lib/core/logger';
 import type { User } from '@/lib/core/types';
 import {
   getFirebaseAdminApp,
   getInitializationError,
   isFirebaseAdminAvailable,
 } from '@/lib/firebase/firebase-admin';
+
+const logger = getLogger('API');
 
 // POST /api/payment-events/generate
 // Generate payment events for all configured categories for the current month or specified month
@@ -18,7 +21,7 @@ export async function POST(request: NextRequest) {
     // Ensure Firebase Admin initialized
     if (!isFirebaseAdminAvailable()) {
       const initErr = getInitializationError();
-      console.error('Firebase Admin not initialized:', initErr);
+      logger.error('Firebase Admin not initialized:', initErr);
       return NextResponse.json(
         {
           error: 'Server configuration error',
@@ -64,7 +67,7 @@ export async function POST(request: NextRequest) {
         decodedToken = await adminAuth.verifyIdToken(idToken!);
       }
     } catch (err) {
-      console.error('Authentication token verification failed:', err);
+      logger.error('Authentication token verification failed:', err);
       return NextResponse.json({ error: 'Invalid session or token' }, { status: 401 });
     }
 
@@ -136,10 +139,10 @@ export async function POST(request: NextRequest) {
     );
 
     // Add logging to help debug issues with monthlyAmount values
-    console.log(`Found ${categories.length} total categories`);
-    console.log(`Found ${paymentEventCategories.length} payment event categories`);
+    logger.debug(`Found ${categories.length} total categories`);
+    logger.debug(`Found ${paymentEventCategories.length} payment event categories`);
     paymentEventCategories.forEach(cat => {
-      console.log(`Category ID: ${cat.id}, Name: ${cat.name}, Amount: ${cat.monthlyAmount}`);
+      logger.debug(`Category ID: ${cat.id}, Name: ${cat.name}, Amount: ${cat.monthlyAmount}`);
     });
 
     // Check if payment events already exist for any apartment/category for targetMonth
@@ -223,7 +226,7 @@ export async function POST(request: NextRequest) {
           typeof category.monthlyAmount === 'number' ? category.monthlyAmount : 0;
 
         if (monthlyAmount <= 0) {
-          console.warn(
+          logger.warn(
             `Skipping payment event for category ${category.name} with invalid amount: ${monthlyAmount}`
           );
           continue;
@@ -245,7 +248,7 @@ export async function POST(request: NextRequest) {
           const docRef = await adminDb.collection('payments').add(paymentEventData);
           createdPayments.push({ id: docRef.id, ...paymentEventData });
         } catch (err) {
-          console.error(`Failed to create payment event for apartment ${apartment.id}:`, err);
+          logger.error(`Failed to create payment event for apartment ${apartment.id}:`, err);
         }
       }
     }
@@ -259,7 +262,7 @@ export async function POST(request: NextRequest) {
       payments: createdPayments,
     });
   } catch (error) {
-    console.error('Error generating payment events:', error);
+    logger.error('Error generating payment events:', error);
     return NextResponse.json(
       {
         error: 'Failed to generate payment events',

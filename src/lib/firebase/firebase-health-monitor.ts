@@ -5,7 +5,10 @@
 import { onAuthStateChanged } from 'firebase/auth';
 import { collection, getDocs, limit, onSnapshot, query } from 'firebase/firestore';
 
+import { getLogger } from '@/lib/core/logger';
 import { auth, db } from '@/lib/firebase/firebase';
+
+const logger = getLogger('Firebase');
 
 export interface ConnectionHealth {
   isConnected: boolean;
@@ -151,7 +154,7 @@ export class FirebaseHealthMonitor {
         lastError: null, // Don't show permission errors to user
       });
     } else {
-      console.error('Firebase health check failed:', error);
+      logger.error('Firebase health check failed:', error);
       this.updateHealth({
         isConnected: false,
         errorCount: this.health.errorCount + 1,
@@ -190,7 +193,7 @@ export class FirebaseHealthMonitor {
     const isPermissionError = error?.code === 'permission-denied';
 
     if (!isPermissionError) {
-      console.error('Firebase test listener error:', error);
+      logger.error('Firebase test listener error:', error);
     }
 
     this.updateHealth({
@@ -222,7 +225,7 @@ export class FirebaseHealthMonitor {
         this.handleTestListenerError
       );
     } catch (error) {
-      console.error('Failed to setup test listener:', error);
+      logger.error('Failed to setup test listener:', error);
       this.updateHealth({
         isConnected: false,
         errorCount: this.health.errorCount + 1,
@@ -269,7 +272,7 @@ export class FirebaseHealthMonitor {
       try {
         listener(currentHealth);
       } catch (error) {
-        console.error('Error in health monitor listener:', error);
+        logger.error('Error in health monitor listener:', error);
       }
     });
   }

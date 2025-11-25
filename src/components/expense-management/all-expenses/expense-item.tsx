@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 
 import Image from 'next/image';
 
+import { getLogger } from '@/lib/core/logger';
 import type { Category, Expense, User } from '@/lib/core/types';
 import {
   calculateExpenseAmounts,
@@ -14,6 +15,8 @@ import {
   markApartmentAsUnpaid,
 } from '@/lib/expense-management/expense-utils';
 import { updateExpense } from '@/lib/firestore/expenses';
+
+const logger = getLogger('Component');
 
 import { CategoryIcon } from '@/components/icons/category-icon';
 import { Button } from '@/components/ui/button';
@@ -141,7 +144,7 @@ export function ExpenseItem({
       setOptimisticPaidByApartments(null);
       onExpenseUpdate?.(expense);
 
-      console.error('Failed to update payment status:', error);
+      logger.error('Failed to update payment status:', error);
       toast({
         title: 'Error',
         description: 'Failed to update payment status',
@@ -202,7 +205,7 @@ export function ExpenseItem({
       setOptimisticPaidByApartments(null);
       onExpenseUpdate?.(expense);
 
-      console.error('Failed to update payment status:', error);
+      logger.error('Failed to update payment status:', error);
       toast({
         title: 'Error',
         description: 'Failed to update payment status',

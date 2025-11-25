@@ -4,9 +4,12 @@ import { AlertCircle, CheckCircle2, Clock, UploadCloud, X } from 'lucide-react';
 
 import * as React from 'react';
 
+import { getLogger } from '@/lib/core/logger';
 import type { Payment, User } from '@/lib/core/types';
 import { addPayment, updatePayment } from '@/lib/firestore/payments';
 import { uploadImage } from '@/lib/storage/storage';
+
+const logger = getLogger('Component');
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -162,11 +165,11 @@ export function MaintenancePaymentStatus({
           inputEl.value = '';
         } catch (clearErr) {
           // Non-fatal; log for diagnostics
-          console.warn('Unable to clear maintenance receipt input', clearErr);
+          logger.warn('Unable to clear maintenance receipt input', clearErr);
         }
       }
     } catch (e: unknown) {
-      console.error('Maintenance receipt upload failed', e);
+      logger.error('Maintenance receipt upload failed', e);
       const message = ((): string => {
         if (e instanceof Error) return e.message || 'Upload failed';
         if (typeof e === 'object' && e && 'message' in e) {

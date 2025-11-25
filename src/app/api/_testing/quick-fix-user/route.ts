@@ -5,15 +5,18 @@ import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
 import { getApartmentIds } from '@/lib/core/apartment-constants';
+import { getLogger } from '@/lib/core/logger';
 import { getFirebaseAdminApp } from '@/lib/firebase/firebase-admin';
 import { getUserByEmail } from '@/lib/firestore/users';
+
+const logger = getLogger('API:QuickFixUser');
 
 async function verifySessionCookie(sessionCookie: string) {
   try {
     const adminApp = getFirebaseAdminApp();
     return await getAuth(adminApp).verifySessionCookie(sessionCookie);
   } catch (error) {
-    console.error('Error verifying session cookie:', error);
+    logger.error('Error verifying session cookie:', error);
     throw error;
   }
 }
@@ -96,7 +99,7 @@ export async function POST() {
       message: `User ${user.name} already has apartment ${user.apartment}`,
     });
   } catch (error) {
-    console.error('Error in quick-fix endpoint:', error);
+    logger.error('Error in quick-fix endpoint:', error);
     return NextResponse.json(
       {
         success: false,

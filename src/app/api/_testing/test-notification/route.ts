@@ -2,8 +2,11 @@ import { getFirestore } from 'firebase-admin/firestore';
 
 import { NextResponse } from 'next/server';
 
+import { getLogger } from '@/lib/core/logger';
 import { getApartmentIds } from '@/lib/core/apartment-constants';
 import { getFirebaseAdminApp } from '@/lib/firebase/firebase-admin';
+
+const logger = getLogger('API');
 
 interface NotificationData {
   type: string;
@@ -55,7 +58,7 @@ export async function POST() {
       apartmentCount: allApartments.length,
     });
   } catch (error) {
-    console.error('Error creating test notification:', error);
+    logger.error('Error creating test notification:', error);
     return NextResponse.json(
       {
         success: false,

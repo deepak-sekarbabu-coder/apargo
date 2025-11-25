@@ -3,10 +3,13 @@ import { getAuth } from 'firebase-admin/auth';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getLogger } from '@/lib/core/logger';
 import { getFirebaseAdminApp } from '@/lib/firebase/firebase-admin';
 import { getUserByEmail } from '@/lib/firestore/users';
 import { addVendor, deleteVendor, getVendors, updateVendor } from '@/lib/firestore/vendors';
 import { withLogging } from '@/lib/middleware/request-logger';
+
+const logger = getLogger('API');
 
 // Helper function to verify authentication and get user
 async function verifyAuth() {
@@ -28,7 +31,7 @@ async function verifyAuth() {
 
     return { user };
   } catch (error) {
-    console.error('Auth verification error:', error);
+    logger.error('Auth verification error:', error);
     if (
       error instanceof Error &&
       error.message.includes('Firebase Admin SDK has not been initialized')
@@ -57,7 +60,7 @@ export const GET = withLogging(async (request: NextRequest) => {
       vendors,
     });
   } catch (error) {
-    console.error('Get vendors error:', error);
+    logger.error('Get vendors error:', error);
     return NextResponse.json({ error: 'Failed to fetch vendors' }, { status: 500 });
   }
 });
@@ -92,7 +95,7 @@ export const POST = withLogging(async (request: NextRequest) => {
       vendor: newVendor,
     });
   } catch (error) {
-    console.error('Create vendor error:', error);
+    logger.error('Create vendor error:', error);
     return NextResponse.json({ error: 'Failed to create vendor' }, { status: 500 });
   }
 });
@@ -126,7 +129,7 @@ export const PUT = withLogging(async (request: NextRequest) => {
       message: 'Vendor updated successfully',
     });
   } catch (error) {
-    console.error('Update vendor error:', error);
+    logger.error('Update vendor error:', error);
     return NextResponse.json({ error: 'Failed to update vendor' }, { status: 500 });
   }
 });
@@ -160,7 +163,7 @@ export const DELETE = withLogging(async (request: NextRequest) => {
       message: 'Vendor deleted successfully',
     });
   } catch (error) {
-    console.error('Delete vendor error:', error);
+    logger.error('Delete vendor error:', error);
     return NextResponse.json({ error: 'Failed to delete vendor' }, { status: 500 });
   }
 });

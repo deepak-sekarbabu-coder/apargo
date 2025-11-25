@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getLogger } from '@/lib/core/logger';
+
+const logger = getLogger('API');
+
 export async function GET() {
   try {
     // Simple health check endpoint
@@ -10,7 +14,7 @@ export async function GET() {
       version: '1.0.0',
     });
   } catch (error) {
-    console.error('Ping endpoint error:', error);
+    logger.error('Ping endpoint error:', error);
     return NextResponse.json(
       {
         status: 'error',
@@ -34,7 +38,7 @@ export async function POST(request: NextRequest) {
       received: body,
     });
   } catch (error) {
-    console.error('Ping POST endpoint error:', error);
+    logger.error('Ping POST endpoint error:', error);
     return NextResponse.json(
       {
         status: 'error',

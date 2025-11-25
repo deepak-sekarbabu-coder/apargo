@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { getLogger } from '@/lib/core/logger';
 import { FileMetadata } from '@/lib/core/types';
 import { storageService } from '@/lib/storage/storage-enhanced';
+
+const logger = getLogger('API');
 
 // POST /api/storage/upload - Enhanced file upload with metadata
 export async function POST(request: NextRequest) {
@@ -65,7 +68,7 @@ export async function POST(request: NextRequest) {
       downloadURL: fileMetadata.downloadURL,
     });
   } catch (error) {
-    console.error('File upload API error:', error);
+    logger.error('File upload API error:', error);
 
     const errorMessage = error instanceof Error ? error.message : 'Upload failed';
 
@@ -107,7 +110,7 @@ export async function GET() {
       categories: ['receipt', 'fault', 'avatar', 'announcement'],
     });
   } catch (error) {
-    console.error('Upload config API error:', error);
+    logger.error('Upload config API error:', error);
     return NextResponse.json({ error: 'Failed to get upload configuration' }, { status: 500 });
   }
 }

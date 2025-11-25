@@ -4,7 +4,10 @@ import * as AvatarPrimitive from '@radix-ui/react-avatar';
 
 import * as React from 'react';
 
+import { getLogger } from '@/lib/core/logger';
 import { cn } from '@/lib/utils';
+
+const logger = getLogger('Component');
 
 const Avatar = React.forwardRef<
   React.ElementRef<typeof AvatarPrimitive.Root>,
@@ -51,7 +54,7 @@ const AvatarImage = React.forwardRef<
           const responsiveSrcSet = generateGoogleImageSrcSet(src, [32, 64, 96, 128]);
           setSrcSet(responsiveSrcSet);
         } catch (error) {
-          console.error('Error optimizing avatar image:', error);
+          logger.error('Error optimizing avatar image:', error);
           setOptimizedSrc(src);
         }
       } else {

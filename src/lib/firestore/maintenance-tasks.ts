@@ -17,6 +17,7 @@ import {
 } from 'firebase/firestore';
 
 import type { MaintenanceTask } from '../core/types';
+import { getLogger } from '../core/logger';
 import { db } from '../firebase/firebase';
 import {
   createRecurringTaskFromCompleted,
@@ -25,6 +26,8 @@ import {
   shouldCreateRecurringTaskOnSkip,
 } from '../maintenance/maintenance-utils';
 import { removeUndefined } from './firestore-utils';
+
+const logger = getLogger('Firestore');
 
 const computeTaskStatus = (task: MaintenanceTask): MaintenanceTask => {
   // If already in a terminal state, leave unchanged
@@ -196,7 +199,7 @@ export const updateMaintenanceTask = async (
 
       return newRecurringTask;
     } catch (error) {
-      console.error('Failed to create recurring task:', error);
+      logger.error('Failed to create recurring task:', error);
       // Don't fail the original update if recurring task creation fails
     }
   }
@@ -217,7 +220,7 @@ export const updateMaintenanceTask = async (
 
       return newRecurringTask;
     } catch (error) {
-      console.error('Failed to create recurring task from skipped task:', error);
+      logger.error('Failed to create recurring task from skipped task:', error);
       // Don't fail the original update if recurring task creation fails
     }
   }

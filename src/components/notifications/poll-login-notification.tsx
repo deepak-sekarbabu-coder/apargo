@@ -5,8 +5,11 @@ import { useAuth } from '@/context/auth-context';
 import { useEffect, useState } from 'react';
 
 import { listenToUnvotedPolls } from '@/lib/community/poll-utils';
+import { getLogger } from '@/lib/core/logger';
 import { Poll } from '@/lib/core/types';
 import { voteOnPoll } from '@/lib/firestore/polls';
+
+const logger = getLogger('Component');
 
 import { Button } from '@/components/ui/button';
 import {
@@ -122,7 +125,7 @@ export function PollLoginNotification() {
 
       // Listener will handle updating the state and showing next notification if any
     } catch (error) {
-      console.error('Error voting on poll:', error);
+      logger.error('Error voting on poll:', error);
       setError(error instanceof Error ? error.message : 'Failed to submit vote');
     } finally {
       setSubmitting(false);

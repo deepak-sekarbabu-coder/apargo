@@ -4,11 +4,13 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import * as React from 'react';
 
-import log from '@/lib/core/logger';
+import { getLogger } from '@/lib/core/logger';
 import type { Apartment, Category, Expense, User } from '@/lib/core/types';
 import { addExpense, deleteExpense } from '@/lib/firestore/expenses';
 
 import { useToast } from '@/hooks/use-toast';
+
+const logger = getLogger('Hook');
 
 interface UseExpenseHandlersProps {
   user: User | null;
@@ -46,7 +48,7 @@ export function useExpenseHandlers({
 
       // Check if apartments data is loaded
       if (!apartments || apartments.length === 0) {
-        console.warn('handleAddExpense called but apartments array is empty:', {
+        logger.warn('handleAddExpense called but apartments array is empty:', {
           apartments,
           apartmentsLoading,
         });
@@ -137,7 +139,7 @@ export function useExpenseHandlers({
           description: successMessage,
         });
       } catch (error) {
-        console.error('❌ Error adding expense:', error);
+        logger.error('Error adding expense:', error);
 
         // Remove the temporary expense from cache since the operation failed
         queryClient.setQueryData<Expense[]>(['expenses', user.apartment], (oldExpenses = []) =>
@@ -150,8 +152,6 @@ export function useExpenseHandlers({
 
         // Remove from local state too
         setExpenses(prev => prev.filter(e => !e.id.startsWith('temp-')));
-
-        log.error('Error adding expense:', error);
         toast({
           title: 'Error',
           description: 'Failed to add expense. Please try again.',
@@ -175,7 +175,7 @@ export function useExpenseHandlers({
           description: 'The expense has been successfully removed.',
         });
       } catch (error) {
-        console.error('Error deleting expense:', error);
+        logger.error('Error deleting expense:', error);
         toast({
           title: 'Error',
           description: 'Failed to delete expense.',
@@ -220,7 +220,7 @@ export function useExpenseHandlers({
         }
       } catch (err) {
         // Non-fatal: guard against queryClient not being initialised in some contexts
-        console.error('Failed to update react-query cache for expenses:', err);
+        logger.error('Failed to update react-query cache for expenses:', err);
       }
     },
     [user, queryClient]

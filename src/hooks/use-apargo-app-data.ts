@@ -3,6 +3,7 @@ import { useQueryClient } from '@tanstack/react-query';
 
 import { useEffect, useRef, useState } from 'react';
 
+import { getLogger } from '@/lib/core/logger';
 import type { Apartment, BalanceSheet, Category, Expense, Payment, User } from '@/lib/core/types';
 import { getApartments } from '@/lib/firestore/apartments';
 import { subscribeToCategories } from '@/lib/firestore/categories';
@@ -14,6 +15,8 @@ import {
 import { subscribeToPayments } from '@/lib/firestore/payments';
 import { subscribeToAllUsers, subscribeToUsers } from '@/lib/firestore/users';
 import { requestNotificationPermission } from '@/lib/notifications/push-notifications';
+
+const logger = getLogger('Hook');
 
 interface Subscription {
   unsubscribe: () => void;
@@ -105,7 +108,7 @@ function useDataSubscriptionManager(
         const apartments = await getApartments();
         handlers.onApartments(apartments);
       } catch (err) {
-        console.error('Error fetching apartments:', err);
+        logger.error('Error fetching apartments:', err);
       }
     };
 
@@ -115,7 +118,7 @@ function useDataSubscriptionManager(
         unsubscribes.push(() => subscription.unsubscribe());
       })
       .catch(err => {
-        console.error('Error subscribing to categories:', err);
+        logger.error('Error subscribing to categories:', err);
       });
 
     // Conditional subscriptions based on user role/apartment
@@ -136,7 +139,7 @@ function useDataSubscriptionManager(
           );
         })
         .catch(err => {
-          console.error('Error setting up admin subscriptions:', err);
+          logger.error('Error setting up admin subscriptions:', err);
         });
     } else if (user?.apartment) {
       // Regular user subscriptions
@@ -155,7 +158,7 @@ function useDataSubscriptionManager(
           );
         })
         .catch(err => {
-          console.error('Error setting up user subscriptions:', err);
+          logger.error('Error setting up user subscriptions:', err);
         });
     }
 

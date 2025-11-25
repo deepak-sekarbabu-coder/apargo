@@ -2,7 +2,10 @@ import { getFirestore } from 'firebase-admin/firestore';
 
 import { NextResponse } from 'next/server';
 
+import { getLogger } from '@/lib/core/logger';
 import { getFirebaseAdminApp } from '@/lib/firebase/firebase-admin';
+
+const logger = getLogger('API:DebugData');
 
 interface UserData {
   id: string;
@@ -75,7 +78,7 @@ export async function GET() {
       notificationCount: notifications.length,
     });
   } catch (error) {
-    console.error('Error in debug endpoint:', error);
+    logger.error('Error in debug endpoint:', error);
     return NextResponse.json(
       {
         success: false,

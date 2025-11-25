@@ -2,8 +2,11 @@
 
 import * as React from 'react';
 
+import { getLogger } from '@/lib/core/logger';
 import { AnnouncementNotification } from '@/lib/core/types';
 import { deleteAnnouncement, listenToActiveAnnouncements } from '@/lib/firestore/announcements';
+
+const logger = getLogger('Component');
 
 import { AnnouncementCard } from './announcement-card';
 import { AnnouncementsEmpty } from './announcements-empty';
@@ -28,7 +31,7 @@ export function ActiveAnnouncements() {
     try {
       await deleteAnnouncement(announcementId);
     } catch (error) {
-      console.error('Error deleting announcement:', error);
+      logger.error('Error deleting announcement:', error);
     } finally {
       setDeletingId(null);
     }

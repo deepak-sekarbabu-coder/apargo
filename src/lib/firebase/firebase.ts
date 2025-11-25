@@ -3,6 +3,10 @@ import { getApp, getApps, initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { Firestore, getFirestore, initializeFirestore } from 'firebase/firestore';
 
+import { getLogger } from '../core/logger';
+
+const logger = getLogger('Firebase');
+
 // Your web app's Firebase configuration
 // Use environment variables to ensure consistency between client and server
 const firebaseConfig = {
@@ -42,7 +46,7 @@ if (!isNodeEnvironment) {
       db = getFirestore(app);
     } else {
       // Handle other initialization errors
-      console.warn('initializeFirestore failed, falling back to getFirestore:', error);
+      logger.warn('initializeFirestore failed, falling back to getFirestore:', error);
       db = getFirestore(app);
     }
   }

@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 
+import { getLogger } from '@/lib/core/logger';
 import { getFaults } from '@/lib/firestore/faults';
+
+const logger = getLogger('API:Faults');
 
 export async function GET() {
   try {
@@ -12,7 +15,7 @@ export async function GET() {
       faults: faults,
     });
   } catch (error) {
-    console.error('❌ API: Error fetching faults:', error);
+    logger.error('❌ API: Error fetching faults:', error);
     return NextResponse.json(
       {
         success: false,

@@ -4,8 +4,11 @@ import { useAuth } from '@/context/auth-context';
 
 import * as React from 'react';
 
+import { getLogger } from '@/lib/core/logger';
 import { Poll } from '@/lib/core/types';
 import { deletePoll, listenToPolls } from '@/lib/firestore/polls';
+
+const logger = getLogger('Component');
 
 import { PollCard } from './poll-card';
 import { PollsEmpty } from './polls-empty';
@@ -35,7 +38,7 @@ export function ActivePolls() {
     try {
       await deletePoll(pollId, user ? { id: user.id, role: user.role } : undefined);
     } catch (error) {
-      console.error('Error deleting poll:', error);
+      logger.error('Error deleting poll:', error);
     } finally {
       setDeletingId(null);
     }

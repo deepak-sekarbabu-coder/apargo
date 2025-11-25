@@ -2,6 +2,7 @@
 
 import * as React from 'react';
 
+import { getLogger } from '@/lib/core/logger';
 import type { Category, Payment, PollOption, User } from '@/lib/core/types';
 import { addCategory, deleteCategory, updateCategory } from '@/lib/firestore/categories';
 import { addPayment, updatePayment } from '@/lib/firestore/payments';
@@ -10,6 +11,8 @@ import { addUser, deleteUser, updateUser } from '@/lib/firestore/users';
 import { uploadImage } from '@/lib/storage/storage';
 
 import { useToast } from '@/hooks/use-toast';
+
+const logger = getLogger('Hook');
 
 interface UseDataHandlersProps {
   user: User | null;
@@ -202,7 +205,7 @@ export function useDataHandlers({
           const path = `receipts/${Date.now()}_${data.receiptFile.name}`;
           receiptURL = await uploadImage(data.receiptFile, path);
         } catch (err) {
-          console.error('Receipt upload failed:', err);
+          logger.error('Receipt upload failed:', err);
           toast({
             title: 'Upload Failed',
             description: 'Failed to upload receipt. Please try again.',
@@ -252,7 +255,7 @@ export function useDataHandlers({
           description: `Payment of ₹${data.amount} has been submitted for approval.`,
         });
       } catch (error) {
-        console.error('Failed to add payment:', error);
+        logger.error('Failed to add payment:', error);
         toast({
           title: 'Error',
           description: 'Failed to add payment. Please try again.',

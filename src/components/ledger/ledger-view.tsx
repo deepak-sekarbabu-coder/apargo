@@ -4,9 +4,12 @@ import { BarChart3, CreditCard } from 'lucide-react';
 
 import * as React from 'react';
 
+import { getLogger } from '@/lib/core/logger';
 import type { BalanceSheet, Payment, User } from '@/lib/core/types';
 import { addPayment, deletePayment, updatePayment } from '@/lib/firestore/payments';
 import { uploadImage } from '@/lib/storage/storage';
+
+const logger = getLogger('Component');
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -116,7 +119,7 @@ export function LedgerView({ payments, users }: LedgerViewProps) {
           const path = `receipts/${Date.now()}_${data.receiptFile.name}`;
           receiptURL = await uploadImage(data.receiptFile, path);
         } catch (err) {
-          console.error('Receipt upload failed:', err);
+          logger.error('Receipt upload failed:', err);
           // Re-throw so caller can surface error if needed
           throw err;
         }
