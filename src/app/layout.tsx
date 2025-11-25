@@ -12,7 +12,7 @@ import './globals.css';
 const inter = Inter({
   subsets: ['latin'],
   variable: '--font-inter', // Define a CSS variable for the font
-  display: 'swap', // Use swap for better performance
+  display: 'fallback', // Use fallback to avoid preload warnings on pages that don't immediately use the font
 });
 
 // Global metadata (Next.js will inject <title> and <meta name="description"> automatically)
