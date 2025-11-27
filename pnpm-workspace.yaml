@@ -5,3 +5,6 @@ onlyBuiltDependencies:
   - protobufjs
   - sharp
   - unrs-resolver
+
+overrides:
+  node-forge@<1.3.2: '>=1.3.2'
