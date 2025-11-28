@@ -19,7 +19,6 @@ import type { ApartmentBalance } from '@/lib/expense-management/balance-calculat
 import { CommunityView } from '@/components/community/community-view';
 import { DashboardView } from '@/components/dashboard/dashboard-view';
 import { ExpensesList } from '@/components/expense-management/all-expenses/expenses-list';
-import { ExpenseAnalyticsView } from '@/components/expense-management/analytics/expense-analytics-view';
 import { FaultView } from '@/components/fault-management/fault-view';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -50,6 +49,24 @@ const AdminView = dynamic(
 const MaintenanceView = dynamic(
   () => import('@/components/maintenance/maintenance-view').then(mod => mod.MaintenanceView),
   { ssr: false }
+);
+
+const ExpenseAnalyticsView = dynamic(
+  () =>
+    import('@/components/expense-management/analytics/expense-analytics-view').then(
+      mod => mod.ExpenseAnalyticsView
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading analytics...</p>
+        </div>
+      </div>
+    ),
+  }
 );
 
 interface MainContentProps {
