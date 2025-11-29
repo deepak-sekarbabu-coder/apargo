@@ -11,6 +11,8 @@ import { deleteFault, getFaults, updateFault } from '@/lib/firestore/faults';
 import { getUsers } from '@/lib/firestore/users';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { CardSkeleton } from '@/components/ui/loading-states';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { useToast } from '@/hooks/use-toast';
@@ -160,22 +162,15 @@ export function FaultView() {
       <div className="space-y-6">
         <div className="grid gap-6 md:grid-cols-3">
           {[...Array(3)].map((_, i) => (
-            <Card key={i}>
-              <CardHeader>
-                <div className="h-4 bg-muted animate-pulse rounded" />
-              </CardHeader>
-              <CardContent>
-                <div className="h-8 bg-muted animate-pulse rounded" />
-              </CardContent>
-            </Card>
+            <CardSkeleton key={i} />
           ))}
         </div>
         <Card>
           <CardHeader>
-            <div className="h-6 bg-muted animate-pulse rounded w-1/3" />
+            <Skeleton className="h-6 w-1/3" />
           </CardHeader>
           <CardContent>
-            <div className="h-40 bg-muted animate-pulse rounded" />
+            <Skeleton className="h-40 w-full" />
           </CardContent>
         </Card>
       </div>

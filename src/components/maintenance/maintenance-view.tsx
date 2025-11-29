@@ -13,6 +13,8 @@ import { deleteVendor } from '@/lib/firestore/vendors';
 import { MaintenanceTaskDialog } from '@/components/dialogs/maintenance-task-dialog';
 import { VendorDialog } from '@/components/dialogs/vendor-dialog';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { CardSkeleton } from '@/components/ui/loading-states';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 import { toast } from '@/hooks/use-toast';
@@ -143,22 +145,15 @@ function MaintenanceViewContent() {
       <div className="space-y-6">
         <div className="grid gap-6 md:grid-cols-2">
           {[...Array(2)].map((_, i) => (
-            <Card key={i}>
-              <CardHeader>
-                <div className="h-4 bg-muted animate-pulse rounded" />
-              </CardHeader>
-              <CardContent>
-                <div className="h-8 bg-muted animate-pulse rounded" />
-              </CardContent>
-            </Card>
+            <CardSkeleton key={i} />
           ))}
         </div>
         <Card>
           <CardHeader>
-            <div className="h-6 bg-muted animate-pulse rounded w-1/3" />
+            <Skeleton className="h-6 w-1/3" />
           </CardHeader>
           <CardContent>
-            <div className="h-40 bg-muted animate-pulse rounded" />
+            <Skeleton className="h-40 w-full" />
           </CardContent>
         </Card>
       </div>

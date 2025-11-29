@@ -8,6 +8,8 @@ import { useRouter } from 'next/navigation';
 
 import log from '@/lib/core/logger';
 
+import { PageLoading } from '@/components/ui/loading-states';
+
 interface RouteGuardProps {
   children: React.ReactNode;
   requiredRole?: 'admin' | 'user';
@@ -40,14 +42,7 @@ export function RouteGuard({ children, requiredRole }: RouteGuardProps): React.R
 
   // Show loading state while checking authentication
   if (loading || !mounted) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-current"></div>
-          <p className="mt-4 text-gray-600 dark:text-gray-400">Loading...</p>
-        </div>
-      </div>
-    );
+    return <PageLoading text="Verifying session..." />;
   }
 
   // Don't render children if not authenticated or role doesn't match
