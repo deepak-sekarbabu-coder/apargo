@@ -85,29 +85,24 @@ export function MaintenancePaymentStatus({
       });
     }
 
-    // Check previous months (up to 12 months back)
-    const now = new Date();
-    for (let i = 1; i <= 12; i++) {
-      const checkDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
-      const checkMonthYear = checkDate.toISOString().slice(0, 7);
-      const monthPayments = paymentsByMonth[checkMonthYear] || [];
+    // Check only months that have maintenance charges generated (from paymentsByMonth)
+    Object.entries(paymentsByMonth).forEach(([monthKey, monthPayments]) => {
+      if (monthKey === monthYear) return; // Already checked current month above
 
-      if (monthPayments.length > 0) {
-        const owed = monthPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
-        const paid = monthPayments
-          .filter(p => p.status === 'paid' || p.status === 'approved')
-          .reduce((sum, p) => sum + (p.amount || 0), 0);
+      const owed = monthPayments.reduce((sum, p) => sum + (p.amount || 0), 0);
+      const paid = monthPayments
+        .filter(p => p.status === 'paid' || p.status === 'approved')
+        .reduce((sum, p) => sum + (p.amount || 0), 0);
 
-        if (paid < owed) {
-          unpaid.push({
-            monthYear: checkMonthYear,
-            payments: monthPayments,
-            totalOwed: owed,
-            totalPaid: paid,
-          });
-        }
+      if (paid < owed) {
+        unpaid.push({
+          monthYear: monthKey,
+          payments: monthPayments,
+          totalOwed: owed,
+          totalPaid: paid,
+        });
       }
-    }
+    });
 
     return unpaid.sort((a, b) => b.monthYear.localeCompare(a.monthYear)); // Most recent first
   }, [paymentsByMonth, monthYear, defaultMonthlyAmount]);
